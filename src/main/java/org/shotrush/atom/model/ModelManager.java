@@ -246,15 +246,19 @@ public class ModelManager {
             
             if (loaded != null && !loaded.isEmpty()) {
                 plugin.getLogger().info("Loading " + loaded.size() + " placed models...");
+                placedModels.clear();
                 int successCount = 0;
                 for (PlacedModel placed : loaded) {
                     try {
                         Location loc = placed.toLocation();
                         if (loc != null && loc.getWorld() != null) {
-                            DisplayGroup group = spawnModel(placed.getModelId(), loc);
-                            if (group != null) {
-                                placedModels.put(group.getId(), placed);
-                                successCount++;
+                            DisplayModel modelData = loadModel(placed.getModelId()).orElse(null);
+                            if (modelData != null) {
+                                DisplayGroup group = spawnModelInternal(modelData, loc);
+                                if (group != null) {
+                                    placedModels.put(group.getId(), placed);
+                                    successCount++;
+                                }
                             }
                         }
                     } catch (Exception e) {
@@ -266,6 +270,74 @@ public class ModelManager {
         } catch (Exception e) {
             plugin.getLogger().warning("Failed to load placed models file: " + e.getMessage());
         }
+    }
+    
+    private DisplayGroup spawnModelInternal(DisplayModel model, Location location) {
+        var dm = Atom.getInstance().getDisplayManager();
+        
+        DisplayGroup group = dm.createDisplayGroup(location);
+        
+        Location rootLoc = location.clone();
+        
+        BlockDisplay root = (BlockDisplay) location.getWorld()
+            .spawnEntity(rootLoc, org.bukkit.entity.EntityType.BLOCK_DISPLAY);
+        root.setBlock(org.bukkit.Material.AIR.createBlockData());
+        
+        Location spawnLoc = location.clone();
+        spawnLoc.setYaw(0);
+        spawnLoc.setPitch(0);
+        
+        for (DisplayModel.DisplayPart part : model.getParts()) {
+            org.bukkit.entity.Display display = createDisplayFromPart(part, spawnLoc);
+            if (display != null) {
+                group.addDisplay(display);
+            }
+        }
+        
+        group.setRoot(root);
+        
+        return group;
+    }
+    
+    private org.bukkit.entity.Display createDisplayFromPart(DisplayModel.DisplayPart part, Location location) {
+        org.bukkit.entity.Display display;
+        
+        if ("item_display".equals(part.getType())) {
+            org.bukkit.entity.ItemDisplay itemDisplay = (org.bukkit.entity.ItemDisplay) location.getWorld()
+                .spawnEntity(location, org.bukkit.entity.EntityType.ITEM_DISPLAY);
+            
+            org.bukkit.inventory.ItemStack item = new org.bukkit.inventory.ItemStack(part.getMaterial());
+            
+            if (part.getItemNbt() != null && !part.getItemNbt().isEmpty()) {
+                try {
+                    item = org.bukkit.inventory.ItemStack.deserializeBytes(
+                        java.util.Base64.getDecoder().decode(part.getItemNbt())
+                    );
+                } catch (Exception e) {
+                    plugin.getLogger().warning("Failed to deserialize item NBT: " + e.getMessage());
+                }
+            }
+            
+            itemDisplay.setItemStack(item);
+            display = itemDisplay;
+        } else {
+            org.bukkit.entity.BlockDisplay blockDisplay = (org.bukkit.entity.BlockDisplay) location.getWorld()
+                .spawnEntity(location, org.bukkit.entity.EntityType.BLOCK_DISPLAY);
+            org.bukkit.block.data.BlockData blockData = org.bukkit.Bukkit.createBlockData(part.getBlockState());
+            blockDisplay.setBlock(blockData);
+            display = blockDisplay;
+        }
+        
+        DisplayModel.TransformData t = part.getTransform();
+        org.bukkit.util.Transformation transform = new org.bukkit.util.Transformation(
+            new org.joml.Vector3f(t.getTranslation()[0], t.getTranslation()[1], t.getTranslation()[2]),
+            new org.joml.Quaternionf(t.getLeftRotation()[0], t.getLeftRotation()[1], t.getLeftRotation()[2], t.getLeftRotation()[3]),
+            new org.joml.Vector3f(t.getScale()[0], t.getScale()[1], t.getScale()[2]),
+            new org.joml.Quaternionf(t.getRightRotation()[0], t.getRightRotation()[1], t.getRightRotation()[2], t.getRightRotation()[3])
+        );
+        display.setTransformation(transform);
+        
+        return display;
     }
     
     public void removePlacedModel(java.util.UUID groupId) {

@@ -118,6 +118,11 @@ public class DisplayGroup {
         this.isRotating = true;
         this.rotationSpeed = degreesPerSecond;
         this.rotationAxis = axis.toLowerCase();
+
+        if (org.shotrush.atom.Atom.getInstance().getRotationCollisionListener() != null) {
+            org.shotrush.atom.Atom.getInstance().getRotationCollisionListener()
+                .registerRotatingGroup(this.id, degreesPerSecond, axis);
+        }
         
         long intervalTicks = 1;
         float degreesPerTick = degreesPerSecond / 20.0f * intervalTicks;
@@ -129,6 +134,10 @@ public class DisplayGroup {
             rootEntity.getLocation(),
             () -> {
                 if (!isRotating || rootEntity == null) return;
+                
+                if (plugin.getRotationCollisionListener() != null) {
+                    plugin.getRotationCollisionListener().checkCollisionsForGroup(this);
+                }
                 
                 org.joml.Quaternionf rotation = switch (rotationAxis) {
                     case "x" -> new org.joml.Quaternionf().rotateX((float) Math.toRadians(degreesPerTick));
@@ -161,8 +170,13 @@ public class DisplayGroup {
     }
     
     public void stopContinuousRotation() {
+        if (!isRotating) return;
         isRotating = false;
         rotationSpeed = 0f;
+        if (org.shotrush.atom.Atom.getInstance().getRotationCollisionListener() != null) {
+            org.shotrush.atom.Atom.getInstance().getRotationCollisionListener()
+                .unregisterRotatingGroup(this.id);
+        }
     }
     
     public boolean isContinuouslyRotating() {
