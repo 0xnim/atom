@@ -2,81 +2,57 @@ package org.shotrush.atom;
 
 import co.aikar.commands.PaperCommandManager;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.shotrush.atom.command.*;
-import org.shotrush.atom.core.*;
-import org.shotrush.atom.display.*;
-import org.shotrush.atom.world.*;
-import org.shotrush.atom.player.*;
-import org.shotrush.atom.recipe.*;
-import org.shotrush.atom.test.*;
+import org.shotrush.atom.core.age.AgeManager;
+import org.shotrush.atom.cog.CogListener;
+import org.shotrush.atom.commands.AgeCommand;
+import org.shotrush.atom.commands.CogCommand;
+import org.shotrush.atom.core.storage.DataStorage;
 
 public final class Atom extends JavaPlugin {
-    @Getter private static Atom instance;
-    @Getter private DataManager dataManager;
-    @Getter private DisplayEntityManager displayManager;
-    @Getter private org.shotrush.atom.model.ModelManager modelManager;
-    @Getter private InteractionManager interactionManager;
-    @Getter private WorldModificationManager worldManager;
-    @Getter private PlayerCustomizationManager playerManager;
-    @Getter private CustomRecipeManager recipeManager;
-    @Getter private SchedulerManager schedulerManager;
-    @Getter private SelfTestManager testManager;
-    @Getter private org.shotrush.atom.listener.DisplayRotationCollisionListener rotationCollisionListener;
-    @Getter private PerformanceMonitor performanceMonitor;
-    @Getter private CustomItemManager itemManager;
-    
+
+    @Getter
+    private static Atom instance;
+
+    @Getter
+    private DataStorage dataStorage;
+
+    @Getter
+    private AgeManager ageManager;
+
+    @Getter
+    private CogListener cogListener;
+
+    private PaperCommandManager commandManager;
+
     @Override
     public void onEnable() {
         instance = this;
-        long start = System.currentTimeMillis();
-        
-        schedulerManager = new SchedulerManager(this);
-        performanceMonitor = new PerformanceMonitor(this);
-        dataManager = new DataManager(this);
-        displayManager = new DisplayEntityManager(this);
-        interactionManager = new InteractionManager(this);
-        worldManager = new WorldModificationManager(this);
-        playerManager = new PlayerCustomizationManager(this);
-        itemManager = new CustomItemManager(this);
-        recipeManager = new CustomRecipeManager(this);
-        modelManager = new org.shotrush.atom.model.ModelManager(this);
-        testManager = new SelfTestManager(this);
-        rotationCollisionListener = new org.shotrush.atom.listener.DisplayRotationCollisionListener();
-        
-        worldManager.initialize();
-        playerManager.initialize();
-        recipeManager.initialize();
-        displayManager.initialize();
-        interactionManager.initialize();
-        performanceMonitor.startMonitoring();
-        modelManager.listModels();
-        
-        PaperCommandManager commandManager = new PaperCommandManager(this);
-        commandManager.registerCommand(new ModelCommand());
 
-        commandManager.getCommandCompletions().registerCompletion("models", c -> 
-            modelManager.getModels().asMap().keySet());
-        
-        getServer().getPluginManager().registerEvents(new org.shotrush.atom.listener.ModelPlaceListener(), this);
-        getServer().getPluginManager().registerEvents(new org.shotrush.atom.listener.DisplayCollisionListener(), this);
-        getServer().getPluginManager().registerEvents(new org.shotrush.atom.listener.ModelLoadListener(), this);
-        
-        getCommand("atom").setExecutor(new AtomCommand());
-        getCommand("atom").setTabCompleter(new AtomCommand());
-        
-        testManager.runTests();
-        
-        getLogger().info("Atom initialized in " + (System.currentTimeMillis() - start) + "ms");
+        dataStorage = new DataStorage(this);
+        ageManager = new AgeManager(this, dataStorage);
+        cogListener = new CogListener(this);
+
+        getServer().getPluginManager().registerEvents(cogListener, this);
+
+        setupCommands();
+
+        getLogger().info("Atom plugin has been enabled!");
     }
-    
+
+    private void setupCommands() {
+        commandManager = new PaperCommandManager(this);
+
+        commandManager.getCommandCompletions().registerCompletion("ages", context ->
+                ageManager.getAllAges().stream().map(age -> age.getId()).toList()
+        );
+
+        commandManager.registerCommand(new AgeCommand(this));
+        commandManager.registerCommand(new CogCommand());
+    }
+
     @Override
     public void onDisable() {
-        if (displayManager != null) displayManager.shutdown();
-        if (worldManager != null) worldManager.shutdown();
-        if (playerManager != null) playerManager.shutdown();
-        if (recipeManager != null) recipeManager.shutdown();
-        getLogger().info("Atom disabled");
+        getLogger().info("Atom plugin has been disabled!");
     }
 }

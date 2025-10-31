@@ -4,15 +4,4 @@ main: org.shotrush.atom.Atom
 api-version: '1.21'
 folia-supported: true
 authors: [ShotRush]
-description: Robust core for hyper-realistic survival with display entity support
 website: https://github.com/ShotRush/atom
-
-commands:
-  atom:
-    description: Main Atom command
-    usage: /atom <subcommand>
-    aliases: [atm]
-  tfc:
-    description: TFC command
-    usage: /tfc <subcommand>
-    aliases: [terrafirmacraft]
