@@ -1,15 +1,13 @@
 package org.shotrush.atom.content.foragingage.workstations;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
 import org.checkerframework.checker.units.qual.A;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
@@ -44,17 +42,15 @@ public class KnappingStation extends InteractiveSurface {
     }
 
     @Override
-    public void spawn(Atom plugin) {
-        Bukkit.getRegionScheduler().run(plugin, spawnLocation, task -> {
-            ItemDisplay display = (ItemDisplay) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.ITEM_DISPLAY);
-            ItemStack stationItem = createItemWithCustomModel(Material.DIAMOND, "knapping_station");
-            
-            spawnDisplay(display, plugin, stationItem, new Vector3f(0, 0.5f, 0), new AxisAngle4f(), new Vector3f(1f, 1f, 1f), false, 0.65f, 0.75f);
-            
-            for (PlacedItem item : placedItems) {
-                spawnItemDisplay(item);
-            }
-        });
+    public void spawn(Atom plugin, RegionAccessor accessor) {
+        ItemDisplay display = (ItemDisplay) accessor.spawnEntity(spawnLocation, EntityType.ITEM_DISPLAY);
+        ItemStack stationItem = createItemWithCustomModel(Material.DIAMOND, "knapping_station");
+
+        spawnDisplay(display, plugin, stationItem, new Vector3f(0, 0.5f, 0), new AxisAngle4f(), new Vector3f(1f, 1f, 1f), false, 0.65f, 0.75f);
+
+        for (PlacedItem item : placedItems) {
+            spawnItemDisplay(item);
+        }
     }
 
     @Override
@@ -63,14 +59,14 @@ public class KnappingStation extends InteractiveSurface {
         Bukkit.getRegionScheduler().run(Atom.getInstance(), itemLoc, task -> {
             ItemDisplay display = (ItemDisplay) itemLoc.getWorld().spawnEntity(itemLoc, EntityType.ITEM_DISPLAY);
             display.setItemStack(item.getItem());
-            
+
             AxisAngle4f flatRotation = new AxisAngle4f((float) Math.toRadians(90), 1, 0, 0);
-            
+
             display.setTransformation(new org.bukkit.util.Transformation(
-                new Vector3f(0, 0, 0),
-                flatRotation,
-                new Vector3f(0.5f, 0.5f, 0.5f),
-                new AxisAngle4f()
+                    new Vector3f(0, 0, 0),
+                    flatRotation,
+                    new Vector3f(0.5f, 0.5f, 0.5f),
+                    new AxisAngle4f()
             ));
             item.setDisplayUUID(display.getUniqueId());
         });
@@ -85,7 +81,8 @@ public class KnappingStation extends InteractiveSurface {
     }
 
     @Override
-    public void update(float globalAngle) {}
+    public void update(float globalAngle) {
+    }
 
     @Override
     public void remove() {
@@ -109,7 +106,7 @@ public class KnappingStation extends InteractiveSurface {
     @Override
     public boolean onWrenchInteract(Player player, boolean sneaking) {
         ItemStack hand = player.getInventory().getItemInMainHand();
-        
+
         if (hand.getType() == Material.BRUSH) {
             if (!placedItems.isEmpty()) {
                 player.swingMainHand();
@@ -119,7 +116,7 @@ public class KnappingStation extends InteractiveSurface {
             }
             return false;
         }
-        
+
         if (sneaking) {
             ItemStack removed = removeLastItem();
             if (removed != null) {
@@ -128,10 +125,10 @@ public class KnappingStation extends InteractiveSurface {
             }
             return false;
         }
-        
+
         if (hand.getType() == Material.WOODEN_HOE || hand.getType() == Material.AIR) return false;
         if (hand.getType() != Material.FLINT) return false;
-        
+
         if (placeItem(hand, calculatePlacement(player, placedItems.size()), 0)) {
             hand.setAmount(hand.getAmount() - 1);
             return true;
@@ -157,8 +154,8 @@ public class KnappingStation extends InteractiveSurface {
     @Override
     public String[] getLore() {
         return new String[]{
-            "§7Knap flint into tools",
-            "§8Use brush to knap"
+                "§7Knap flint into tools",
+                "§8Use brush to knap"
         };
     }
 
@@ -167,10 +164,10 @@ public class KnappingStation extends InteractiveSurface {
         try {
             String[] parts = data.split(";");
             World world = Bukkit.getWorld(parts[0]);
-            Location location = new Location(world, 
-                Double.parseDouble(parts[1]),
-                Double.parseDouble(parts[2]),
-                Double.parseDouble(parts[3])
+            Location location = new Location(world,
+                    Double.parseDouble(parts[1]),
+                    Double.parseDouble(parts[2]),
+                    Double.parseDouble(parts[3])
             );
             BlockFace face = BlockFace.valueOf(parts[4]);
             return new KnappingStation(location, face);
