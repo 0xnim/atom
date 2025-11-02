@@ -23,12 +23,12 @@ public class PlayerTemperatureSystem implements Listener {
     
     private final Plugin plugin;
     private final Map<UUID, Double> playerTemperatures = new HashMap<>();
-    private final Map<UUID, Double> lastTemperatures = new HashMap<>();
     
     private static final double NORMAL_TEMP = 37.0;
-    private static final double MAX_TEMP = 45.0;
-    private static final double MIN_TEMP = 25.0;
-    private static final double SHOCK_THRESHOLD = 3.0;
+    private static final double MAX_TEMP = 42.0;
+    private static final double MIN_TEMP = 32.0;
+    private static final double COMFORTABLE_RANGE = 2.0;
+    private static final double WARNING_RANGE = 3.0;
     
     public PlayerTemperatureSystem(Plugin plugin) {
         this.plugin = plugin;
@@ -45,7 +45,6 @@ public class PlayerTemperatureSystem implements Listener {
         double savedTemp = config.getDouble("temperature.body", NORMAL_TEMP);
         
         playerTemperatures.put(playerId, savedTemp);
-        lastTemperatures.put(playerId, savedTemp);
         startTemperatureTickForPlayer(player);
     }
     
@@ -62,7 +61,6 @@ public class PlayerTemperatureSystem implements Listener {
         org.shotrush.atom.Atom.getInstance().getDataStorage().savePlayerData(playerId, config);
         
         playerTemperatures.remove(playerId);
-        lastTemperatures.remove(playerId);
     }
     
     private void startTemperatureTickForPlayer(Player player) {
@@ -78,88 +76,58 @@ public class PlayerTemperatureSystem implements Listener {
     private void updatePlayerTemperature(Player player) {
         UUID playerId = player.getUniqueId();
         double currentTemp = playerTemperatures.getOrDefault(playerId, NORMAL_TEMP);
-        double lastTemp = lastTemperatures.getOrDefault(playerId, currentTemp);
         org.bukkit.Location loc = player.getLocation();
         
-        double tempChange = org.shotrush.atom.core.api.EnvironmentalFactorAPI
-            .calculateEnvironmentalTemperatureChange(player, loc, 0.002);
+        double envChange = org.shotrush.atom.core.api.EnvironmentalFactorAPI
+            .calculateEnvironmentalTemperatureChange(player, loc, 0.01);
         
         double armorInsulation = org.shotrush.atom.core.api.ArmorProtectionAPI.getInsulationValue(player);
-        tempChange *= (1.0 - armorInsulation);
+        envChange *= (1.0 - armorInsulation * 0.7);
         
-        if (currentTemp > NORMAL_TEMP) {
-            tempChange -= 0.003;
-        } else if (currentTemp < NORMAL_TEMP) {
-            tempChange += 0.002;
+        double naturalRegulation = 0.0;
+        double tempDiff = currentTemp - NORMAL_TEMP;
+        double deviation = Math.abs(tempDiff);
+        
+        if (deviation > COMFORTABLE_RANGE) {
+            naturalRegulation = -tempDiff * 0.12;
+            
+            double regulationCost = deviation * 0.015;
+            
+            if (Math.random() < regulationCost) {
+                int currentHunger = player.getFoodLevel();
+                if (currentHunger > 0) {
+                    player.setFoodLevel(Math.max(0, currentHunger - 1));
+                }
+                
+                ThirstSystem thirstSystem = ThirstSystem.getInstance();
+                if (thirstSystem != null) {
+                    int currentThirst = thirstSystem.getThirst(player);
+                    if (currentThirst > 0) {
+                        thirstSystem.addThirst(player, -1);
+                    }
+                }
+            }
         }
         
-        double newTemp = Math.max(MIN_TEMP, Math.min(MAX_TEMP, currentTemp + tempChange));
+        double totalChange = envChange + naturalRegulation;
+        totalChange = Math.max(-0.2, Math.min(0.2, totalChange));
         
-        double tempDelta = Math.abs(newTemp - lastTemp);
-        if (tempDelta >= SHOCK_THRESHOLD) {
-            applyTemperatureShock(player, tempDelta, newTemp > lastTemp);
-            lastTemperatures.put(playerId, newTemp);
-        }
+        double newTemp = Math.max(MIN_TEMP, Math.min(MAX_TEMP, currentTemp + totalChange));
         
         playerTemperatures.put(playerId, newTemp);
         
         applyTemperatureEffects(player, newTemp);
     }
     
-    private void applyTemperatureShock(Player player, double delta, boolean heating) {
-        if (heating) {
-            if (delta >= 5.0) {
-                player.addPotionEffect(new org.bukkit.potion.PotionEffect(
-                    org.bukkit.potion.PotionEffectType.NAUSEA, 200, 1, false, false
-                ));
-                player.addPotionEffect(new org.bukkit.potion.PotionEffect(
-                    org.bukkit.potion.PotionEffectType.WEAKNESS, 200, 1, false, false
-                ));
-                player.addPotionEffect(new org.bukkit.potion.PotionEffect(
-                    PotionEffectType.NAUSEA, 100, 0, false, false
-                ));
-                player.damage(3.0);
-            } else if (delta >= 3.0) {
-                player.addPotionEffect(new org.bukkit.potion.PotionEffect(
-                    org.bukkit.potion.PotionEffectType.NAUSEA, 100, 0, false, false
-                ));
-                player.addPotionEffect(new org.bukkit.potion.PotionEffect(
-                    org.bukkit.potion.PotionEffectType.WEAKNESS, 100, 0, false, false
-                ));
-                player.damage(1.5);
-            }
-        } else {
-            if (delta >= 5.0) {
-                player.addPotionEffect(new org.bukkit.potion.PotionEffect(
-                    org.bukkit.potion.PotionEffectType.SLOWNESS, 200, 2, false, false
-                ));
-                player.addPotionEffect(new org.bukkit.potion.PotionEffect(
-                    org.bukkit.potion.PotionEffectType.MINING_FATIGUE, 200, 1, false, false
-                ));
-                player.addPotionEffect(new org.bukkit.potion.PotionEffect(
-                    org.bukkit.potion.PotionEffectType.WEAKNESS, 200, 1, false, false
-                ));
-                player.setFreezeTicks(Math.min(player.getFreezeTicks() + 100, 140));
-                player.damage(3.0);
-            } else if (delta >= 3.0) {
-                player.addPotionEffect(new org.bukkit.potion.PotionEffect(
-                    org.bukkit.potion.PotionEffectType.SLOWNESS, 100, 1, false, false
-                ));
-                player.addPotionEffect(new org.bukkit.potion.PotionEffect(
-                    org.bukkit.potion.PotionEffectType.WEAKNESS, 100, 0, false, false
-                ));
-                player.setFreezeTicks(Math.min(player.getFreezeTicks() + 40, 140));
-                player.damage(1.5);
-            }
-        }
-    }
-    
     private void applyTemperatureEffects(Player player, double temp) {
         org.shotrush.atom.core.api.TemperatureEffectsAPI.applyBodyTemperatureEffects(player, temp);
         
-        String tempDisplay = String.format("%.1f°C", temp);
-        String color = org.shotrush.atom.core.api.TemperatureEffectsAPI.getBodyTempColor(temp);
-        player.sendActionBar(net.kyori.adventure.text.Component.text("§7Body Temperature: " + color + tempDisplay));
+        double deviation = Math.abs(temp - NORMAL_TEMP);
+        if (deviation > WARNING_RANGE) {
+            String tempDisplay = String.format("%.1f°C", temp);
+            String color = org.shotrush.atom.core.api.TemperatureEffectsAPI.getBodyTempColor(temp);
+            player.sendActionBar(net.kyori.adventure.text.Component.text("§7Body Temperature: " + color + tempDisplay));
+        }
     }
     
     public double getPlayerTemperature(Player player) {

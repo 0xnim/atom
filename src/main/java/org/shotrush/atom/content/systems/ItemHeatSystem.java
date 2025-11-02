@@ -36,8 +36,8 @@ public class ItemHeatSystem implements Listener {
     private static final NamespacedKey HEAT_MODIFIER_KEY = new NamespacedKey("atom", "heat_modifier");
     private final Map<UUID, BossBar> heatBossBars = new HashMap<>();
     
-    public ItemHeatSystem(Atom plugin) {
-        this.plugin = plugin;
+    public ItemHeatSystem(org.bukkit.plugin.Plugin plugin) {
+        this.plugin = (Atom) plugin;
     }
     
     @EventHandler
@@ -211,19 +211,6 @@ public class ItemHeatSystem implements Listener {
         PersistentDataContainer container = meta.getPersistentDataContainer();
         container.set(HEAT_KEY, PersistentDataType.DOUBLE, heat);
         
-        java.util.List<net.kyori.adventure.text.Component> lore = meta.lore();
-        if (lore == null) {
-            lore = new java.util.ArrayList<>();
-        }
-        
-        lore.removeIf(line -> net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
-            .serialize(line).contains("Heat:"));
-        
-        if (heat > 0) {
-            lore.add(net.kyori.adventure.text.Component.text("§7Heat: §c" + (int)heat + "°C"));
-        }
-        
-        meta.lore(lore);
         item.setItemMeta(meta);
     }
     

@@ -28,14 +28,9 @@ public class SpearProjectileListener implements Listener {
 
         CustomItem spearItem = plugin.getItemRegistry().getItem("wood_spear");
         if (spearItem == null || !spearItem.isCustomItem(item)) return;
-
-        event.setCancelled(true);
         
-        Location startLoc = trident.getLocation();
-        Vector velocity = trident.getVelocity().multiply(0.5);
         Player shooter = (Player) trident.getShooter();
-
-        assert shooter != null;
+        if (shooter == null) return;
         
         ItemStack thrownItem = item.clone();
         
@@ -43,6 +38,7 @@ public class SpearProjectileListener implements Listener {
         org.shotrush.atom.core.util.DurabilityUtil.applyQualityBasedDamage(thrownItem, quality);
         
         if (thrownItem.getType() == Material.AIR || thrownItem.getAmount() <= 0) {
+            event.setCancelled(true);
             trident.remove();
             return;
         }
@@ -57,37 +53,15 @@ public class SpearProjectileListener implements Listener {
             }
         }
         
-        trident.remove();
+        trident.setDamage(8.0);
         
-        org.joml.Quaternionf baseRotation = new org.joml.Quaternionf()
-            .rotateY((float) Math.toRadians(90))
-            .rotateZ((float) Math.toRadians(45));
-        
-        CustomProjectile.ProjectileConfig config = new CustomProjectile.ProjectileConfig()
-            .gravity(0.03)
-            .airDrag(0.99)
-            .maxLifetime(200)
-            .damage(8.0)
-            .interpolation(5, -1)
-            .baseRotation(baseRotation)
-            .scale(1.2f);
-        
-        CustomProjectile projectile = new CustomProjectile(
-            plugin, startLoc, velocity, thrownItem, thrownItem, shooter, config
-        );
-        
-        projectile.onEntityHit(hitEntity -> {
-            hitEntity.damage(8.0, shooter);
-            projectile.getDisplay().getLocation().getWorld().dropItemNaturally(
-                projectile.getDisplay().getLocation(), thrownItem
-            );
-        });
-        
-        projectile.onBlockHit(blockHit -> {
-            blockHit.getHitPosition().toLocation(startLoc.getWorld())
-                .getWorld().dropItemNaturally(blockHit.getHitPosition().toLocation(startLoc.getWorld()), thrownItem);
-        });
-        
-        projectile.start();
+        trident.getScheduler().runAtFixedRate(plugin, task -> {
+            if (!trident.isValid() || trident.isInBlock() || trident.isOnGround()) {
+                Location dropLoc = trident.getLocation();
+                trident.getWorld().dropItemNaturally(dropLoc, thrownItem);
+                trident.remove();
+                task.cancel();
+            }
+        }, null, 1L, 1L);
     }
 }

@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
@@ -21,6 +22,8 @@ import org.shotrush.atom.core.systems.annotation.AutoRegisterSystem;
 @AutoRegisterSystem(priority = 2)
 public class ThirstSystem implements Listener {
     
+    private static ThirstSystem instance;
+    
     private final Plugin plugin;
     private final Map<UUID, Integer> thirstLevels = new HashMap<>();
     private final Map<UUID, Long> thirstAccelerationEnd = new HashMap<>();
@@ -30,6 +33,11 @@ public class ThirstSystem implements Listener {
     
     public ThirstSystem(Plugin plugin) {
         this.plugin = plugin;
+        instance = this;
+    }
+    
+    public static ThirstSystem getInstance() {
+        return instance;
     }
     
     @EventHandler
@@ -87,6 +95,7 @@ public class ThirstSystem implements Listener {
             }
             
             if (currentThirst <= 0) {
+                player.setRemainingAir(0);
                 player.damage(1.0);
             } else if (currentThirst <= 5) {
                 player.addPotionEffect(new org.bukkit.potion.PotionEffect(
@@ -100,21 +109,52 @@ public class ThirstSystem implements Listener {
         }, null, THIRST_DECREASE_INTERVAL, THIRST_DECREASE_INTERVAL);
     }
     
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onEntityAirChange(org.bukkit.event.entity.EntityAirChangeEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
         
         int thirst = thirstLevels.getOrDefault(player.getUniqueId(), MAX_THIRST);
         int targetAir = (thirst * 300) / MAX_THIRST;
         
+        if (thirst <= 0) {
+            event.setCancelled(true);
+            player.getScheduler().run(plugin, task -> {
+                if (player.isOnline()) {
+                    player.setRemainingAir(0);
+                }
+            }, null);
+            return;
+        }
+        
         if (player.isInWater() || player.getEyeLocation().getBlock().getType() == Material.WATER) {
             if (event.getAmount() > targetAir) {
                 event.setAmount(targetAir);
             }
         } else {
-            int currentAir = player.getRemainingAir();
-            if (event.getAmount() != targetAir && currentAir != targetAir) {
-                event.setAmount(Math.min(299, targetAir));
+            if (event.getAmount() > targetAir) {
+                event.setCancelled(true);
+                player.getScheduler().run(plugin, task -> {
+                    if (player.isOnline()) {
+                        player.setRemainingAir(Math.min(299, targetAir));
+                    }
+                }, null);
+            }
+        }
+    }
+    
+    @EventHandler
+    public void onPlayerItemConsume(org.bukkit.event.player.PlayerItemConsumeEvent event) {
+        Player player = event.getPlayer();
+        ItemStack item = event.getItem();
+        
+        if (item.getType() == Material.POTION) {
+            org.bukkit.inventory.meta.PotionMeta meta = (org.bukkit.inventory.meta.PotionMeta) item.getItemMeta();
+            if (meta != null) {
+                if (meta.hasCustomEffect(PotionEffectType.REGENERATION)) {
+                    drinkPurifiedWater(player);
+                } else if (meta.getBasePotionType() == org.bukkit.potion.PotionType.WATER) {
+                    drinkRawWater(player);
+                }
             }
         }
     }
@@ -140,21 +180,19 @@ public class ThirstSystem implements Listener {
                 return;
             }
         }
-        
-        if (item.getType() == Material.POTION) {
-            org.bukkit.inventory.meta.PotionMeta meta = (org.bukkit.inventory.meta.PotionMeta) item.getItemMeta();
-            if (meta != null && meta.hasCustomEffect(PotionEffectType.REGENERATION)) {
-                drinkPurifiedWater(player);
-                item.setAmount(item.getAmount() - 1);
-                event.setCancelled(true);
-            }
-        }
     }
     
     private void drinkRawWater(Player player) {
         UUID playerId = player.getUniqueId();
         
+        int currentThirst = thirstLevels.getOrDefault(playerId, MAX_THIRST);
         addThirst(player, 5);
+        int newThirst = thirstLevels.getOrDefault(playerId, MAX_THIRST);
+        int gained = newThirst - currentThirst;
+        
+        if (gained > 0) {
+            player.sendActionBar(net.kyori.adventure.text.Component.text("§b+§f" + gained + " §bThirst"));
+        }
         
         player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 200, 0, false, false));
         
@@ -162,7 +200,16 @@ public class ThirstSystem implements Listener {
     }
     
     private void drinkPurifiedWater(Player player) {
+        UUID playerId = player.getUniqueId();
+        
+        int currentThirst = thirstLevels.getOrDefault(playerId, MAX_THIRST);
         addThirst(player, 10);
+        int newThirst = thirstLevels.getOrDefault(playerId, MAX_THIRST);
+        int gained = newThirst - currentThirst;
+        
+        if (gained > 0) {
+            player.sendActionBar(net.kyori.adventure.text.Component.text("§b+§f" + gained + " §bThirst §7(Purified)"));
+        }
     }
     
     private void checkWaterPurification(Player player) {
