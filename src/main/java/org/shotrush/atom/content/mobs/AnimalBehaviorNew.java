@@ -122,27 +122,74 @@ public class AnimalBehaviorNew implements Listener {
     }
     
     private void registerSpecialGoals(Mob mob, SpeciesBehavior behavior, com.destroystokyo.paper.entity.ai.MobGoals goalSelector, boolean isAggressive) {
-        if (!isAggressive) return;
-        
         switch (behavior.specialMechanic()) {
             case RAM_CHARGE:
-                if (mob.getType() == EntityType.SHEEP || mob.getType() == EntityType.GOAT) {
+                if (isAggressive && (mob.getType() == EntityType.SHEEP || mob.getType() == EntityType.GOAT)) {
                     goalSelector.addGoal(mob, 2, new RamChargeGoal(mob, plugin));
                     plugin.getLogger().info("  + Added Ram Charge");
                 }
                 break;
                 
             case KICK_ATTACK:
-                if (mob.getType() == EntityType.HORSE || mob.getType() == EntityType.DONKEY || mob.getType() == EntityType.MULE) {
+                if (isAggressive && (mob.getType() == EntityType.HORSE || mob.getType() == EntityType.DONKEY || mob.getType() == EntityType.MULE)) {
                     goalSelector.addGoal(mob, 2, new KickAttackGoal(mob, plugin));
                     plugin.getLogger().info("  + Added Kick Attack");
                 }
                 break;
                 
             case SPIT_ATTACK:
-                if (mob.getType() == EntityType.LLAMA) {
+                if (isAggressive && mob.getType() == EntityType.LLAMA) {
                     goalSelector.addGoal(mob, 2, new SpitAttackGoal(mob, plugin));
                     plugin.getLogger().info("  + Added Spit Attack");
+                }
+                break;
+                
+            case COUNTER_CHARGE:
+                if (isAggressive && mob.getType() == EntityType.PIG) {
+                    goalSelector.addGoal(mob, 2, new CounterChargeGoal(mob, plugin));
+                    plugin.getLogger().info("  + Added Counter Charge");
+                }
+                break;
+                
+            case PACK_HUNTING:
+                if (isAggressive && mob.getType() == EntityType.WOLF) {
+                    goalSelector.addGoal(mob, 2, new PackHuntingGoal(mob, plugin, herdManager));
+                    plugin.getLogger().info("  + Added Pack Hunting");
+                }
+                break;
+                
+            case POUNCE_ATTACK:
+                if (isAggressive && mob.getType() == EntityType.FOX) {
+                    goalSelector.addGoal(mob, 2, new PounceAttackGoal(mob, plugin));
+                    plugin.getLogger().info("  + Added Pounce Attack");
+                }
+                break;
+                
+            case STAMPEDE:
+                if (mob.getType() == EntityType.COW) {
+                    goalSelector.addGoal(mob, 1, new StampedeGoal(mob, plugin, herdManager));
+                    plugin.getLogger().info("  + Added Stampede");
+                }
+                break;
+                
+            case FLIGHT_BURST:
+                if (mob.getType() == EntityType.CHICKEN) {
+                    goalSelector.addGoal(mob, 1, new FlightBurstGoal(mob, plugin));
+                    plugin.getLogger().info("  + Added Flight Burst");
+                }
+                break;
+                
+            case CUB_PROTECTION:
+                if (mob.getType() == EntityType.POLAR_BEAR) {
+                    goalSelector.addGoal(mob, 1, new CubProtectionGoal(mob, plugin));
+                    plugin.getLogger().info("  + Added Cub Protection");
+                }
+                break;
+                
+            case ROLL_DEFENSE:
+                if (mob.getType() == EntityType.ARMADILLO) {
+                    goalSelector.addGoal(mob, 0, new RollDefenseGoal(mob, plugin));
+                    plugin.getLogger().info("  + Added Roll Defense");
                 }
                 break;
                 
