@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.world.EntitiesLoadEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.shotrush.atom.Atom;
 import org.shotrush.atom.content.mobs.ai.config.SpeciesBehavior;
@@ -72,40 +73,7 @@ public class AnimalBehaviorNew implements Listener {
             return;
         }
         
-        double domesticationFactor = AnimalDomestication.getDomesticationFactor(animal);
-        SpeciesBehavior behavior = SpeciesBehavior.get(animal.getType());
-        
-        enhanceAnimalStats(animal, domesticationFactor, behavior);
-        
-        Herd herd = herdManager.getOrCreateHerd(animal);
-        HerdRole role = herdManager.getRole(animal.getUniqueId());
-        
-        double aggressionChance = behavior.getAggressionChance(domesticationFactor);
-        boolean isAggressive = Math.random() < aggressionChance;
-        animal.setMetadata("aggressive", new FixedMetadataValue(plugin, isAggressive));
-        
-        plugin.getLogger().info(">>> Aggressive: " + isAggressive + " (chance: " + String.format("%.1f%%", aggressionChance * 100) + ", role: " + role + ")");
-        
-        double maxStamina = herdManager.getPersistence().getMaxStamina(animal, 100 + (Math.random() * 100));
-        double stamina = herdManager.getPersistence().getStamina(animal, maxStamina);
-        
-        animal.setMetadata("maxStamina", new FixedMetadataValue(plugin, maxStamina));
-        animal.setMetadata("stamina", new FixedMetadataValue(plugin, stamina));
-        animal.setMetadata("fleeing", new FixedMetadataValue(plugin, false));
-        
-        herdManager.getPersistence().saveHerdData(animal, herd.id(), role == HerdRole.LEADER, isAggressive, maxStamina, stamina);
-        
-        trackedAnimals.add(animal.getUniqueId());
-        
-        registerGoals(mob, behavior, isAggressive, role);
-        
-        if (isAggressive && entity instanceof Wolf wolf) {
-            wolf.setAngry(true);
-        }
-        
-        plugin.getLogger().info(">>> Goals registered successfully!");
-        
-        startStaminaRegeneration(animal);
+        initializeAnimal(animal, mob);
     }
     
     private void enhanceAnimalStats(Animals animal, double domesticationFactor, SpeciesBehavior behavior) {
@@ -248,6 +216,73 @@ public class AnimalBehaviorNew implements Listener {
         
         herdManager.leaveHerd(animal.getUniqueId());
         trackedAnimals.remove(animal.getUniqueId());
+    }
+    
+    @EventHandler
+    public void onEntitiesLoad(EntitiesLoadEvent event) {
+        for (Entity entity : event.getEntities()) {
+            if (!COMMON_ANIMALS.contains(entity.getType())) continue;
+            if (!(entity instanceof Animals animal)) continue;
+            if (!(entity instanceof Mob mob)) continue;
+            
+            if (trackedAnimals.contains(animal.getUniqueId())) {
+                continue;
+            }
+            
+            plugin.getLogger().info(">>> Entity loaded from chunk: " + animal.getType() + " (UUID: " + animal.getUniqueId() + ")");
+            
+            if (AnimalDomestication.isFullyDomesticated(animal)) {
+                plugin.getLogger().info("Fully domesticated - skipping");
+                continue;
+            }
+            
+            initializeAnimal(animal, mob);
+        }
+    }
+    
+    private void initializeAnimal(Animals animal, Mob mob) {
+        double domesticationFactor = AnimalDomestication.getDomesticationFactor(animal);
+        SpeciesBehavior behavior = SpeciesBehavior.get(animal.getType());
+        
+        enhanceAnimalStats(animal, domesticationFactor, behavior);
+        
+        Herd herd = herdManager.getOrCreateHerd(animal);
+        HerdRole role = herdManager.getRole(animal.getUniqueId());
+        
+        boolean isAggressive;
+        if (animal.hasMetadata("aggressive")) {
+            isAggressive = animal.getMetadata("aggressive").get(0).asBoolean();
+        } else {
+            isAggressive = herdManager.getPersistence().isAggressive(animal);
+            if (!isAggressive) {
+                double aggressionChance = behavior.getAggressionChance(domesticationFactor);
+                isAggressive = Math.random() < aggressionChance;
+            }
+            animal.setMetadata("aggressive", new FixedMetadataValue(plugin, isAggressive));
+        }
+        
+        plugin.getLogger().info(">>> Initializing: Aggressive=" + isAggressive + ", Role=" + role);
+        
+        double maxStamina = herdManager.getPersistence().getMaxStamina(animal, 100 + (Math.random() * 100));
+        double stamina = herdManager.getPersistence().getStamina(animal, maxStamina);
+        
+        animal.setMetadata("maxStamina", new FixedMetadataValue(plugin, maxStamina));
+        animal.setMetadata("stamina", new FixedMetadataValue(plugin, stamina));
+        animal.setMetadata("fleeing", new FixedMetadataValue(plugin, false));
+        
+        herdManager.getPersistence().saveHerdData(animal, herd.id(), role == HerdRole.LEADER, isAggressive, maxStamina, stamina);
+        
+        trackedAnimals.add(animal.getUniqueId());
+        
+        registerGoals(mob, behavior, isAggressive, role);
+        
+        if (isAggressive && animal instanceof Wolf wolf) {
+            wolf.setAngry(true);
+        }
+        
+        plugin.getLogger().info(">>> Initialization complete!");
+        
+        startStaminaRegeneration(animal);
     }
     
     public HerdManager getHerdManager() {
