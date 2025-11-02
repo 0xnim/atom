@@ -113,10 +113,7 @@ public class HerdLeaderWanderGoal implements Goal<Mob> {
             wanderTarget = current.clone().add(x, 0, z);
         }
         
-        if (wanderTarget.getWorld() != null) {
-            int highestY = wanderTarget.getWorld().getHighestBlockYAt(wanderTarget.getBlockX(), wanderTarget.getBlockZ());
-            wanderTarget.setY(highestY);
-        }
+        wanderTarget.setY(current.getY());
     }
     
     @Override
