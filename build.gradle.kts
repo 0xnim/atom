@@ -19,6 +19,10 @@ repositories {
         name = "aikar"
         url = uri("https://repo.aikar.co/content/groups/aikar/")
     }
+    maven {
+        name = "dmulloy2-repo"
+        url = uri("https://repo.dmulloy2.net/repository/public/")
+    }
 }
 
 dependencies {

@@ -55,6 +55,10 @@ public abstract class CustomBlock implements BlockType {
 
 
     public void spawn(Atom plugin) {
+        if (spawnLocation.getWorld() == null) {
+            plugin.getLogger().warning("Cannot spawn block at " + spawnLocation + " - world is null");
+            return;
+        }
         Bukkit.getRegionScheduler().run(plugin, spawnLocation, task -> {
             spawn(plugin, spawnLocation.getWorld());
         });
@@ -79,6 +83,10 @@ public abstract class CustomBlock implements BlockType {
     
     
     public boolean onWrenchInteract(org.bukkit.entity.Player player, boolean sneaking) {
+        return false;
+    }
+
+    public boolean onInteract(org.bukkit.entity.Player player, boolean sneaking) {
         return false;
     }
     
@@ -131,7 +139,20 @@ public abstract class CustomBlock implements BlockType {
 
     @Override
     public ItemStack getDropItem() {
-        return new ItemStack(getItemMaterial());
+        ItemStack item = createItemWithCustomModel(getItemMaterial(), getIdentifier());
+        ItemMeta meta = item.getItemMeta();
+        
+        if (meta != null) {
+            meta.setDisplayName(getDisplayName());
+            meta.setLore(java.util.Arrays.asList(getLore()));
+            
+            NamespacedKey key = new NamespacedKey(Atom.getInstance(), getIdentifier());
+            meta.getPersistentDataContainer().set(key, org.bukkit.persistence.PersistentDataType.BYTE, (byte) 1);
+            
+            item.setItemMeta(meta);
+        }
+        
+        return item;
     }
     public String getBlockType() {
         return getIdentifier();

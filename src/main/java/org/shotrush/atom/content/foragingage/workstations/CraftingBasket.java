@@ -49,12 +49,9 @@ public class CraftingBasket extends InteractiveSurface {
     }
 
     @Override
-    public void spawn(Atom plugin) {
-        Bukkit.getRegionScheduler().run(plugin, spawnLocation, task -> {
-            ItemDisplay display = (ItemDisplay) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.ITEM_DISPLAY);
-            ItemStack basketItem = createItemWithCustomModel(Material.STONE_BUTTON, "crafting_basket");
-        });
-    }
+    public void spawn(Atom plugin, RegionAccessor accessor) {
+        ItemDisplay display = (ItemDisplay) accessor.spawnEntity(spawnLocation, EntityType.ITEM_DISPLAY);
+        ItemStack basketItem = createItemWithCustomModel(Material.STONE_BUTTON, "crafting_basket");
 
         spawnDisplay(display, plugin, basketItem, new Vector3f(0, 0.5f, 0), new AxisAngle4f(), new Vector3f(1f, 1f, 1f), false, 1f, 0.2f);
 
@@ -82,6 +79,7 @@ public class CraftingBasket extends InteractiveSurface {
 
     @Override
     public boolean isValid() {
+        if (interactionUUID == null || displayUUID == null) return false;
         Entity interaction = Bukkit.getEntity(interactionUUID);
         Entity display = Bukkit.getEntity(displayUUID);
         return interaction != null && display != null && !interaction.isDead() && !display.isDead();
@@ -148,10 +146,5 @@ public class CraftingBasket extends InteractiveSurface {
             e.printStackTrace();
         }
         return null;
-    }
-
-    @Override
-    public ItemStack getDropItem() {
-        return new ItemStack(Material.DEAD_BUSH);
     }
 }

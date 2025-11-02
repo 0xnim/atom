@@ -296,7 +296,7 @@ public class AnimalBehavior implements Listener {
             
             stamina = Math.max(0, stamina - staminaDrain);
             animal.setMetadata("stamina", new FixedMetadataValue(plugin, stamina));
-        } else if (distance >= 20.0 && stamina < maxStamina) {
+        } else if (distance >= 60.0 && stamina < maxStamina) {
             stamina = Math.min(maxStamina, stamina + 2.0);
             animal.setMetadata("stamina", new FixedMetadataValue(plugin, stamina));
         }

@@ -21,9 +21,54 @@ public abstract class InteractiveSurface extends CustomBlock {
         super(spawnLocation, blockFace);
     }
     
+    @Override
+    public boolean onInteract(Player player, boolean sneaking) {
+        if (sneaking) {
+            return onCrouchRightClick(player);
+        }
+        return false;
+    }
+    
     public abstract int getMaxItems();
     public abstract boolean canPlaceItem(ItemStack item);
     public abstract Vector3f calculatePlacement(Player player, int itemCount);
+
+    protected boolean onCrouchRightClick(Player player) {
+        ItemStack result = checkRecipe();
+        
+        if (result != null) {
+            clearAllItems();
+            player.getWorld().dropItemNaturally(spawnLocation, result);
+            player.sendMessage("§aCrafted: " + result.getType().name());
+            return true;
+        } else {
+            releaseAllItems(player);
+            return true;
+        }
+    }
+
+    protected ItemStack checkRecipe() {
+        return null;
+    }
+
+    protected void releaseAllItems(Player player) {
+        if (placedItems.isEmpty()) {
+            return;
+        }
+        
+        for (PlacedItem placedItem : new ArrayList<>(placedItems)) {
+            removeItemDisplay(placedItem);
+            player.getWorld().dropItemNaturally(spawnLocation, placedItem.getItem());
+        }
+        placedItems.clear();
+    }
+
+    protected void clearAllItems() {
+        for (PlacedItem placedItem : new ArrayList<>(placedItems)) {
+            removeItemDisplay(placedItem);
+        }
+        placedItems.clear();
+    }
     
     public boolean placeItem(ItemStack item, Vector3f position, float yaw) {
         if (placedItems.size() >= getMaxItems()) return false;
@@ -54,6 +99,10 @@ public abstract class InteractiveSurface extends CustomBlock {
     
     protected void spawnItemDisplay(PlacedItem item) {
         Location itemLoc = spawnLocation.clone().add(item.getPosition().x, item.getPosition().y, item.getPosition().z);
+        if (itemLoc.getWorld() == null) {
+            org.shotrush.atom.Atom.getInstance().getLogger().warning("Cannot spawn item display - world is null");
+            return;
+        }
         org.bukkit.Bukkit.getRegionScheduler().run(org.shotrush.atom.Atom.getInstance(), itemLoc, task -> {
             org.bukkit.entity.ItemDisplay display = (org.bukkit.entity.ItemDisplay) itemLoc.getWorld().spawnEntity(itemLoc, org.bukkit.entity.EntityType.ITEM_DISPLAY);
             display.setItemStack(item.getItem());
@@ -93,6 +142,14 @@ public abstract class InteractiveSurface extends CustomBlock {
     
     public List<PlacedItem> getPlacedItems() {
         return new ArrayList<>(placedItems);
+    }
+    
+    public void respawnAllItemDisplays() {
+        for (PlacedItem item : placedItems) {
+            if (item.getDisplayUUID() == null) {
+                spawnItemDisplay(item);
+            }
+        }
     }
     
     @Override

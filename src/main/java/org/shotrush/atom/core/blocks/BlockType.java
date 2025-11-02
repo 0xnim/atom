@@ -33,4 +33,8 @@ public interface BlockType {
     default ItemStack getDropItem() {
         return null;
     }
+
+    default double getBreakTime() {
+        return 20.0;
+    }
 }

@@ -59,6 +59,7 @@ public class Pebble extends CustomBlock {
 
     @Override
     public boolean isValid() {
+        if (interactionUUID == null || displayUUID == null) return false;
         Entity interaction = Bukkit.getEntity(interactionUUID);
         Entity display = Bukkit.getEntity(displayUUID);
         return interaction != null && display != null && !interaction.isDead() && !display.isDead();
@@ -109,11 +110,6 @@ public class Pebble extends CustomBlock {
             e.printStackTrace();
         }
         return null;
-    }
-
-    @Override
-    public ItemStack getDropItem() {
-        return new ItemStack(Material.BRUSH, 1);
     }
 
     public String getModelName() {

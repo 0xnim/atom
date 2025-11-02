@@ -38,26 +38,19 @@ public class KnappingStation extends InteractiveSurface {
 
     @Override
     public Vector3f calculatePlacement(Player player, int itemCount) {
-        return new Vector3f(-0.15f, 0.98f, 0.17f);
+        return new Vector3f(-0.2f, 1f, 0.2f);
     }
 
     @Override
-    public void spawn(Atom plugin) {
-        Bukkit.getRegionScheduler().run(plugin, spawnLocation, task -> {
-            // Place barrier block at the block location
-            if (blockLocation != null) {
-                blockLocation.getBlock().setType(Material.BARRIER);
-            }
-            
-            ItemDisplay display = (ItemDisplay) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.ITEM_DISPLAY);
-            ItemStack stationItem = createItemWithCustomModel(Material.STONE_BUTTON, "knapping_station");
-            
-            spawnDisplay(display, plugin, stationItem, new Vector3f(0, 0.5f, 0), new AxisAngle4f(), new Vector3f(1f, 1f, 1f), false, 0.65f, 0.75f);
-            
-            for (PlacedItem item : placedItems) {
-                spawnItemDisplay(item);
-            }
-        });
+    public void spawn(Atom plugin, RegionAccessor accessor) {
+        ItemDisplay display = (ItemDisplay) accessor.spawnEntity(spawnLocation, EntityType.ITEM_DISPLAY);
+        ItemStack stationItem = createItemWithCustomModel(Material.STONE_BUTTON, "knapping_station");
+
+        spawnDisplay(display, plugin, stationItem, new Vector3f(0, 0.5f, 0), new AxisAngle4f(), new Vector3f(1f, 1f, 1f), true, 0.65f, 0.75f);
+
+        for (PlacedItem item : placedItems) {
+            spawnItemDisplay(item);
+        }
     }
 
 
@@ -78,11 +71,6 @@ public class KnappingStation extends InteractiveSurface {
 
     @Override
     protected void removeEntities() {
-        // Remove barrier block
-        if (blockLocation != null && blockLocation.getBlock().getType() == Material.BARRIER) {
-            blockLocation.getBlock().setType(Material.AIR);
-        }
-      
         for (PlacedItem item : placedItems) {
             removeItemDisplay(item);
             spawnLocation.getWorld().dropItemNaturally(spawnLocation, item.getItem());
@@ -95,6 +83,7 @@ public class KnappingStation extends InteractiveSurface {
 
     @Override
     public boolean isValid() {
+        if (interactionUUID == null || displayUUID == null) return false;
         Entity interaction = Bukkit.getEntity(interactionUUID);
         Entity display = Bukkit.getEntity(displayUUID);
         return interaction != null && display != null && !interaction.isDead() && !display.isDead();
@@ -175,10 +164,5 @@ public class KnappingStation extends InteractiveSurface {
             e.printStackTrace();
         }
         return null;
-    }
-
-    @Override
-    public ItemStack getDropItem() {
-        return new ItemStack(Material.LEATHER);
     }
 }

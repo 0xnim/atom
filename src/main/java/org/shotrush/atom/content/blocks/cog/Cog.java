@@ -68,13 +68,12 @@ public class Cog extends CustomBlock {
         cleanupExistingEntities();
         ItemDisplay display = (ItemDisplay) accessor.spawnEntity(spawnLocation, EntityType.ITEM_DISPLAY);
 
-            String modelName = isPowerSource ? "cog_small_powered" : "cog_small";
-            ItemStack buttonItem = createItemWithCustomModel(Material.STONE_BUTTON, modelName);
+        String modelName = isPowerSource ? "cog_small_powered" : "cog_small";
+        ItemStack diamondItem = createItemWithCustomModel(Material.STONE_BUTTON, modelName);
 
         AxisAngle4f initialRotation = BlockRotationUtil.getInitialRotationFromFace(blockFace);
 
-            spawnDisplay(display, plugin, buttonItem, new Vector3f(0, 0.5f, 0), initialRotation, new Vector3f(1, 1, 1), true, 1f, 1f);
-        });
+        spawnDisplay(display, plugin, diamondItem, new Vector3f(0, 0.5f, 0), initialRotation, new Vector3f(1, 1, 1), true, 1f, 1f);
     }
 
     public void updateRotation(float globalAngle) {
@@ -95,14 +94,14 @@ public class Cog extends CustomBlock {
 
             Transformation currentTransform = display.getTransformation();
             String modelName = isPowerSource ? "cog_small_powered" : "cog_small";
-            ItemStack buttonItem = createItemWithCustomModel(Material.STONE_BUTTON, modelName);
-        
-            
+            ItemStack diamondItem = createItemWithCustomModel(Material.STONE_BUTTON, modelName);
+
+
             display.setInterpolationDuration(0);
             display.setInterpolationDelay(0);
-        
-            
-            display.setItemStack(buttonItem);
+
+
+            display.setItemStack(diamondItem);
             display.setTransformation(currentTransform);
 
 
@@ -135,6 +134,7 @@ public class Cog extends CustomBlock {
 
     @Override
     public boolean isValid() {
+        if (interactionUUID == null || displayUUID == null) return false;
         Entity interaction = Bukkit.getEntity(interactionUUID);
         Entity display = Bukkit.getEntity(displayUUID);
         return interaction != null && display != null && !interaction.isDead() && !display.isDead();
@@ -208,7 +208,7 @@ public class Cog extends CustomBlock {
 
     @Override
     public String getIdentifier() {
-        return "cog_small";
+        return "cog";
     }
 
     @Override
@@ -266,6 +266,6 @@ public class Cog extends CustomBlock {
         if (item != null) {
             return item.create();
         }
-        return new ItemStack(getItemMaterial());
+        return createItemWithCustomModel(Material.STONE_BUTTON, getIdentifier());
     }
 }

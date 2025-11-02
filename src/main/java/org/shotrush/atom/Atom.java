@@ -13,6 +13,7 @@ import org.shotrush.atom.core.blocks.CustomBlockManager;
 import org.shotrush.atom.content.mobs.AnimalBehavior;
 import org.shotrush.atom.content.mobs.AnimalDomestication;
 import org.shotrush.atom.content.mobs.MobScale;
+import org.shotrush.atom.content.foragingage.throwing.SpearProjectileListener;
 import org.shotrush.atom.core.age.AgeManager;
 import org.shotrush.atom.core.items.CustomItemRegistry;
 import org.shotrush.atom.core.storage.DataStorage;
@@ -49,6 +50,7 @@ public final class Atom extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new MobScale(this), this);
         getServer().getPluginManager().registerEvents(new AnimalBehavior(this), this);
         getServer().getPluginManager().registerEvents(new AnimalDomestication(this), this);
+        getServer().getPluginManager().registerEvents(new SpearProjectileListener(this), this);
         
         setupCommands();
         getLogger().info("Atom plugin has been enabled!");
@@ -61,6 +63,7 @@ public final class Atom extends JavaPlugin {
     public void onDisable() {
         if (blockManager != null) {
             blockManager.stopGlobalUpdate();
+            blockManager.cleanupAllDisplays();
             blockManager.saveBlocks();
         }
         

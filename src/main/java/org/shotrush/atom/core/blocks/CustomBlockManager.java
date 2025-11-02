@@ -3,6 +3,8 @@ package org.shotrush.atom.core.blocks;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Getter;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -45,6 +47,7 @@ public class CustomBlockManager implements Listener {
 
         
         Bukkit.getPluginManager().registerEvents(this, plugin);
+        Bukkit.getPluginManager().registerEvents(new BarrierBreakHandler(plugin, this), plugin);
 
         
         loadBlocks();
@@ -118,25 +121,54 @@ public class CustomBlockManager implements Listener {
 
     private void loadBlocks() {
         List<CustomBlock> loadedBlocks = dataManager.loadBlocks();
-        for (CustomBlock block : loadedBlocks) {
-            block.spawn(plugin);
-            blocks.add(block);
-        }
-        // Recalculate power for all cogs after loading
+        blocks.addAll(loadedBlocks);
+        plugin.getLogger().info("Loaded " + loadedBlocks.size() + " block(s) from data");
+        
         Bukkit.getGlobalRegionScheduler().runDelayed(plugin, task -> {
-            org.shotrush.atom.content.blocks.cog.CogManager cogManager =
-                    new org.shotrush.atom.content.blocks.cog.CogManager(plugin);
-            cogManager.recalculatePower(blocks);
-            plugin.getLogger().info("Recalculated cog power after server restart");
-        }, 5L); // Small delay to ensure all blocks are fully spawned
-
-        plugin.getLogger().info("Loaded " + loadedBlocks.size() + " block(s)");
+            int spawnedCount = 0;
+            int respawnedCount = 0;
+            
+            for (CustomBlock block : blocks) {
+                if (block.getSpawnLocation().getWorld() != null) {
+                    block.spawn(plugin);
+                    spawnedCount++;
+                    
+                    if (block instanceof InteractiveSurface surface) {
+                        surface.respawnAllItemDisplays();
+                        respawnedCount += surface.getPlacedItems().size();
+                    }
+                }
+            }
+            
+            plugin.getLogger().info("Spawned " + spawnedCount + " block(s) after world load");
+            if (respawnedCount > 0) {
+                plugin.getLogger().info("Respawned " + respawnedCount + " item display(s)");
+            }
+        }, 20L);
     }
 
     public void saveBlocks() {
         blocks.removeIf(block -> !block.isValid());
         dataManager.saveBlocks(blocks);
         plugin.getLogger().info("Saved " + blocks.size() + " block(s)");
+    }
+    
+    public void cleanupAllDisplays() {
+        int cleanedCount = 0;
+        for (CustomBlock block : blocks) {
+            if (block instanceof InteractiveSurface surface) {
+                for (InteractiveSurface.PlacedItem item : surface.getPlacedItems()) {
+                    if (item.getDisplayUUID() != null) {
+                        Entity entity = Bukkit.getEntity(item.getDisplayUUID());
+                        if (entity != null) {
+                            entity.remove();
+                            cleanedCount++;
+                        }
+                    }
+                }
+            }
+        }
+        plugin.getLogger().info("Cleaned up " + cleanedCount + " item display(s) on shutdown");
     }
 
     public void removeAllBlocks() {
@@ -183,7 +215,6 @@ public class CustomBlockManager implements Listener {
             meta.setDisplayName(blockType.getDisplayName());
             meta.setLore(Arrays.asList(blockType.getLore()));
             
-            // Add custom model data
             org.bukkit.inventory.meta.components.CustomModelDataComponent component = meta.getCustomModelDataComponent();
             component.setStrings(java.util.List.of(blockTypeId));
             meta.setCustomModelDataComponent(component);
@@ -204,6 +235,21 @@ public class CustomBlockManager implements Listener {
             player.getInventory().addItem(wrench);
             player.sendMessage("§aYou received a Mechanical Wrench!");
         }
+    }
+    
+    public CustomBlock getBlockAt(Location location) {
+        for (CustomBlock block : blocks) {
+            if (block.getBlockLocation().equals(location)) {
+                return block;
+            }
+        }
+        return null;
+    }
+    
+    public void removeBlock(CustomBlock block) {
+        block.remove();
+        blocks.remove(block);
+        block.onRemoved();
     }
 
     @EventHandler
@@ -247,34 +293,6 @@ public class CustomBlockManager implements Listener {
                 event.getPlayer().getInventory().setItem(event.getHand(), new ItemStack(Material.AIR));
             }
             return;
-        }
-    }
-
-    @EventHandler
-    public void onBlockBreak(org.bukkit.event.block.BlockBreakEvent event) {
-        if (event.isCancelled()) return;
-        if (event.getBlock().getType() != Material.BARRIER) return;
-        
-        Location brokenLoc = event.getBlock().getLocation();
-        for (int i = 0; i < blocks.size(); i++) {
-            CustomBlock block = blocks.get(i);
-            if (block.getBlockLocation().equals(brokenLoc)) {
-                event.setCancelled(true);
-                
-                BlockType blockType = registry.getBlockType(block.getBlockType());
-                if (blockType != null) {
-                    ItemStack dropItem = blockType.getDropItem();
-                    if (dropItem != null) {
-                        brokenLoc.getWorld().dropItemNaturally(brokenLoc, dropItem);
-                    }
-                }
-                
-                block.remove();
-                blocks.remove(i);
-                block.onRemoved();
-                event.getPlayer().sendMessage("§cCustom block removed");
-                return;
-            }
         }
     }
 
@@ -377,8 +395,11 @@ public class CustomBlockManager implements Listener {
                     return;
                 }
             } else {
-                boolean shouldCancel = block.onWrenchInteract(player, false);
-                if (shouldCancel) {
+                boolean handled = block.onInteract(player, player.isSneaking());
+                if (!handled) {
+                    handled = block.onWrenchInteract(player, false);
+                }
+                if (handled) {
                     event.setCancelled(true);
                 }
                 return;
