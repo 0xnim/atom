@@ -79,11 +79,24 @@ public class AnimalBehaviorNew implements Listener {
     private void enhanceAnimalStats(Animals animal, double domesticationFactor, SpeciesBehavior behavior) {
         double wildFactor = 1.0 - domesticationFactor;
         
+        org.bukkit.NamespacedKey wildnessKey = new org.bukkit.NamespacedKey(plugin, "wildness_modifier");
+        
         if (animal.getAttribute(Attribute.MAX_HEALTH) != null) {
-            double currentMax = Objects.requireNonNull(animal.getAttribute(Attribute.MAX_HEALTH)).getBaseValue();
-            double healthMultiplier = 1.0 + (0.5 * wildFactor);
-            Objects.requireNonNull(animal.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(currentMax * healthMultiplier);
-            animal.setHealth(Objects.requireNonNull(animal.getAttribute(Attribute.MAX_HEALTH)).getValue());
+            org.bukkit.attribute.AttributeInstance healthAttr = animal.getAttribute(Attribute.MAX_HEALTH);
+            Objects.requireNonNull(healthAttr).getModifiers().forEach(mod -> {
+                if (mod.getKey().equals(wildnessKey)) {
+                    healthAttr.removeModifier(mod);
+                }
+            });
+            
+            double healthBonus = 0.5 * wildFactor;
+            if (healthBonus > 0) {
+                org.bukkit.attribute.AttributeModifier healthMod = new org.bukkit.attribute.AttributeModifier(
+                    wildnessKey, healthBonus, org.bukkit.attribute.AttributeModifier.Operation.MULTIPLY_SCALAR_1
+                );
+                healthAttr.addModifier(healthMod);
+            }
+            animal.setHealth(healthAttr.getValue());
         }
         
         if (animal.getAttribute(Attribute.KNOCKBACK_RESISTANCE) != null) {
@@ -91,9 +104,20 @@ public class AnimalBehaviorNew implements Listener {
         }
         
         if (animal.getAttribute(Attribute.MOVEMENT_SPEED) != null) {
-            double currentSpeed = Objects.requireNonNull(animal.getAttribute(Attribute.MOVEMENT_SPEED)).getBaseValue();
-            double speedMultiplier = 1.0 + (0.35 * wildFactor);
-            Objects.requireNonNull(animal.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(currentSpeed * speedMultiplier);
+            org.bukkit.attribute.AttributeInstance speedAttr = animal.getAttribute(Attribute.MOVEMENT_SPEED);
+            speedAttr.getModifiers().forEach(mod -> {
+                if (mod.getKey().equals(wildnessKey)) {
+                    speedAttr.removeModifier(mod);
+                }
+            });
+            
+            double speedBonus = 0.35 * wildFactor;
+            if (speedBonus > 0) {
+                org.bukkit.attribute.AttributeModifier speedMod = new org.bukkit.attribute.AttributeModifier(
+                    wildnessKey, speedBonus, org.bukkit.attribute.AttributeModifier.Operation.MULTIPLY_SCALAR_1
+                );
+                speedAttr.addModifier(speedMod);
+            }
         }
     }
     

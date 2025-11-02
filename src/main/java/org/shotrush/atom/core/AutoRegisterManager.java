@@ -188,25 +188,26 @@ public class AutoRegisterManager {
         ));
         
         for (Class<?> clazz : sortedClasses) {
-            if (org.bukkit.event.Listener.class.isAssignableFrom(clazz)) {
+            try {
+                Constructor<?> constructor;
+                Object instance;
+                
                 try {
-                    Constructor<?> constructor;
-                    org.bukkit.event.Listener listener;
-                    
-                    try {
-                        constructor = clazz.getConstructor(Plugin.class);
-                        listener = (org.bukkit.event.Listener) constructor.newInstance(plugin);
-                    } catch (NoSuchMethodException e) {
-                        constructor = clazz.getConstructor();
-                        listener = (org.bukkit.event.Listener) constructor.newInstance();
-                    }
-                    
-                    plugin.getServer().getPluginManager().registerEvents(listener, plugin);
-                    plugin.getLogger().info("Auto-registered system: " + clazz.getSimpleName());
-                } catch (Exception e) {
-                    plugin.getLogger().warning("Failed to auto-register system: " + clazz.getName());
-                    e.printStackTrace();
+                    constructor = clazz.getConstructor(Plugin.class);
+                    instance = constructor.newInstance(plugin);
+                } catch (NoSuchMethodException e) {
+                    constructor = clazz.getConstructor();
+                    instance = constructor.newInstance();
                 }
+                
+                if (instance instanceof org.bukkit.event.Listener listener) {
+                    plugin.getServer().getPluginManager().registerEvents(listener, plugin);
+                }
+                
+                plugin.getLogger().info("Auto-registered system: " + clazz.getSimpleName());
+            } catch (Exception e) {
+                plugin.getLogger().warning("Failed to auto-register system: " + clazz.getName());
+                e.printStackTrace();
             }
         }
     }

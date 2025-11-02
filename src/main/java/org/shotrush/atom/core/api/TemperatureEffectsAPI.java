@@ -33,32 +33,31 @@ public class TemperatureEffectsAPI {
     }
     
     public static void applyBodyTemperatureEffects(Player player, double bodyTemp) {
-        if (bodyTemp >= 40.0) {
-            player.damage(2.0);
+        if (bodyTemp >= 41.0) {
+            player.damage(0.5);
             player.addPotionEffect(new PotionEffect(
                 PotionEffectType.SLOWNESS, 40, 1, false, false
             ));
             player.addPotionEffect(new PotionEffect(
                 PotionEffectType.NAUSEA, 100, 0, false, false
             ));
-        } else if (bodyTemp >= 38.5) {
+        } else if (bodyTemp >= 39.0) {
             player.addPotionEffect(new PotionEffect(
                 PotionEffectType.SLOWNESS, 40, 0, false, false
             ));
         }
         
-        else if (bodyTemp <= 32.0) {
-            player.damage(2.0);
+        else if (bodyTemp <= 33.0) {
+            player.damage(0.5);
             player.addPotionEffect(new PotionEffect(
                 PotionEffectType.SLOWNESS, 40, 2, false, false
             ));
-            player.setFreezeTicks(Math.min(player.getFreezeTicks() + 20, 140));
-        } else if (bodyTemp <= 34.0) {
-            player.damage(1.0);
+            player.setFreezeTicks(Math.min(player.getFreezeTicks() + 10, 140));
+        } else if (bodyTemp <= 34.5) {
             player.addPotionEffect(new PotionEffect(
                 PotionEffectType.SLOWNESS, 40, 1, false, false
             ));
-            player.setFreezeTicks(Math.min(player.getFreezeTicks() + 10, 140));
+            player.setFreezeTicks(Math.min(player.getFreezeTicks() + 5, 140));
         } else if (bodyTemp <= 35.5) {
             player.addPotionEffect(new PotionEffect(
                 PotionEffectType.SLOWNESS, 40, 0, false, false

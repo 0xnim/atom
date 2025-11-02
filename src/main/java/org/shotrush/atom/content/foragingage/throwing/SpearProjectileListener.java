@@ -68,7 +68,7 @@ public class SpearProjectileListener implements Listener {
             .airDrag(0.99)
             .maxLifetime(200)
             .damage(8.0)
-            .interpolation(5, -1)
+            .interpolation(5, 0)
             .baseRotation(baseRotation)
             .scale(1.2f);
         

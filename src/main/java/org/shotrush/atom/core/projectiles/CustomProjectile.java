@@ -136,6 +136,13 @@ public class CustomProjectile {
         }
         
         Location nextLoc = currentLoc.clone().add(velocity);
+        
+        double speed = velocity.length();
+        int dynamicInterpolation = (int) Math.ceil(speed * 3.0);
+        dynamicInterpolation = Math.max(1, Math.min(10, dynamicInterpolation));
+        
+        display.setInterpolationDuration(dynamicInterpolation);
+        display.setInterpolationDelay(0);
         display.teleportAsync(nextLoc);
         
         velocity.multiply(config.airDrag);
