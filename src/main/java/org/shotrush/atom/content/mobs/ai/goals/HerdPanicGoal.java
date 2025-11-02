@@ -102,14 +102,16 @@ public class HerdPanicGoal implements Goal<Mob> {
             computeFleeTarget();
         }
         
-        if (fleeTarget != null && fleeTarget.getWorld() != null) {
-            double domesticationFactor = AnimalDomestication.getDomesticationFactor((Animals) mob);
-            double speed = behavior.getFleeSpeed(domesticationFactor);
-            
-            drainStamina();
-            
-            mob.getPathfinder().moveTo(fleeTarget, speed);
+        if (fleeTarget == null || fleeTarget.getWorld() == null) {
+            return;
         }
+        
+        double domesticationFactor = AnimalDomestication.getDomesticationFactor((Animals) mob);
+        double speed = behavior.getFleeSpeed(domesticationFactor);
+        
+        drainStamina();
+        
+        mob.getPathfinder().moveTo(fleeTarget, speed);
     }
     
     private void computeFleeTarget() {
