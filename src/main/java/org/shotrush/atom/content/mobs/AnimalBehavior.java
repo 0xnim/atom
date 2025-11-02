@@ -87,14 +87,8 @@ public class AnimalBehavior implements Listener {
         
         trackedAnimals.add(animal.getUniqueId());
         
-        if (isAggressive) {
-            Bukkit.getRegionScheduler().runDelayed(plugin, animal.getLocation(), task -> {
-                makeAggressive(animal);
-            }, 1L);
-            
-            if (entity instanceof Wolf wolf) {
-                wolf.setAngry(true);
-            }
+        if (isAggressive && entity instanceof Wolf wolf) {
+            wolf.setAngry(true);
         }
         
         
@@ -129,57 +123,6 @@ public class AnimalBehavior implements Listener {
         }
     }
     
-    private void makeAggressive(Animals animal) {
-        Location loc = animal.getLocation();
-        
-        plugin.getLogger().info("Making " + animal.getType() + " aggressive at " + loc);
-        
-        Husk husk = (Husk) loc.getWorld().spawnEntity(loc, EntityType.HUSK);
-        husk.setBaby();
-        husk.setInvisible(true);
-        husk.setInvulnerable(true);
-        husk.setSilent(true);
-        husk.setAI(true);
-        husk.setCollidable(false);
-        husk.setGravity(false);
-        husk.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, false, false));
-        husk.setMetadata("aggressionHelper", new FixedMetadataValue(plugin, true));
-        
-        plugin.getLogger().info("Spawned baby husk: " + husk.getUniqueId());
-        
-        animal.addPassenger(husk);
-        animal.setMetadata("aggressionEntity", new FixedMetadataValue(plugin, husk.getUniqueId()));
-        
-        plugin.getLogger().info("Added husk as passenger to animal");
-    }
-    
-    @EventHandler
-    public void onAnimalBreed(EntityBreedEvent event) {
-        if (!(event.getMother() instanceof Animals mother)) return;
-        if (!(event.getFather() instanceof Animals father)) return;
-        
-        removePassengerTemporarily(mother);
-        removePassengerTemporarily(father);
-    }
-    
-    private void removePassengerTemporarily(Animals animal) {
-        if (animal.hasMetadata("aggressionEntity")) {
-            UUID huskId = (UUID) animal.getMetadata("aggressionEntity").getFirst().value();
-            Entity husk = Bukkit.getEntity(Objects.requireNonNull(huskId));
-            if (husk != null) {
-                husk.remove();
-            }
-            animal.removeMetadata("aggressionEntity", plugin);
-            
-            Bukkit.getRegionScheduler().runDelayed(plugin, animal.getLocation(), task -> {
-                if (animal.isValid() && !animal.isDead() && animal.hasMetadata("aggressive") && 
-                    animal.getMetadata("aggressive").getFirst().asBoolean()) {
-                    makeAggressive(animal);
-                }
-            }, 100L);
-        }
-    }
-    
     @EventHandler
     public void onAnimalDamage(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Animals animal)) return;
@@ -209,15 +152,6 @@ public class AnimalBehavior implements Listener {
         }
         
         animal.setMetadata("fleeing", new FixedMetadataValue(plugin, true));
-        
-        if (animal.hasMetadata("aggressionEntity")) {
-            UUID huskId = (UUID) animal.getMetadata("aggressionEntity").getFirst().value();
-            Entity husk = Bukkit.getEntity(Objects.requireNonNull(huskId));
-            if (husk != null) {
-                husk.remove();
-            }
-            animal.removeMetadata("aggressionEntity", plugin);
-        }
         
         if (animal instanceof Mob mob) {
             mob.setTarget(null);
@@ -255,14 +189,6 @@ public class AnimalBehavior implements Listener {
                 switchToFleeing(animal);
             }
             handleFleeingBehavior(animal, nearestPlayer, nearbyPlayers);
-        } else if (isAggressive && !isFleeing) {
-            if (animal.hasMetadata("aggressionEntity")) {
-                UUID huskId = (UUID) animal.getMetadata("aggressionEntity").getFirst().value();
-                Entity huskEntity = Bukkit.getEntity(Objects.requireNonNull(huskId));
-                if (huskEntity instanceof Mob husk) {
-                    husk.setTarget(nearestPlayer);
-                }
-            }
         } else if (!isAggressive && !isFleeing) {
             if (nearestPlayer.getLocation().distance(animal.getLocation()) < FLEE_DISTANCE) {
                 switchToFleeing(animal);
