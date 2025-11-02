@@ -6,6 +6,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.joml.Vector3f;
+import org.shotrush.atom.Atom;
+import org.shotrush.atom.core.util.MessageUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +41,7 @@ public abstract class InteractiveSurface extends CustomBlock {
         if (result != null) {
             clearAllItems();
             player.getWorld().dropItemNaturally(spawnLocation, result);
-            player.sendMessage("§aCrafted: " + result.getType().name());
+            MessageUtil.send(player, "§aCrafted: " + result.getType().name());
             return true;
         } else {
             releaseAllItems(player);
@@ -100,13 +102,12 @@ public abstract class InteractiveSurface extends CustomBlock {
     protected void spawnItemDisplay(PlacedItem item) {
         Location itemLoc = spawnLocation.clone().add(item.getPosition().x, item.getPosition().y, item.getPosition().z);
         if (itemLoc.getWorld() == null) {
-            org.shotrush.atom.Atom.getInstance().getLogger().warning("Cannot spawn item display - world is null");
+            Atom.getInstance().getLogger().warning("Cannot spawn item display - world is null");
             return;
         }
-        org.bukkit.Bukkit.getRegionScheduler().run(org.shotrush.atom.Atom.getInstance(), itemLoc, task -> {
+        org.bukkit.Bukkit.getRegionScheduler().run(Atom.getInstance(), itemLoc, task -> {
             org.bukkit.entity.ItemDisplay display = (org.bukkit.entity.ItemDisplay) itemLoc.getWorld().spawnEntity(itemLoc, org.bukkit.entity.EntityType.ITEM_DISPLAY);
             display.setItemStack(item.getItem());
-            
             org.joml.AxisAngle4f rotation = getItemDisplayRotation(item);
             org.joml.Vector3f translation = getItemDisplayTranslation(item);
             org.joml.Vector3f scale = getItemDisplayScale(item);
@@ -164,6 +165,37 @@ public abstract class InteractiveSurface extends CustomBlock {
             sb.append(",").append(item.getYaw());
         }
         return sb.toString();
+    }
+    
+    @Override
+    protected String deserializeAdditionalData(String[] parts, int startIndex) {
+        if (startIndex >= parts.length) return null;
+        
+        try {
+            int itemCount = Integer.parseInt(parts[startIndex]);
+            
+            for (int i = 0; i < itemCount; i++) {
+                int partIndex = startIndex + 1 + i;
+                if (partIndex >= parts.length) break;
+                
+                String[] itemData = parts[partIndex].split(",");
+                if (itemData.length < 5) continue;
+                
+                org.bukkit.Material material = org.bukkit.Material.valueOf(itemData[0]);
+                float x = Float.parseFloat(itemData[1]);
+                float y = Float.parseFloat(itemData[2]);
+                float z = Float.parseFloat(itemData[3]);
+                float yaw = Float.parseFloat(itemData[4]);
+                
+                ItemStack item = new ItemStack(material);
+                Vector3f position = new Vector3f(x, y, z);
+                placedItems.add(new PlacedItem(item, position, yaw));
+            }
+        } catch (Exception e) {
+            Atom.getInstance().getLogger().warning("Failed to deserialize placed items: " + e.getMessage());
+        }
+        
+        return null;
     }
     
     public static class PlacedItem {

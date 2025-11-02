@@ -1,4 +1,4 @@
-package org.shotrush.atom.content.foragingage.workstations;
+package org.shotrush.atom.content.foragingage.workstations.craftingbasket;
 
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
@@ -7,63 +7,64 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import org.checkerframework.checker.units.qual.A;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 import org.shotrush.atom.Atom;
 import org.shotrush.atom.core.blocks.InteractiveSurface;
 import org.shotrush.atom.core.blocks.annotation.AutoRegister;
+import org.shotrush.atom.core.recipe.RecipeManager;
 
-@AutoRegister(priority = 32)
-public class KnappingStation extends InteractiveSurface {
+import java.util.ArrayList;
+import java.util.List;
 
-    public KnappingStation(Location spawnLocation, Location blockLocation, BlockFace blockFace) {
+@AutoRegister(priority = 33)
+public class CraftingBasket extends InteractiveSurface {
+
+    public CraftingBasket(Location spawnLocation, Location blockLocation, BlockFace blockFace) {
         super(spawnLocation, blockLocation, blockFace);
     }
 
-    public KnappingStation(Location spawnLocation, BlockFace blockFace) {
+    public CraftingBasket(Location spawnLocation, BlockFace blockFace) {
         super(spawnLocation, blockFace);
     }
 
     @Override
     public int getMaxItems() {
-        return 1;
+        return 4;
     }
 
     @Override
     public boolean canPlaceItem(ItemStack item) {
-        return item != null && item.getType() == Material.FLINT;
+        return item != null;
     }
 
     @Override
     public Vector3f calculatePlacement(Player player, int itemCount) {
-        return new Vector3f(-0.2f, 1f, 0.2f);
+        float[][] positions = {
+                {-0.3f, 0.3f, -0.3f},
+                {0.3f, 0.3f, -0.3f},
+                {-0.3f, 0.3f, 0.3f},
+                {0.3f, 0.3f, 0.3f}
+        };
+
+        if (itemCount < positions.length) {
+            return new Vector3f(positions[itemCount][0], positions[itemCount][1], positions[itemCount][2]);
+        }
+        return new Vector3f(0, 0.2f, 0);
     }
 
     @Override
     public void spawn(Atom plugin, RegionAccessor accessor) {
         ItemDisplay display = (ItemDisplay) accessor.spawnEntity(spawnLocation, EntityType.ITEM_DISPLAY);
-        ItemStack stationItem = createItemWithCustomModel(Material.STONE_BUTTON, "knapping_station");
+        ItemStack basketItem = createItemWithCustomModel(Material.STONE_BUTTON, "crafting_basket");
 
-        spawnDisplay(display, plugin, stationItem, new Vector3f(0, 0.5f, 0), new AxisAngle4f(), new Vector3f(1f, 1f, 1f), true, 0.65f, 0.75f);
+        spawnDisplay(display, plugin, basketItem, new Vector3f(0, 0.5f, 0), new AxisAngle4f(), new Vector3f(1f, 1f, 1f), false, 1f, 0.2f);
 
         for (PlacedItem item : placedItems) {
             spawnItemDisplay(item);
         }
     }
 
-
-    @Override
-    protected AxisAngle4f getItemDisplayRotation(PlacedItem item) {
-        float randomYaw = (float) (Math.random() * Math.PI * 2);
-        AxisAngle4f yawRotation = new AxisAngle4f(randomYaw, 0, 1, 0);
-
-            AxisAngle4f flatRotation = new AxisAngle4f((float) Math.toRadians(90), 1, 0, 0);
-
-            return org.shotrush.atom.core.blocks.util.BlockRotationUtil.combineRotations(yawRotation,
-                    flatRotation);
-    }
 
     @Override
     public void update(float globalAngle) {
@@ -90,17 +91,21 @@ public class KnappingStation extends InteractiveSurface {
     }
 
     @Override
+    protected ItemStack checkRecipe() {
+        RecipeManager recipeManager = Atom.getInstance().getRecipeManager();
+        if (recipeManager == null) return null;
+        
+        List<ItemStack> items = new ArrayList<>();
+        for (PlacedItem placedItem : placedItems) {
+            items.add(placedItem.getItem());
+        }
+        
+        return recipeManager.findMatch(items);
+    }
+    
+    @Override
     public boolean onWrenchInteract(Player player, boolean sneaking) {
         ItemStack hand = player.getInventory().getItemInMainHand();
-
-        if (hand.getType() == Material.BRUSH) {
-            if (placedItems.isEmpty()) {
-                player.sendMessage("§cPlace flint first!");
-                return true;
-            }
-            player.swingMainHand();
-            return false;
-        }
 
         if (sneaking) {
             ItemStack removed = removeLastItem();
@@ -112,7 +117,6 @@ public class KnappingStation extends InteractiveSurface {
         }
 
         if (hand.getType() == Material.WOODEN_HOE || hand.getType() == Material.AIR) return false;
-        if (hand.getType() != Material.FLINT) return false;
 
         if (placeItem(player, hand, calculatePlacement(player, placedItems.size()), 0)) {
             hand.setAmount(hand.getAmount() - 1);
@@ -123,12 +127,12 @@ public class KnappingStation extends InteractiveSurface {
 
     @Override
     public String getIdentifier() {
-        return "knapping_station";
+        return "crafting_basket";
     }
 
     @Override
     public String getDisplayName() {
-        return "§6Knapping Station";
+        return "§eCrafting Basket";
     }
 
     @Override
@@ -139,30 +143,15 @@ public class KnappingStation extends InteractiveSurface {
     @Override
     public String[] getLore() {
         return new String[]{
-                "§7Knap flint into tools",
-                "§8Use brush to knap"
+                "§7A basket for crafting items",
+                "§8Place up to 4 items"
         };
     }
 
     @Override
     public org.shotrush.atom.core.blocks.CustomBlock deserialize(String data) {
-        try {
-            String[] parts = data.split(";");
-            World world = Bukkit.getWorld(parts[0]);
-            if (world == null) {
-                Atom.getInstance().getLogger().warning("World '" + parts[0] + "' not loaded, skipping KnappingStation deserialization");
-                return null;
-            }
-            Location location = new Location(world,
-                    Double.parseDouble(parts[1]),
-                    Double.parseDouble(parts[2]),
-                    Double.parseDouble(parts[3])
-            );
-            BlockFace face = BlockFace.valueOf(parts[4]);
-            return new KnappingStation(location, face);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        Object[] parsed = parseDeserializeData(data);
+        if (parsed == null) return null;
+        return new CraftingBasket((Location) parsed[1], (BlockFace) parsed[2]);
     }
 }

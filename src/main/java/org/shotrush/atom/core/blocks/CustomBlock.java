@@ -1,10 +1,7 @@
 package org.shotrush.atom.core.blocks;
 
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.RegionAccessor;
+import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -131,6 +128,36 @@ public abstract class CustomBlock implements BlockType {
 
     @Override
     public abstract CustomBlock deserialize(String data);
+    
+    /**
+     * Helper method to parse common deserialization data
+     * @param data Serialized data string
+     * @return Array containing [World, Location, BlockFace] or null if parsing fails
+     */
+    protected Object[] parseDeserializeData(String data) {
+        try {
+            String[] parts = data.split(";");
+            World world = Bukkit.getWorld(parts[0]);
+            if (world == null) {
+                Atom.getInstance().getLogger().warning("World '" + parts[0] + "' not loaded, skipping " + getIdentifier() + " deserialization");
+                return null;
+            }
+            Location location = new Location(world,
+                    Double.parseDouble(parts[1]),
+                    Double.parseDouble(parts[2]),
+                    Double.parseDouble(parts[3])
+            );
+            BlockFace face = BlockFace.valueOf(parts[4]);
+            
+            deserializeAdditionalData(parts, 5);
+            
+            return new Object[]{world, location, face};
+        } catch (Exception e) {
+            Atom.getInstance().getLogger().warning("Failed to deserialize " + getIdentifier() + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     @Override
     public boolean requiresUpdate() {
@@ -177,15 +204,7 @@ public abstract class CustomBlock implements BlockType {
 
     
     protected ItemStack createItemWithCustomModel(Material material, String modelName) {
-        ItemStack item = new ItemStack(material);
-        ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            org.bukkit.inventory.meta.components.CustomModelDataComponent component = meta.getCustomModelDataComponent();
-            component.setStrings(java.util.List.of(modelName));
-            meta.setCustomModelDataComponent(component);
-            item.setItemMeta(meta);
-        }
-        return item;
+        return org.shotrush.atom.core.util.ItemUtil.createItemWithCustomModel(material, modelName);
     }
 
     

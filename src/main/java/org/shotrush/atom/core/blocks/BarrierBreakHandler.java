@@ -20,6 +20,7 @@ import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.shotrush.atom.Atom;
+import org.shotrush.atom.core.util.MessageUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -159,7 +160,7 @@ public class BarrierBreakHandler implements Listener {
             
             block.setType(Material.AIR);
             blockManager.removeBlock(customBlock);
-            player.sendMessage("§aCustom block removed");
+            MessageUtil.send(player, "§aCustom block removed");
         }
     }
     

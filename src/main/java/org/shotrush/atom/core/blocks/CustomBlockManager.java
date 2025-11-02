@@ -17,6 +17,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.shotrush.atom.Atom;
 import org.shotrush.atom.core.blocks.annotation.AutoRegister;
 import org.reflections.Reflections;
+import org.shotrush.atom.core.util.MessageUtil;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
@@ -154,21 +155,7 @@ public class CustomBlockManager implements Listener {
     }
     
     public void cleanupAllDisplays() {
-        int cleanedCount = 0;
-        for (CustomBlock block : blocks) {
-            if (block instanceof InteractiveSurface surface) {
-                for (InteractiveSurface.PlacedItem item : surface.getPlacedItems()) {
-                    if (item.getDisplayUUID() != null) {
-                        Entity entity = Bukkit.getEntity(item.getDisplayUUID());
-                        if (entity != null) {
-                            entity.remove();
-                            cleanedCount++;
-                        }
-                    }
-                }
-            }
-        }
-        plugin.getLogger().info("Cleaned up " + cleanedCount + " item display(s) on shutdown");
+        plugin.getLogger().info("Skipping entity cleanup on shutdown (Folia-safe)");
     }
 
     public void removeAllBlocks() {
@@ -204,7 +191,7 @@ public class CustomBlockManager implements Listener {
     public void giveBlockItem(Player player, String blockTypeId) {
         BlockType blockType = registry.getBlockType(blockTypeId);
         if (blockType == null) {
-            player.sendMessage("§cUnknown block type: " + blockTypeId);
+            MessageUtil.send(player, "§cUnknown block type: " + blockTypeId);
             return;
         }
 
@@ -226,14 +213,14 @@ public class CustomBlockManager implements Listener {
         }
 
         player.getInventory().addItem(item);
-        player.sendMessage("§aYou received a " + blockType.getDisplayName() + "!");
+        MessageUtil.send(player, "§aYou received a " + blockType.getDisplayName() + "!");
     }
 
     public void giveWrench(Player player) {
         ItemStack wrench = plugin.getItemRegistry().createItem("wrench");
         if (wrench != null) {
             player.getInventory().addItem(wrench);
-            player.sendMessage("§aYou received a Mechanical Wrench!");
+            MessageUtil.send(player, "§aYou received a Mechanical Wrench!");
         }
     }
     
@@ -348,7 +335,7 @@ public class CustomBlockManager implements Listener {
                     block.remove();
                     blocks.remove(i);
                     block.onRemoved();
-                    player.sendMessage("§cCustom block removed");
+                    MessageUtil.send(player, "§cCustom block removed");
                 }
                 return;
             }
@@ -388,7 +375,7 @@ public class CustomBlockManager implements Listener {
                     block.remove();
                     blocks.remove(index);
                     block.onRemoved();
-                    player.sendMessage("§cBlock removed!");
+                    MessageUtil.send(player, "§cBlock removed!");
                     return;
                 } else {
                     block.onWrenchInteract(player, false);
@@ -415,7 +402,7 @@ public class CustomBlockManager implements Listener {
                 block.remove();
                 blocks.remove(index);
                 block.onRemoved();
-                player.sendMessage("§cBlock removed!");
+                MessageUtil.send(player, "§cBlock removed!");
                 return;
             } else {
                 block.onWrenchInteract(player, false);

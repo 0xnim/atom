@@ -11,6 +11,9 @@ import org.shotrush.atom.core.blocks.BlockType;
 import org.shotrush.atom.core.blocks.CustomBlockRegistry;
 import org.shotrush.atom.core.items.CustomItem;
 import org.shotrush.atom.core.items.CustomItemRegistry;
+import org.shotrush.atom.core.recipe.Recipe;
+import org.shotrush.atom.core.recipe.RecipeManager;
+import org.shotrush.atom.core.recipe.RecipeProvider;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
@@ -142,6 +145,34 @@ public class AutoRegisterManager {
         if (!ages.isEmpty()) {
             ageManager.registerAges(ages.toArray(new Age[0]));
             ageManager.setAge(ages.get(0));
+        }
+    }
+    
+    public static void registerRecipes(Plugin plugin, RecipeManager recipeManager) {
+        Reflections reflections = new Reflections("org.shotrush.atom");
+        Set<Class<?>> annotatedClasses = reflections.getTypesAnnotatedWith(
+            org.shotrush.atom.core.recipe.annotation.AutoRegister.class
+        );
+        
+        List<Class<?>> sortedClasses = new ArrayList<>(annotatedClasses);
+        sortedClasses.sort(Comparator.comparingInt(cls -> 
+            cls.getAnnotation(org.shotrush.atom.core.recipe.annotation.AutoRegister.class).priority()
+        ));
+        
+        for (Class<?> clazz : sortedClasses) {
+            if (RecipeProvider.class.isAssignableFrom(clazz)) {
+                try {
+                    RecipeProvider provider = (RecipeProvider) clazz.getConstructor().newInstance();
+                    List<Recipe> recipes = provider.getRecipes();
+                    for (Recipe recipe : recipes) {
+                        recipeManager.registerRecipe(recipe);
+                        plugin.getLogger().info("Auto-registered recipe: " + recipe.getId());
+                    }
+                } catch (Exception e) {
+                    plugin.getLogger().warning("Failed to auto-register recipe provider: " + clazz.getName());
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

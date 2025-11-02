@@ -11,6 +11,7 @@ import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 import org.shotrush.atom.Atom;
+import org.shotrush.atom.core.util.MessageUtil;
 import org.shotrush.atom.core.blocks.CustomBlock;
 import org.shotrush.atom.core.blocks.InteractiveSurface;
 import org.shotrush.atom.core.blocks.annotation.AutoRegister;
@@ -29,7 +30,7 @@ public class AnvilSurface extends InteractiveSurface {
     
     @Override
     public int getMaxItems() {
-        return 8;
+        return 2;
     }
     
     @Override
@@ -39,15 +40,16 @@ public class AnvilSurface extends InteractiveSurface {
     
     @Override
     public Vector3f calculatePlacement(Player player, int itemCount) {
-        org.bukkit.util.RayTraceResult result = player.rayTraceBlocks(5);
-        if (result != null && result.getHitPosition() != null) {
-            org.bukkit.util.Vector hitPos = result.getHitPosition();
-            float x = (float) (hitPos.getX() - blockLocation.getX() - 0.5);
-            float z = (float) (hitPos.getZ() - blockLocation.getZ() - 0.5);
-            return new Vector3f(x, 0.6f, z);
+        // Fixed positions for 2 items
+        float[][] positions = {
+                {-0.25f, 0.6f, 0f},  // Left position
+                {0.25f, 0.6f, 0f}    // Right position
+        };
+        
+        if (itemCount < positions.length) {
+            return new Vector3f(positions[itemCount][0], positions[itemCount][1], positions[itemCount][2]);
         }
-        float offset = itemCount * 0.15f - 0.3f;
-        return new Vector3f(offset, 0.6f, 0);
+        return new Vector3f(0, 0.6f, 0);
     }
 
     @Override
@@ -117,7 +119,7 @@ public class AnvilSurface extends InteractiveSurface {
             ItemStack removed = removeLastItem();
             if (removed != null) {
                 player.getInventory().addItem(removed);
-                player.sendMessage("§7Removed item (" + placedItems.size() + "/" + getMaxItems() + ")");
+                MessageUtil.send(player, "§7Removed item (" + placedItems.size() + "/" + getMaxItems() + ")");
                 return true;
             }
             return false;
@@ -130,11 +132,11 @@ public class AnvilSurface extends InteractiveSurface {
         Vector3f pos = calculatePlacement(player, placedItems.size());
         if (placeItem(player, hand, pos, player.getLocation().getYaw())) {
             hand.setAmount(hand.getAmount() - 1);
-            player.sendMessage("§aPlaced item (" + placedItems.size() + "/" + getMaxItems() + ")");
+            MessageUtil.send(player, "§aPlaced item (" + placedItems.size() + "/" + getMaxItems() + ")");
             return true;
         }
         
-        player.sendMessage("§cSurface is full!");
+        MessageUtil.send(player, "§cSurface is full!");
         return false;
     }
     @Override
@@ -155,7 +157,7 @@ public class AnvilSurface extends InteractiveSurface {
     @Override
     public String[] getLore() {
         return new String[]{
-            "§7Place items on this surface",
+            "§7Place up to 2 items on this surface",
             "§8• Right-click: Place item",
             "§8• Shift + Right-click: Remove item"
         };

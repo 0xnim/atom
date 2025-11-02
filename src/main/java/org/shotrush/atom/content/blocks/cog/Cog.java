@@ -14,10 +14,12 @@ import org.bukkit.entity.Interaction;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
+import org.bukkit.World;
 
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 import org.shotrush.atom.Atom;
+import org.shotrush.atom.core.util.MessageUtil;
 import org.shotrush.atom.core.blocks.*;
 import org.shotrush.atom.core.blocks.annotation.AutoRegister;
 import org.shotrush.atom.core.blocks.util.BlockRotationUtil;
@@ -50,7 +52,7 @@ public class Cog extends CustomBlock {
 
     @Override
     public String getBlockType() {
-        return "cog";
+        return "cog_small";
     }
 
     @Override
@@ -185,7 +187,7 @@ public class Cog extends CustomBlock {
         }
 
         togglePowerSource();
-        player.sendMessage(isPowerSource ?
+        MessageUtil.send(player, isPowerSource ?
                 "§aCog is now a power source!" :
                 "§7Cog is no longer a power source");
 
@@ -208,7 +210,7 @@ public class Cog extends CustomBlock {
 
     @Override
     public String getIdentifier() {
-        return "cog";
+        return "cog_small";
     }
 
     @Override
@@ -235,24 +237,26 @@ public class Cog extends CustomBlock {
     public CustomBlock deserialize(String data) {
         try {
             String[] parts = data.split(";");
-            if (parts.length >= 5) {
-                org.bukkit.World world = Bukkit.getWorld(parts[0]);
-                if (world == null) return null;
-
-                double x = Double.parseDouble(parts[1]);
-                double y = Double.parseDouble(parts[2]);
-                double z = Double.parseDouble(parts[3]);
-                Location location = new Location(world, x, y, z);
-
-                BlockFace face = BlockFace.valueOf(parts[4]);
-                boolean isPowerSource = parts.length > 5 && Boolean.parseBoolean(parts[5]);
-
-                return new Cog(location, face, isPowerSource);
+            World world = org.bukkit.Bukkit.getWorld(parts[0]);
+            if (world == null) return null;
+            
+            Location location = new Location(world,
+                    Double.parseDouble(parts[1]),
+                    Double.parseDouble(parts[2]),
+                    Double.parseDouble(parts[3])
+            );
+            BlockFace face = BlockFace.valueOf(parts[4]);
+            
+            boolean isPowerSource = false;
+            if (parts.length > 5) {
+                isPowerSource = Boolean.parseBoolean(parts[5]);
             }
+            
+            return new Cog(location, face, isPowerSource);
         } catch (Exception e) {
-            e.printStackTrace();
+            org.shotrush.atom.Atom.getInstance().getLogger().warning("Failed to deserialize Cog: " + e.getMessage());
+            return null;
         }
-        return null;
     }
 
     @Override

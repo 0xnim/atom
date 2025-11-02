@@ -86,24 +86,8 @@ public class GroundStick extends CustomBlock {
 
     @Override
     public CustomBlock deserialize(String data) {
-        try {
-            String[] parts = data.split(";");
-            if (parts.length >= 5) {
-                World world = Bukkit.getWorld(parts[0]);
-                if (world == null) return null;
-
-                double x = Double.parseDouble(parts[1]);
-                double y = Double.parseDouble(parts[2]);
-                double z = Double.parseDouble(parts[3]);
-                Location location = new Location(world, x, y, z);
-
-                BlockFace face = BlockFace.valueOf(parts[4]);
-
-                return new GroundStick(location, face);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        Object[] parsed = parseDeserializeData(data);
+        if (parsed == null) return null;
+        return new GroundStick((Location) parsed[1], (BlockFace) parsed[2]);
     }
 }

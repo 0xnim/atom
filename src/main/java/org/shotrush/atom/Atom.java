@@ -16,8 +16,10 @@ import org.shotrush.atom.content.mobs.MobScale;
 import org.shotrush.atom.content.foragingage.throwing.SpearProjectileListener;
 import org.shotrush.atom.core.age.AgeManager;
 import org.shotrush.atom.core.items.CustomItemRegistry;
+import org.shotrush.atom.core.recipe.RecipeManager;
 import org.shotrush.atom.core.storage.DataStorage;
 import org.shotrush.atom.core.skin.SkinListener;
+import org.shotrush.atom.core.util.RightClickDetector;
 import org.shotrush.atom.world.RockChunkGenerator;
 
 public final class Atom extends JavaPlugin {
@@ -32,6 +34,8 @@ public final class Atom extends JavaPlugin {
     private DataStorage dataStorage;
     @Getter
     private AgeManager ageManager;
+    @Getter
+    private RecipeManager recipeManager;
 
     @Override
     public void onEnable() {
@@ -41,11 +45,14 @@ public final class Atom extends JavaPlugin {
         ageManager = new AgeManager(this, dataStorage);
         itemRegistry = new CustomItemRegistry(this);
         blockManager = new CustomBlockManager(this);
+        recipeManager = new RecipeManager();
         
         AutoRegisterManager.registerAges(this, ageManager);
         AutoRegisterManager.registerItems(this, itemRegistry);
         AutoRegisterManager.registerBlocks(this, blockManager.getRegistry());
+        AutoRegisterManager.registerRecipes(this, recipeManager);
         
+        getServer().getPluginManager().registerEvents(new RightClickDetector(), this);
         getServer().getPluginManager().registerEvents(new SkinListener(), this);
         getServer().getPluginManager().registerEvents(new MobScale(this), this);
         getServer().getPluginManager().registerEvents(new AnimalBehavior(this), this);
