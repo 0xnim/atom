@@ -10,6 +10,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.content.mobs.AnimalDomestication;
+import org.shotrush.atom.content.mobs.ai.combat.MoraleSystem;
 import org.shotrush.atom.content.mobs.ai.config.SpeciesBehavior;
 import org.shotrush.atom.content.mobs.herd.Herd;
 import org.shotrush.atom.content.mobs.herd.HerdManager;
@@ -24,21 +25,27 @@ public class HerdPanicGoal implements Goal<Mob> {
     private final Plugin plugin;
     private final HerdManager herdManager;
     private final SpeciesBehavior behavior;
+    private final MoraleSystem moraleSystem;
     private Location fleeTarget;
     private int repathTimer;
     private static final int REPATH_INTERVAL = 20;
     
-    public HerdPanicGoal(Mob mob, Plugin plugin, HerdManager herdManager, SpeciesBehavior behavior) {
+    public HerdPanicGoal(Mob mob, Plugin plugin, HerdManager herdManager, SpeciesBehavior behavior, MoraleSystem moraleSystem) {
         this.mob = mob;
         this.plugin = plugin;
         this.herdManager = herdManager;
         this.behavior = behavior;
+        this.moraleSystem = moraleSystem;
         this.key = GoalKey.of(Mob.class, new NamespacedKey(plugin, "herd_panic"));
         this.repathTimer = 0;
     }
     
     @Override
     public boolean shouldActivate() {
+        if (moraleSystem != null && moraleSystem.isMoraleBroken(mob)) {
+            return true;
+        }
+        
         Optional<Herd> herdOpt = herdManager.getHerd(mob.getUniqueId());
         if (herdOpt.isPresent() && herdOpt.get().isPanicking()) {
             return true;
@@ -95,14 +102,16 @@ public class HerdPanicGoal implements Goal<Mob> {
             computeFleeTarget();
         }
         
-        if (fleeTarget != null) {
-            double domesticationFactor = AnimalDomestication.getDomesticationFactor((Animals) mob);
-            double speed = behavior.getFleeSpeed(domesticationFactor);
-            
-            drainStamina();
-            
-            mob.getPathfinder().moveTo(fleeTarget, speed);
+        if (fleeTarget == null || fleeTarget.getWorld() == null) {
+            return;
         }
+        
+        double domesticationFactor = AnimalDomestication.getDomesticationFactor((Animals) mob);
+        double speed = behavior.getFleeSpeed(domesticationFactor);
+        
+        drainStamina();
+        
+        mob.getPathfinder().moveTo(fleeTarget, speed);
     }
     
     private void computeFleeTarget() {
@@ -138,7 +147,7 @@ public class HerdPanicGoal implements Goal<Mob> {
         double distance = 20.0 + (Math.random() * 10.0);
         
         fleeTarget = current.clone().add(awayFromThreat.multiply(distance));
-        fleeTarget.setY(current.getWorld().getHighestBlockYAt(fleeTarget));
+        fleeTarget.setY(current.getY());
         
         if (fleeTarget.getWorld() == null) {
             fleeTarget = null;
