@@ -1,6 +1,7 @@
 package org.shotrush.atom.core.util;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.components.CustomModelDataComponent;
@@ -21,5 +22,10 @@ public class ItemUtil {
         CustomModelDataComponent component = meta.getCustomModelDataComponent();
         component.setStrings(java.util.List.of(modelName));
         meta.setCustomModelDataComponent(component);
+    }
+    
+    public static void setItemModelAndCustomName(ItemMeta meta, NamespacedKey baseModel, String customModelName) {
+        meta.setItemModel(baseModel);
+        setCustomModelName(meta, customModelName);
     }
 }

@@ -44,6 +44,7 @@ public class WoodSpear extends CustomItem {
 
     @Override
     protected void applyCustomMeta(ItemMeta meta) {
+        meta.setItemModel(NamespacedKey.minecraft("stick"));
         org.shotrush.atom.core.util.ItemUtil.setCustomModelName(meta, "wood_spear");
     }
 }
