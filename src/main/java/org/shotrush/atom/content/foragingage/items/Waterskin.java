@@ -1,4 +1,4 @@
-package org.shotrush.atom.content.items;
+package org.shotrush.atom.content.foragingage.items;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
