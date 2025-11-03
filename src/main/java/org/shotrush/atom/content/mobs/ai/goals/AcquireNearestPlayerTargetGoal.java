@@ -9,6 +9,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.content.mobs.ai.config.SpeciesBehavior;
+import org.shotrush.atom.content.mobs.ai.vision.VisionSystem;
 
 import java.util.EnumSet;
 
@@ -98,6 +99,15 @@ public class AcquireNearestPlayerTargetGoal implements Goal<Mob> {
         
         for (Player player : mob.getLocation().getNearbyPlayers(behavior.aggroRadius())) {
             if (player.getGameMode() == org.bukkit.GameMode.CREATIVE || player.getGameMode() == org.bukkit.GameMode.SPECTATOR) {
+                continue;
+            }
+            
+            if (!VisionSystem.canSee(mob, player)) {
+                continue;
+            }
+            
+            double detectionChance = VisionSystem.getDetectionChance(mob, player);
+            if (Math.random() > detectionChance) {
                 continue;
             }
             

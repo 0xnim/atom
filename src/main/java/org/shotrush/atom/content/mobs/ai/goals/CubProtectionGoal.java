@@ -14,6 +14,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.PolarBear;
 import org.bukkit.plugin.Plugin;
+import org.shotrush.atom.content.mobs.ai.vision.VisionSystem;
 
 import java.util.EnumSet;
 
@@ -43,9 +44,15 @@ public class CubProtectionGoal implements Goal<Mob> {
         
         for (org.bukkit.entity.Entity nearby : bearLoc.getWorld().getNearbyEntities(bearLoc, CUB_PROTECTION_RADIUS, CUB_PROTECTION_RADIUS, CUB_PROTECTION_RADIUS)) {
             if (nearby instanceof PolarBear cub && !cub.isAdult() && cub.getUniqueId() != mob.getUniqueId()) {
+                if (!VisionSystem.canSee(mob, cub)) {
+                    continue;
+                }
+                
                 if (cub.getLastDamageCause() != null && cub.getLastDamageCause().getEntity() instanceof LivingEntity attacker) {
-                    mob.setTarget(attacker);
-                    return true;
+                    if (VisionSystem.canSee(mob, attacker)) {
+                        mob.setTarget(attacker);
+                        return true;
+                    }
                 }
             }
         }

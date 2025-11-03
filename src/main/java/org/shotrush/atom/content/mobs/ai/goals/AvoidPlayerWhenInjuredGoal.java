@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.content.mobs.AnimalDomestication;
 import org.shotrush.atom.content.mobs.ai.config.SpeciesBehavior;
+import org.shotrush.atom.content.mobs.ai.vision.VisionSystem;
 
 import java.util.EnumSet;
 
@@ -105,6 +106,10 @@ public class AvoidPlayerWhenInjuredGoal implements Goal<Mob> {
         double nearestDist = FLEE_DISTANCE;
         
         for (Player player : mob.getLocation().getNearbyPlayers(FLEE_DISTANCE)) {
+            if (!VisionSystem.canSee(mob, player)) {
+                continue;
+            }
+            
             double dist = player.getLocation().distance(mob.getLocation());
             if (dist < nearestDist) {
                 nearest = player;

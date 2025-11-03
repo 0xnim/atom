@@ -13,6 +13,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.content.mobs.ai.config.SpeciesBehavior;
 import org.shotrush.atom.content.mobs.ai.needs.NeedsManager;
+import org.shotrush.atom.content.mobs.ai.vision.VisionSystem;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -126,6 +127,7 @@ public class HuntPreyGoal implements Goal<Mob>, Listener {
             .filter(entity -> entity instanceof LivingEntity)
             .filter(entity -> PREY_TYPES.contains(entity.getType()))
             .filter(entity -> entity.isValid() && !((LivingEntity) entity).isDead())
+            .filter(entity -> VisionSystem.canSee(mob, entity))
             .map(entity -> (LivingEntity) entity)
             .min((a, b) -> Double.compare(
                 mobLoc.distanceSquared(a.getLocation()),

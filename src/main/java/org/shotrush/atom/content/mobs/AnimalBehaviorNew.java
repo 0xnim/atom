@@ -20,7 +20,10 @@ import org.shotrush.atom.content.mobs.ai.goals.*;
 import org.bukkit.entity.EntityType;
 import org.shotrush.atom.content.mobs.ai.lifecycle.LifeCycleManager;
 import org.shotrush.atom.content.mobs.ai.memory.MemoryManager;
+import org.shotrush.atom.content.mobs.ai.memory.AnimalMemory;
+import org.shotrush.atom.content.mobs.ai.memory.PlayerMemory;
 import org.shotrush.atom.content.mobs.ai.needs.NeedsManager;
+import org.shotrush.atom.content.mobs.ai.vocalization.VocalizationSystem;
 import org.shotrush.atom.content.mobs.herd.Herd;
 import org.shotrush.atom.content.mobs.herd.HerdManager;
 import org.shotrush.atom.content.mobs.herd.HerdRole;
@@ -40,6 +43,7 @@ public class AnimalBehaviorNew implements Listener {
     private final NeedsManager needsManager;
     private final MemoryManager memoryManager;
     private final LifeCycleManager lifeCycleManager;
+    private final VocalizationSystem vocalizationSystem;
     private static final Set<EntityType> COMMON_ANIMALS = new HashSet<>();
     private final Set<UUID> trackedAnimals = new HashSet<>();
     
@@ -78,6 +82,7 @@ public class AnimalBehaviorNew implements Listener {
         this.needsManager = new NeedsManager(plugin);
         this.memoryManager = new MemoryManager(plugin);
         this.lifeCycleManager = new LifeCycleManager(plugin);
+        this.vocalizationSystem = new VocalizationSystem(plugin, herdManager);
     }
     
     @EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST)
@@ -135,6 +140,8 @@ public class AnimalBehaviorNew implements Listener {
             goalSelector.addGoal(mob, 2, new GrazingGoal(mob, plugin, needsManager));
         }
         goalSelector.addGoal(mob, 2, new SeekWaterGoal(mob, plugin, needsManager));
+        
+        goalSelector.addGoal(mob, 3, new BiomePreferenceGoal(mob, plugin));
         
         if (isCarnivore(mob.getType())) {
             goalSelector.addGoal(mob, 2, new HuntPreyGoal(mob, plugin, needsManager, behavior));
@@ -300,7 +307,17 @@ public class AnimalBehaviorNew implements Listener {
             return;
         }
         
+        memoryManager.recordPlayerInteraction(animal, attacker, PlayerMemory.PlayerInteraction.ATTACKED);
+        memoryManager.recordDanger(animal, animal.getLocation(), AnimalMemory.DangerType.ATTACKED, 5);
+        
+        vocalizationSystem.makeCall(animal, VocalizationSystem.CallType.DISTRESS);
+        
         injurySystem.applyInjuryEffects(mob);
+        
+        InjurySystem.InjuryLevel injuryLevel = injurySystem.getInjuryLevel(mob);
+        if (injuryLevel == InjurySystem.InjuryLevel.WOUNDED || injuryLevel == InjurySystem.InjuryLevel.CRITICALLY_INJURED) {
+            injurySystem.spawnBloodTrail(mob);
+        }
         
         moraleSystem.checkMorale(mob);
         
@@ -323,6 +340,19 @@ public class AnimalBehaviorNew implements Listener {
         if (!COMMON_ANIMALS.contains(animal.getType())) return;
         
         UUID animalId = animal.getUniqueId();
+        
+        if (event.getDamageSource() != null && event.getDamageSource().getCausingEntity() instanceof Player killer) {
+            herdManager.getHerd(animalId).ifPresent(herd -> {
+                for (UUID memberId : herd.members()) {
+                    if (!memberId.equals(animalId)) {
+                        Animals member = (Animals) org.bukkit.Bukkit.getEntity(memberId);
+                        if (member != null && member.isValid()) {
+                            memoryManager.recordPlayerInteraction(member, killer, PlayerMemory.PlayerInteraction.KILLED_HERD_MEMBER);
+                        }
+                    }
+                }
+            });
+        }
         
         herdManager.leaveHerd(animalId);
         needsManager.removeNeeds(animalId);

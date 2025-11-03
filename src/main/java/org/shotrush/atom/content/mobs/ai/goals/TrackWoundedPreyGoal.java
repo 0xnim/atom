@@ -11,6 +11,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.content.mobs.ai.combat.InjurySystem;
+import org.shotrush.atom.content.mobs.ai.vision.VisionSystem;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -95,6 +96,11 @@ public class TrackWoundedPreyGoal implements Goal<Mob> {
         
         for (LivingEntity entity : nearbyEntities) {
             Mob potentialPrey = (Mob) entity;
+            
+            if (!VisionSystem.canSee(mob, entity)) {
+                continue;
+            }
+            
             InjurySystem.InjuryLevel level = injurySystem.getInjuryLevel(potentialPrey);
             
             if (level == InjurySystem.InjuryLevel.WOUNDED || level == InjurySystem.InjuryLevel.CRITICALLY_INJURED) {

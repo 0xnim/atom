@@ -16,6 +16,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.content.mobs.ai.lifecycle.FamilyRelationships;
+import org.shotrush.atom.content.mobs.ai.vision.VisionSystem;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -54,12 +55,18 @@ public class MotherProtectionGoal implements Goal<Mob> {
                 BABY_PROTECTION_RADIUS, BABY_PROTECTION_RADIUS, BABY_PROTECTION_RADIUS)) {
             
             if (nearby instanceof Animals baby && children.contains(baby.getUniqueId())) {
+                if (!VisionSystem.canSee(mob, baby)) {
+                    continue;
+                }
+                
                 if (baby.getLastDamageCause() != null && 
                     baby.getLastDamageCause().getEntity() instanceof LivingEntity attacker &&
                     attacker.getUniqueId() != mob.getUniqueId()) {
                     
-                    mob.setTarget(attacker);
-                    return true;
+                    if (VisionSystem.canSee(mob, attacker)) {
+                        mob.setTarget(attacker);
+                        return true;
+                    }
                 }
             }
         }

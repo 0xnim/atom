@@ -12,6 +12,7 @@ import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.content.mobs.AnimalDomestication;
 import org.shotrush.atom.content.mobs.ai.combat.MoraleSystem;
 import org.shotrush.atom.content.mobs.ai.config.SpeciesBehavior;
+import org.shotrush.atom.content.mobs.ai.vocalization.VocalizationSystem;
 import org.shotrush.atom.content.mobs.herd.Herd;
 import org.shotrush.atom.content.mobs.herd.HerdManager;
 
@@ -79,6 +80,12 @@ public class HerdPanicGoal implements Goal<Mob> {
     @Override
     public void start() {
         mob.setMetadata("fleeing", new FixedMetadataValue(plugin, true));
+        
+        if (mob instanceof Animals animal) {
+            VocalizationSystem vocalizationSystem = new VocalizationSystem(plugin, herdManager);
+            vocalizationSystem.makeCall(animal, VocalizationSystem.CallType.ALARM);
+        }
+        
         computeFleeTarget();
         repathTimer = 0;
     }

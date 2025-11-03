@@ -10,6 +10,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
+import org.shotrush.atom.content.mobs.ai.vision.VisionSystem;
 import org.shotrush.atom.content.mobs.herd.DominanceRank;
 import org.shotrush.atom.content.mobs.herd.Herd;
 import org.shotrush.atom.content.mobs.herd.HerdManager;
@@ -130,6 +131,10 @@ public class SentryBehaviorGoal implements Goal<Mob> {
         
         for (Entity entity : loc.getWorld().getNearbyEntities(loc, 
                 THREAT_DETECTION_RANGE, THREAT_DETECTION_RANGE, THREAT_DETECTION_RANGE)) {
+            
+            if (!VisionSystem.canSee(mob, entity)) {
+                continue;
+            }
             
             if (isThreat(entity)) {
                 alertHerd(entity.getLocation());

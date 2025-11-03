@@ -13,6 +13,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
+import org.shotrush.atom.content.mobs.ai.vocalization.VocalizationSystem;
 import org.shotrush.atom.content.mobs.herd.DominanceRank;
 import org.shotrush.atom.content.mobs.herd.Herd;
 import org.shotrush.atom.content.mobs.herd.HerdManager;
@@ -96,6 +97,11 @@ public class TerritoryDefenseGoal implements Goal<Mob> {
     @Override
     public void start() {
         chargeTimer = 0;
+        
+        if (mob instanceof Animals animal) {
+            VocalizationSystem vocalizationSystem = new VocalizationSystem(plugin, herdManager);
+            vocalizationSystem.makeCall(animal, VocalizationSystem.CallType.THREAT);
+        }
         
         Location mobLoc = mob.getLocation();
         if (mobLoc != null && mobLoc.getWorld() != null) {
