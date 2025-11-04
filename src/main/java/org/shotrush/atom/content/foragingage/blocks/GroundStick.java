@@ -86,6 +86,11 @@ public class GroundStick extends CustomBlock {
     }
 
     @Override
+    public ItemStack getDropItem() {
+        return new ItemStack(Material.STICK, 1);
+    }
+
+    @Override
     public CustomBlock deserialize(String data) {
         Object[] parsed = parseDeserializeData(data);
         if (parsed == null) return null;

@@ -34,7 +34,7 @@ public class ThirstSystem implements Listener {
     private static final int MAX_THIRST = 20;
     private static final int THIRST_DECREASE_INTERVAL = 1;
     private static final int THIRST_DRAIN_RATE = 600;
-    private static final int THIRST_DAMAGE_INTERVAL = 3;
+    private static final int THIRST_DAMAGE_INTERVAL = 80;
     
     public ThirstSystem(Plugin plugin) {
         this.plugin = plugin;

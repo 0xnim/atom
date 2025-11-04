@@ -21,7 +21,7 @@ public class PlayerAttributeModifier implements Listener {
     }
     
     public static void applyAttributeModifiers(Player player) {
-        modifyAttribute(player, Attribute.BLOCK_BREAK_SPEED, -0.565, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
+        modifyAttribute(player, Attribute.BLOCK_BREAK_SPEED, -0.767, AttributeModifier.Operation.MULTIPLY_SCALAR_1); // 67
         modifyAttribute(player, Attribute.BLOCK_INTERACTION_RANGE, -1.0, AttributeModifier.Operation.ADD_NUMBER);
         modifyAttribute(player, Attribute.ENTITY_INTERACTION_RANGE, -1.0, AttributeModifier.Operation.ADD_NUMBER);
         modifyAttribute(player, Attribute.MOVEMENT_SPEED, -0.2, AttributeModifier.Operation.MULTIPLY_SCALAR_1);

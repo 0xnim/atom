@@ -6,7 +6,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.type.PointedDripstone;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -73,24 +72,30 @@ public class WoodHarvestingSystem implements Listener {
             return;
         }
         handleWoodDamageStage(block, player);
+        damageFlint(item, player);
         event.setCancelled(true);
     }
     
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         Block broken = event.getBlock();
+        String typeName = broken.getType().name();
 
-        if (isWoodBlock(broken.getType()) || broken.getType().name().contains("STRIPPED") || broken.getType().name().contains("FENCE")) {
+        if (isWoodBlock(broken.getType()) || typeName.contains("STRIPPED") || 
+            typeName.contains("SANDSTONE_WALL") || typeName.contains("FENCE")) {
             Player player = event.getPlayer();
             ItemStack item = player.getInventory().getItemInMainHand();
 
-            if (!isUsingSharpenedFlint(item)) {
+            if (isUsingSharpenedFlint(item)) {
+                event.setCancelled(true);
+                handleWoodDamageStage(broken, player);
+                damageFlint(item, player);
+            } else if (isUsingAxe(item)) {
+                event.setDropItems(true);
+            } else {
                 event.setDropItems(false);
-                player.sendActionBar("§cYou need a Sharpened Flint to harvest wood!");
-                return;
+                MessageUtil.send(player, "§cYou need an Axe or Sharpened Flint to harvest wood!");
             }
-            event.setCancelled(true);
-            handleWoodDamageStage(broken, player);
         }
     }
     
@@ -110,32 +115,22 @@ public class WoodHarvestingSystem implements Listener {
         return false;
     }
     
-    private void checkAndSplitWoodAbove(Block dripstone) {
-        if (dripstone.getBlockData() instanceof PointedDripstone pointedDripstone) {
-            plugin.getLogger().info("[WoodHarvesting] Dripstone direction: " + pointedDripstone.getVerticalDirection());
-            
-            BlockFace direction = pointedDripstone.getVerticalDirection();
-            Block targetBlock = null;
-            if (direction == BlockFace.UP) {
-                targetBlock = dripstone.getRelative(BlockFace.UP);
-                plugin.getLogger().info("[WoodHarvesting] Checking block above: " + targetBlock.getType());
-            }
-            else if (direction == BlockFace.DOWN) {
-                targetBlock = dripstone.getRelative(BlockFace.DOWN);
-                plugin.getLogger().info("[WoodHarvesting] Checking block below: " + targetBlock.getType());
-            }
-            
-            if (targetBlock != null && isWoodBlock(targetBlock.getType())) {
-                plugin.getLogger().info("[WoodHarvesting] Splitting wood block!");
-                splitWoodBlock(targetBlock);
-            } else {
-                plugin.getLogger().info("[WoodHarvesting] No wood block found in dripstone's direction");
-            }
-        } else {
-            plugin.getLogger().info("[WoodHarvesting] Block is not PointedDripstone data?");
-        }
+    private boolean isUsingAxe(ItemStack item) {
+        if (item == null) return false;
+        String typeName = item.getType().name();
+        return typeName.endsWith("_AXE");
     }
     
+    private void damageFlint(ItemStack item, Player player) {
+        CustomItemRegistry registry = Atom.instance.getItemRegistry();
+        if (registry != null) {
+            SharpenedFlint sharpenedFlint = (SharpenedFlint) registry.getItem("sharpened_flint");
+            if (sharpenedFlint != null) {
+                sharpenedFlint.damageItem(item, player);
+            }
+        }
+    }
+
     public boolean isWoodBlock(Material material) {
         String name = material.name();
         return name.endsWith("_LOG") || name.endsWith("_WOOD");
@@ -184,6 +179,8 @@ public class WoodHarvestingSystem implements Listener {
         String typeName = currentType.name();
         int currentStage = 0;
         if (typeName.contains("FENCE")) {
+            currentStage = 3;
+        } else if (typeName.contains("SANDSTONE_WALL")) {
             currentStage = 2;
         } else if (typeName.contains("STRIPPED")) {
             currentStage = 1;
@@ -206,11 +203,23 @@ public class WoodHarvestingSystem implements Listener {
                         loc.add(0.5, 0.5, 0.5), 10, 0.2, 0.2, 0.2, 0.05,
                         currentType.createBlockData());
                     
-                    player.sendActionBar("§7Wood partially damaged (1/3)");
+                    MessageUtil.send(player,"§7Wood partially damaged (1/4)");
                 }
                 break;
                 
             case 2:
+                block.setType(Material.SANDSTONE_WALL);
+                woodDamageStates.put(loc, currentStage);
+                
+                block.getWorld().playSound(loc, Sound.BLOCK_WOOD_HIT, 1.0f, 0.9f);
+                block.getWorld().spawnParticle(Particle.BLOCK, 
+                    loc.add(0.5, 0.5, 0.5), 12, 0.25, 0.25, 0.25, 0.05,
+                    currentType.createBlockData());
+
+                MessageUtil.send(player,"§7Wood damaged (2/4)");
+                break;
+                
+            case 3:
                 Material fenceType = getFenceType(currentType);
                 if (fenceType != null) {
                     block.setType(fenceType);
@@ -220,12 +229,11 @@ public class WoodHarvestingSystem implements Listener {
                     block.getWorld().spawnParticle(Particle.BLOCK, 
                         loc.add(0.5, 0.5, 0.5), 15, 0.3, 0.3, 0.3, 0.05,
                         currentType.createBlockData());
-                    
-                    player.sendActionBar("§7Wood heavily damaged (2/3)");
+                    MessageUtil.send(player,"§7Wood heavily damaged (3/4)");
                 }
                 break;
                 
-            case 3:
+            case 4:
             default:
                 Material plankType = getPlankTypeFromWood(currentType);
                 if (plankType != null) {
@@ -240,8 +248,8 @@ public class WoodHarvestingSystem implements Listener {
                     block.getWorld().spawnParticle(Particle.BLOCK, 
                         loc, 20, 0.3, 0.3, 0.3, 0.1,
                         currentType.createBlockData());
-                    
-                    player.sendActionBar("§aWood harvested!");
+
+                    MessageUtil.send(player,"§aWood harvested!");
                 }
                 break;
         }

@@ -39,8 +39,9 @@ public class SpearProjectileListener implements Listener {
         
         ItemStack thrownItem = item.clone();
         
-        org.shotrush.atom.core.items.ItemQuality quality = org.shotrush.atom.core.api.ItemQualityAPI.getQuality(thrownItem);
-        org.shotrush.atom.core.util.DurabilityUtil.applyQualityBasedDamage(thrownItem, quality);
+        if (spearItem instanceof org.shotrush.atom.content.foragingage.items.WoodSpear woodSpear) {
+            woodSpear.damageItem(thrownItem, shooter);
+        }
         
         if (thrownItem.getType() == Material.AIR || thrownItem.getAmount() <= 0) {
             trident.remove();
