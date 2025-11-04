@@ -12,7 +12,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Mob;
 import org.bukkit.plugin.Plugin;
-import org.shotrush.atom.content.mobs.ai.debug.DebugCategory;
 import org.shotrush.atom.content.mobs.ai.debug.DebugManager;
 import org.shotrush.atom.content.mobs.ai.needs.NeedsManager;
 
@@ -71,12 +70,10 @@ public class GrazingGoal implements Goal<Mob> {
     @Override
     public void start() {
         eatingTicks = 0;
-        DebugManager.logGoalActivation(mob, "GrazingGoal", DebugCategory.GOALS);
         if (mob instanceof Animals animal) {
             var needs = needsManager.getNeeds(animal);
             DebugManager.log(String.format("%s#%d started grazing (hunger: %.1f%%)", 
-                mob.getType().name(), mob.getEntityId(), needs.getHunger()),
-                DebugCategory.NEEDS);
+                mob.getType().name(), mob.getEntityId(), needs.getHunger()));
         }
     }
     
@@ -85,7 +82,6 @@ public class GrazingGoal implements Goal<Mob> {
         grassTarget = null;
         eatingTicks = 0;
         mob.getPathfinder().stopPathfinding();
-        DebugManager.logGoalDeactivation(mob, "GrazingGoal", DebugCategory.GOALS);
     }
     
     @Override
@@ -138,8 +134,7 @@ public class GrazingGoal implements Goal<Mob> {
                 needs.eat(30);
                 lastGrazingTime = System.currentTimeMillis();
                 DebugManager.log(String.format("%s#%d finished eating (hunger now: %.1f%%)", 
-                    mob.getType().name(), mob.getEntityId(), needs.getHunger()),
-                    DebugCategory.NEEDS);
+                    mob.getType().name(), mob.getEntityId(), needs.getHunger()));
                 stop();
             }
         }

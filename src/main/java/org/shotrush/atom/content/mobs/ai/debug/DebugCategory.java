@@ -1,19 +1,19 @@
 package org.shotrush.atom.content.mobs.ai.debug;
 
-import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public enum DebugCategory {
-    GOALS("Goals", TextColor.color(85, 255, 85)),
-    NEEDS("Needs", TextColor.color(255, 170, 0)),
-    MEMORY("Memory", TextColor.color(170, 85, 255)),
-    COMBAT("Combat", TextColor.color(255, 85, 85)),
-    SOCIAL("Social", TextColor.color(85, 170, 255)),
-    ENVIRONMENTAL("Environmental", TextColor.color(255, 255, 85));
+    GOALS("Goals", NamedTextColor.GOLD),
+    NEEDS("Needs", NamedTextColor.GREEN),
+    MEMORY("Memory", NamedTextColor.BLUE),
+    COMBAT("Combat", NamedTextColor.RED),
+    SOCIAL("Social", NamedTextColor.AQUA),
+    ENVIRONMENTAL("Environmental", NamedTextColor.YELLOW);
     
     private final String displayName;
-    private final TextColor color;
+    private final NamedTextColor color;
     
-    DebugCategory(String displayName, TextColor color) {
+    DebugCategory(String displayName, NamedTextColor color) {
         this.displayName = displayName;
         this.color = color;
     }
@@ -22,7 +22,7 @@ public enum DebugCategory {
         return displayName;
     }
     
-    public TextColor getColor() {
+    public NamedTextColor getColor() {
         return color;
     }
 }

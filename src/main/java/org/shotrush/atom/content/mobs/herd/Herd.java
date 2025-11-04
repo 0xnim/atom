@@ -17,7 +17,6 @@ public final class Herd {
     private UUID leader;
     private long panicUntil;
     private Location lastThreatLocation;
-    private final DominanceHierarchy dominanceHierarchy;
     
     public Herd(UUID id, EntityType species, World world, UUID initialLeader) {
         this.id = id;
@@ -27,7 +26,6 @@ public final class Herd {
         this.leader = initialLeader;
         this.panicUntil = 0;
         this.lastThreatLocation = null;
-        this.dominanceHierarchy = new DominanceHierarchy(this);
         this.members.add(initialLeader);
     }
     
@@ -82,9 +80,5 @@ public final class Herd {
     
     public boolean isEmpty() {
         return members.isEmpty();
-    }
-    
-    public DominanceHierarchy getDominanceHierarchy() {
-        return dominanceHierarchy;
     }
 }

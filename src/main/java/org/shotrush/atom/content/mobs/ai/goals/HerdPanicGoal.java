@@ -10,9 +10,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.content.mobs.AnimalDomestication;
-import org.shotrush.atom.content.mobs.ai.combat.MoraleSystem;
 import org.shotrush.atom.content.mobs.ai.config.SpeciesBehavior;
-import org.shotrush.atom.content.mobs.ai.vocalization.VocalizationSystem;
 import org.shotrush.atom.content.mobs.herd.Herd;
 import org.shotrush.atom.content.mobs.herd.HerdManager;
 
@@ -26,27 +24,21 @@ public class HerdPanicGoal implements Goal<Mob> {
     private final Plugin plugin;
     private final HerdManager herdManager;
     private final SpeciesBehavior behavior;
-    private final MoraleSystem moraleSystem;
     private Location fleeTarget;
     private int repathTimer;
     private static final int REPATH_INTERVAL = 20;
     
-    public HerdPanicGoal(Mob mob, Plugin plugin, HerdManager herdManager, SpeciesBehavior behavior, MoraleSystem moraleSystem) {
+    public HerdPanicGoal(Mob mob, Plugin plugin, HerdManager herdManager, SpeciesBehavior behavior) {
         this.mob = mob;
         this.plugin = plugin;
         this.herdManager = herdManager;
         this.behavior = behavior;
-        this.moraleSystem = moraleSystem;
         this.key = GoalKey.of(Mob.class, new NamespacedKey(plugin, "herd_panic"));
         this.repathTimer = 0;
     }
     
     @Override
     public boolean shouldActivate() {
-        if (moraleSystem != null && moraleSystem.isMoraleBroken(mob)) {
-            return true;
-        }
-        
         Optional<Herd> herdOpt = herdManager.getHerd(mob.getUniqueId());
         if (herdOpt.isPresent() && herdOpt.get().isPanicking()) {
             return true;
@@ -80,11 +72,6 @@ public class HerdPanicGoal implements Goal<Mob> {
     @Override
     public void start() {
         mob.setMetadata("fleeing", new FixedMetadataValue(plugin, true));
-        
-        if (mob instanceof Animals animal) {
-            VocalizationSystem vocalizationSystem = new VocalizationSystem(plugin, herdManager);
-            vocalizationSystem.makeCall(animal, VocalizationSystem.CallType.ALARM);
-        }
         
         computeFleeTarget();
         repathTimer = 0;

@@ -22,14 +22,12 @@ import java.util.Optional;
 @CommandPermission("atom.debug.mobai")
 public class MobAIDebugCommand extends BaseCommand {
     
-    private final VisualDebugger visualDebugger;
     private final NeedsManager needsManager;
     private final MemoryManager memoryManager;
     private final HerdManager herdManager;
     
-    public MobAIDebugCommand(VisualDebugger visualDebugger, NeedsManager needsManager, 
+    public MobAIDebugCommand(NeedsManager needsManager, 
                             MemoryManager memoryManager, HerdManager herdManager) {
-        this.visualDebugger = visualDebugger;
         this.needsManager = needsManager;
         this.memoryManager = memoryManager;
         this.herdManager = herdManager;
@@ -259,21 +257,7 @@ public class MobAIDebugCommand extends BaseCommand {
     @Subcommand("track")
     @Description("Toggle visual tracking for target entity")
     public void onTrack(Player player) {
-        Entity target = player.getTargetEntity(10, false);
-        
-        if (!(target instanceof Mob mob)) {
-            player.sendMessage(Component.text("You must be looking at a mob!", NamedTextColor.RED));
-            return;
-        }
-        
-        visualDebugger.toggleTracking(mob.getUniqueId());
-        visualDebugger.enableVisualsForPlayer(player.getUniqueId());
-        
-        boolean isTracking = visualDebugger.isTracking(mob.getUniqueId());
-        player.sendMessage(Component.text(
-            isTracking ? "Now tracking " : "Stopped tracking ",
-            isTracking ? NamedTextColor.GREEN : NamedTextColor.YELLOW
-        ).append(Component.text(mob.getType().name() + " #" + mob.getEntityId(), NamedTextColor.WHITE)));
+        player.sendMessage(Component.text("Visual tracking system has been removed.", NamedTextColor.YELLOW));
     }
     
     @Subcommand("performance")
