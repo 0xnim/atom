@@ -8,6 +8,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.*;
+import org.shotrush.atom.core.data.PersistentData;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 import org.shotrush.atom.content.mobs.herd.DominanceRank;
@@ -53,11 +54,7 @@ public class SentryBehaviorGoal implements Goal<Mob> {
         }
         
         long timeSinceLastSentry = System.currentTimeMillis() - 
-            mob.getPersistentDataContainer().getOrDefault(
-                new NamespacedKey(plugin, "last_sentry_time"), 
-                org.bukkit.persistence.PersistentDataType.LONG, 
-                0L
-            );
+            PersistentData.getLong(mob, "last_sentry_time", 0L);
         
         return timeSinceLastSentry > SENTRY_DURATION * 50 && Math.random() < 0.1;
     }
@@ -85,11 +82,7 @@ public class SentryBehaviorGoal implements Goal<Mob> {
     
     @Override
     public void stop() {
-        mob.getPersistentDataContainer().set(
-            new NamespacedKey(plugin, "last_sentry_time"),
-            org.bukkit.persistence.PersistentDataType.LONG,
-            System.currentTimeMillis()
-        );
+        PersistentData.set(mob, "last_sentry_time", System.currentTimeMillis());
     }
     
     @Override

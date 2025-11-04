@@ -1,48 +1,30 @@
 package org.shotrush.atom.content.mobs.herd;
 
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Animals;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
+import org.shotrush.atom.core.data.PersistentData;
 
 import java.util.UUID;
 
 public final class HerdPersistence {
     
-    private final NamespacedKey herdIdKey;
-    private final NamespacedKey isLeaderKey;
-    private final NamespacedKey isAggressiveKey;
-    private final NamespacedKey maxStaminaKey;
-    private final NamespacedKey staminaKey;
-    
     public HerdPersistence(Plugin plugin) {
-        this.herdIdKey = new NamespacedKey(plugin, "herd_id");
-        this.isLeaderKey = new NamespacedKey(plugin, "is_leader");
-        this.isAggressiveKey = new NamespacedKey(plugin, "is_aggressive");
-        this.maxStaminaKey = new NamespacedKey(plugin, "max_stamina");
-        this.staminaKey = new NamespacedKey(plugin, "stamina");
     }
     
     public void saveHerdData(Animals animal, UUID herdId, boolean isLeader, boolean isAggressive, double maxStamina, double stamina) {
-        PersistentDataContainer pdc = animal.getPersistentDataContainer();
-        
-        pdc.set(herdIdKey, PersistentDataType.STRING, herdId.toString());
-        pdc.set(isLeaderKey, PersistentDataType.BYTE, (byte) (isLeader ? 1 : 0));
-        pdc.set(isAggressiveKey, PersistentDataType.BYTE, (byte) (isAggressive ? 1 : 0));
-        pdc.set(maxStaminaKey, PersistentDataType.DOUBLE, maxStamina);
-        pdc.set(staminaKey, PersistentDataType.DOUBLE, stamina);
+        PersistentData.set(animal, "herd_id", herdId.toString());
+        PersistentData.set(animal, "is_leader", isLeader);
+        PersistentData.set(animal, "is_aggressive", isAggressive);
+        PersistentData.set(animal, "max_stamina", maxStamina);
+        PersistentData.set(animal, "stamina", stamina);
     }
     
     public boolean hasHerdData(Animals animal) {
-        return animal.getPersistentDataContainer().has(herdIdKey, PersistentDataType.STRING);
+        return PersistentData.has(animal, "herd_id");
     }
     
     public UUID getHerdId(Animals animal) {
-        PersistentDataContainer pdc = animal.getPersistentDataContainer();
-        if (!pdc.has(herdIdKey, PersistentDataType.STRING)) return null;
-        
-        String idString = pdc.get(herdIdKey, PersistentDataType.STRING);
+        String idString = PersistentData.getString(animal, "herd_id", null);
         if (idString == null) return null;
         
         try {
@@ -53,48 +35,30 @@ public final class HerdPersistence {
     }
     
     public boolean isLeader(Animals animal) {
-        PersistentDataContainer pdc = animal.getPersistentDataContainer();
-        if (!pdc.has(isLeaderKey, PersistentDataType.BYTE)) return false;
-        
-        Byte value = pdc.get(isLeaderKey, PersistentDataType.BYTE);
-        return value != null && value == 1;
+        return PersistentData.getBoolean(animal, "is_leader", false);
     }
     
     public boolean isAggressive(Animals animal) {
-        PersistentDataContainer pdc = animal.getPersistentDataContainer();
-        if (!pdc.has(isAggressiveKey, PersistentDataType.BYTE)) return false;
-        
-        Byte value = pdc.get(isAggressiveKey, PersistentDataType.BYTE);
-        return value != null && value == 1;
+        return PersistentData.getBoolean(animal, "is_aggressive", false);
     }
     
     public double getMaxStamina(Animals animal, double defaultValue) {
-        PersistentDataContainer pdc = animal.getPersistentDataContainer();
-        if (!pdc.has(maxStaminaKey, PersistentDataType.DOUBLE)) return defaultValue;
-        
-        Double value = pdc.get(maxStaminaKey, PersistentDataType.DOUBLE);
-        return value != null ? value : defaultValue;
+        return PersistentData.getDouble(animal, "max_stamina", defaultValue);
     }
     
     public double getStamina(Animals animal, double defaultValue) {
-        PersistentDataContainer pdc = animal.getPersistentDataContainer();
-        if (!pdc.has(staminaKey, PersistentDataType.DOUBLE)) return defaultValue;
-        
-        Double value = pdc.get(staminaKey, PersistentDataType.DOUBLE);
-        return value != null ? value : defaultValue;
+        return PersistentData.getDouble(animal, "stamina", defaultValue);
     }
     
     public void updateStamina(Animals animal, double stamina) {
-        PersistentDataContainer pdc = animal.getPersistentDataContainer();
-        pdc.set(staminaKey, PersistentDataType.DOUBLE, stamina);
+        PersistentData.set(animal, "stamina", stamina);
     }
     
     public void clearHerdData(Animals animal) {
-        PersistentDataContainer pdc = animal.getPersistentDataContainer();
-        pdc.remove(herdIdKey);
-        pdc.remove(isLeaderKey);
-        pdc.remove(isAggressiveKey);
-        pdc.remove(maxStaminaKey);
-        pdc.remove(staminaKey);
+        PersistentData.remove(animal, "herd_id");
+        PersistentData.remove(animal, "is_leader");
+        PersistentData.remove(animal, "is_aggressive");
+        PersistentData.remove(animal, "max_stamina");
+        PersistentData.remove(animal, "stamina");
     }
 }

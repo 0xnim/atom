@@ -1,6 +1,7 @@
 package org.shotrush.atom.core.blocks;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
@@ -26,12 +27,14 @@ public abstract class CustomBlock implements BlockType {
     protected final Location blockLocation;
     @Getter
     protected final BlockFace blockFace;
+    @Setter
     @Getter
     protected UUID interactionUUID;
+    @Setter
     @Getter
     protected UUID displayUUID;
 
-    
+
     public CustomBlock(Location spawnLocation, Location blockLocation, BlockFace blockFace) {
         this.spawnLocation = spawnLocation.clone();
         this.blockLocation = blockLocation.clone();
@@ -138,11 +141,7 @@ public abstract class CustomBlock implements BlockType {
     @Override
     public abstract CustomBlock deserialize(String data);
     
-    /**
-     * Helper method to parse common deserialization data
-     * @param data Serialized data string
-     * @return Array containing [World, Location, BlockFace] or null if parsing fails
-     */
+
     protected Object[] parseDeserializeData(String data) {
         try {
             String[] parts = data.split(";");
@@ -158,8 +157,8 @@ public abstract class CustomBlock implements BlockType {
             );
             BlockFace face = BlockFace.valueOf(parts[4]);
 
-            // handled in InteractiveSurface as only that has additional data
-            //deserializeAdditionalData(parts, 5);
+
+
             
             return new Object[]{world, location, face};
         } catch (Exception e) {
@@ -176,16 +175,16 @@ public abstract class CustomBlock implements BlockType {
 
     @Override
     public ItemStack getDropItem() {
-        // Access the plugin instance and its CustomBlockManager
+
         Atom plugin = Atom.getInstance();
         CustomBlockManager manager = plugin.getBlockManager();
 
-        // Use the shared block item creation logic
+
         ItemStack item = manager.createBlockItem(getIdentifier());
 
         if (item == null) {
             plugin.getLogger().warning("Failed to create drop item for " + getIdentifier());
-            return new ItemStack(getItemMaterial()); // fallback
+
         }
 
         return item;

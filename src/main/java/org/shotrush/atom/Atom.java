@@ -33,6 +33,7 @@ public final class Atom extends JavaPlugin {
 
     @Getter
     public static Atom instance;
+
     @Getter
     public CustomBlockManager blockManager;
     @Getter
@@ -83,8 +84,6 @@ public final class Atom extends JavaPlugin {
         VisualDebugger visualDebugger = new VisualDebugger(this);
         commandManager.registerCommand(new MobAIDebugCommand(
             visualDebugger,
-            animalBehavior.getNeedsManager(),
-            animalBehavior.getMemoryManager(),
             animalBehavior.getHerdManager()
         ));
     }

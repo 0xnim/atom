@@ -24,18 +24,19 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 public abstract class InteractiveSurface extends CustomBlock {
     protected final List<PlacedItem> placedItems = new ArrayList<>();
-    
+
     public InteractiveSurface(Location spawnLocation, Location blockLocation, BlockFace blockFace) {
         super(spawnLocation, blockLocation, blockFace);
     }
-    
+
     public InteractiveSurface(Location spawnLocation, BlockFace blockFace) {
         super(spawnLocation, blockFace);
     }
-    
+
     @Override
     public boolean onInteract(Player player, boolean sneaking) {
         if (sneaking) {
@@ -46,7 +47,7 @@ public abstract class InteractiveSurface extends CustomBlock {
 
     @Override
     public void spawn(Atom plugin) {
-        // Skip if the world isn't valid
+
         if (spawnLocation.getWorld() == null) {
             plugin.getLogger().warning("Cannot spawn InteractiveSurface at " + spawnLocation + " - world is null");
             return;
@@ -57,15 +58,15 @@ public abstract class InteractiveSurface extends CustomBlock {
             getIdentifier(), placedItems.size()
         ));
 
-        // Run region-safe
+
         Bukkit.getRegionScheduler().run(plugin, spawnLocation, task -> {
-            // 1. Clean up any stale displays/interactions from before
+
             cleanupExistingEntities();
 
-            // 2. Call the normal subclass spawn() that sets up its visuals/interactions
+
             spawn(plugin, spawnLocation.getWorld());
 
-            // 3. Automatically restore placed items (if any were deserialized)
+
 
             if (!placedItems.isEmpty()) {
                 plugin.getLogger().info(String.format(
@@ -82,14 +83,14 @@ public abstract class InteractiveSurface extends CustomBlock {
 
         });
     }
-    
+
     public abstract int getMaxItems();
     public abstract boolean canPlaceItem(ItemStack item);
     public abstract Vector3f calculatePlacement(Player player, int itemCount);
 
     protected boolean onCrouchRightClick(Player player) {
         ItemStack result = checkRecipe();
-        
+
         if (result != null) {
             clearAllItems();
             player.getWorld().dropItemNaturally(spawnLocation, result);
@@ -104,14 +105,14 @@ public abstract class InteractiveSurface extends CustomBlock {
     protected ItemStack checkRecipe() {
         return null;
     }
-    
+
     protected void applyQualityInheritance(ItemStack result) {
         if (result == null || placedItems.isEmpty()) return;
-        
+
         ItemStack[] ingredients = placedItems.stream()
             .map(PlacedItem::getItem)
             .toArray(ItemStack[]::new);
-        
+
         org.shotrush.atom.core.api.QualityInheritanceAPI.applyInheritedQuality(result, ingredients);
     }
 
@@ -119,7 +120,7 @@ public abstract class InteractiveSurface extends CustomBlock {
         if (placedItems.isEmpty()) {
             return;
         }
-        
+
         for (PlacedItem placedItem : new ArrayList<>(placedItems)) {
             removeItemDisplay(placedItem);
             player.getWorld().dropItemNaturally(spawnLocation, placedItem.getItem());
@@ -133,11 +134,11 @@ public abstract class InteractiveSurface extends CustomBlock {
         }
         placedItems.clear();
     }
-    
+
     public boolean placeItem(ItemStack item, Vector3f position, float yaw) {
         if (placedItems.size() >= getMaxItems()) return false;
         if (!canPlaceItem(item)) return false;
-        
+
         ItemStack singleItem = item.clone();
         singleItem.setAmount(1);
         PlacedItem placedItem = new PlacedItem(singleItem, position, yaw);
@@ -145,7 +146,7 @@ public abstract class InteractiveSurface extends CustomBlock {
         spawnItemDisplay(placedItem);
         return true;
     }
-    
+
     public boolean placeItem(Player player, ItemStack item, Vector3f position, float yaw) {
         if (placeItem(item, position, yaw)) {
             player.swingMainHand();
@@ -153,14 +154,14 @@ public abstract class InteractiveSurface extends CustomBlock {
         }
         return false;
     }
-    
+
     public ItemStack removeLastItem() {
         if (placedItems.isEmpty()) return null;
         PlacedItem item = placedItems.remove(placedItems.size() - 1);
         removeItemDisplay(item);
         return item.getItem();
     }
-    
+
     protected void spawnItemDisplay(PlacedItem item) {
         Location itemLoc = spawnLocation.clone().add(item.getPosition().x, item.getPosition().y, item.getPosition().z);
         if (itemLoc.getWorld() == null) {
@@ -173,7 +174,7 @@ public abstract class InteractiveSurface extends CustomBlock {
             org.joml.AxisAngle4f rotation = getItemDisplayRotation(item);
             org.joml.Vector3f translation = getItemDisplayTranslation(item);
             org.joml.Vector3f scale = getItemDisplayScale(item);
-            
+
             display.setTransformation(new org.bukkit.util.Transformation(
                 translation,
                 rotation,
@@ -183,36 +184,112 @@ public abstract class InteractiveSurface extends CustomBlock {
             item.setDisplayUUID(display.getUniqueId());
         });
     }
-    
+
     protected org.joml.AxisAngle4f getItemDisplayRotation(PlacedItem item) {
         return new org.joml.AxisAngle4f((float) Math.toRadians(90), 1, 0, 0);
     }
-    
+
     protected org.joml.Vector3f getItemDisplayTranslation(PlacedItem item) {
         return new org.joml.Vector3f(0, 0, 0);
     }
-    
+
     protected org.joml.Vector3f getItemDisplayScale(PlacedItem item) {
         return new org.joml.Vector3f(0.5f, 0.5f, 0.5f);
     }
-    
+
     protected void removeItemDisplay(PlacedItem item) {
         if (item.getDisplayUUID() != null) {
+
             org.bukkit.entity.Entity entity = org.bukkit.Bukkit.getEntity(item.getDisplayUUID());
-            if (entity != null) entity.remove();
+            
+            if (entity != null) {
+
+                Bukkit.getRegionScheduler().run(Atom.getInstance(), entity.getLocation(), task -> {
+
+                    org.bukkit.entity.Entity ent = org.bukkit.Bukkit.getEntity(item.getDisplayUUID());
+                    if (ent != null) {
+
+                        ent.remove();
+                        
+
+                        Location expectedLoc = spawnLocation.clone().add(item.getPosition().x, item.getPosition().y, item.getPosition().z);
+                        for (Entity nearby : expectedLoc.getWorld().getNearbyEntities(expectedLoc, 0.5, 0.5, 0.5)) {
+                            if (nearby instanceof ItemDisplay && nearby.getUniqueId().equals(item.getDisplayUUID())) {
+                                nearby.remove();
+                            }
+                        }
+                        
+                        Atom.getInstance().getLogger().info("Removed item display with UUID: " + item.getDisplayUUID());
+                    } else {
+                        Atom.getInstance().getLogger().warning("Could not find entity to remove with UUID: " + item.getDisplayUUID());
+                    }
+                });
+            } else {
+
+                Location expectedLoc = spawnLocation.clone().add(item.getPosition().x, item.getPosition().y, item.getPosition().z);
+                
+                Bukkit.getRegionScheduler().run(Atom.getInstance(), expectedLoc, task -> {
+                    boolean found = false;
+                    for (Entity nearby : expectedLoc.getWorld().getNearbyEntities(expectedLoc, 0.5, 0.5, 0.5)) {
+                        if (nearby instanceof ItemDisplay) {
+                            nearby.remove();
+                            found = true;
+                            Atom.getInstance().getLogger().info("Removed item display by location (UUID was stale)");
+                        }
+                    }
+                    if (!found) {
+                        Atom.getInstance().getLogger().warning("Could not find any item display to remove at expected location");
+                    }
+                });
+            }
+        } else {
+            Atom.getInstance().getLogger().warning("PlacedItem has null display UUID, cannot remove");
         }
     }
-    
+
     public List<PlacedItem> getPlacedItems() {
         return new ArrayList<>(placedItems);
     }
-    
+
     public void respawnAllItemDisplays() {
         for (PlacedItem item : placedItems) {
             if (item.getDisplayUUID() == null) {
                 spawnItemDisplay(item);
             }
         }
+    }
+
+    public void updateItemDisplayUUIDs() {
+
+        if (spawnLocation.getWorld() == null) return;
+
+        Atom.getInstance().getLogger().info("Updating item display UUIDs for " + placedItems.size() + " items");
+
+
+        List<org.bukkit.entity.ItemDisplay> toRemove = new ArrayList<>();
+        for (Entity entity : spawnLocation.getWorld().getNearbyEntities(spawnLocation, 2, 2, 2)) {
+            if (entity instanceof org.bukkit.entity.ItemDisplay && !entity.getUniqueId().equals(displayUUID)) {
+                toRemove.add((org.bukkit.entity.ItemDisplay) entity);
+            }
+        }
+        
+        Atom.getInstance().getLogger().info("Removing " + toRemove.size() + " stale ItemDisplay entities");
+        for (org.bukkit.entity.ItemDisplay display : toRemove) {
+            display.remove();
+        }
+        
+
+        for (PlacedItem item : placedItems) {
+            item.setDisplayUUID(null);
+        }
+        
+
+        Bukkit.getRegionScheduler().runDelayed(Atom.getInstance(), spawnLocation, task -> {
+            for (PlacedItem item : placedItems) {
+                spawnItemDisplay(item);
+            }
+            Atom.getInstance().getLogger().info("Respawned " + placedItems.size() + " item displays");
+        }, 2L);
     }
 
     @Override
@@ -246,9 +323,9 @@ public abstract class InteractiveSurface extends CustomBlock {
                 int partIndex = startIndex + 1 + i;
                 if (partIndex >= parts.length) break;
 
-                // Split by comma to get: base64, x, y, z, yaw
+
                 String[] itemData = parts[partIndex].split(",");
-                if (itemData.length < 5) continue;  // Changed from 6 to 5
+
 
                 String base64 = itemData[0];
                 float x = Float.parseFloat(itemData[1]);
@@ -267,7 +344,7 @@ public abstract class InteractiveSurface extends CustomBlock {
             }
         } catch (Exception e) {
             Atom.getInstance().getLogger().warning("Failed to deserialize placed items: " + e.getMessage());
-            e.printStackTrace();  // Add stack trace for better debugging
+
         }
 
         return null;
@@ -301,7 +378,7 @@ public abstract class InteractiveSurface extends CustomBlock {
             }
         }
 
-        // cleanup item displays on top of workstation
+
         for (Entity entity : spawnLocation.getWorld().getNearbyEntities(getBlockCenter(), 0.5, 0.6, 0.5)) {
             if (entity instanceof ItemDisplay) {
                 if (entity.getLocation().distance(getBlockCenter()) <= 0.6) {
@@ -311,10 +388,7 @@ public abstract class InteractiveSurface extends CustomBlock {
         }
     }
 
-    /**
-     * Gets the center point of the block
-     * @return Location at the center of the block (blockX + 0.5, blockY + 0.5, blockZ + 0.5)
-     */
+
     protected Location getBlockCenter() {
         return blockLocation.clone().add(0.5, 0.5, 0.5);
     }

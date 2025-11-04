@@ -13,8 +13,8 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.shotrush.atom.Atom;
+import org.shotrush.atom.core.data.PersistentData;
 import org.shotrush.atom.content.blocks.cog.CogManager;
 import org.shotrush.atom.core.blocks.annotation.AutoRegister;
 import org.reflections.Reflections;
@@ -51,7 +51,6 @@ public class CustomBlockManager implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
         Bukkit.getPluginManager().registerEvents(new BarrierBreakHandler(plugin, this), plugin);
 
-        // Delay loading blocks until worlds are loaded
         Bukkit.getGlobalRegionScheduler().runDelayed(plugin, task -> {
             loadBlocks();
             startGlobalUpdate();
@@ -135,12 +134,7 @@ public class CustomBlockManager implements Listener {
                     block.spawn(plugin);
                     spawnedCount++;
 
-                    /*
-                    if (block instanceof InteractiveSurface surface) {
-                        surface.respawnAllItemDisplays();
-                        respawnedCount += surface.getPlacedItems().size();
-                    }
-                     */
+
                 }
             }
             
@@ -149,7 +143,7 @@ public class CustomBlockManager implements Listener {
                 plugin.getLogger().info("Respawned " + respawnedCount + " item display(s)");
             }
 
-            // Recalculate power for all cogs after blocks are loaded
+
             CogManager cogManager = new CogManager(plugin);
             cogManager.recalculatePower(blocks);
         }, 20L);
@@ -188,7 +182,7 @@ public class CustomBlockManager implements Listener {
                 "§8[Engineering Tool]"
             ));
 
-            meta.getPersistentDataContainer().set(wrenchKey, PersistentDataType.BYTE, (byte) 1);
+            PersistentData.flag(meta, wrenchKey.getKey());
             meta.setUnbreakable(true);
             wrench.setItemMeta(meta);
         }
@@ -207,7 +201,7 @@ public class CustomBlockManager implements Listener {
         MessageUtil.send(player, "§aYou received a " + item.getItemMeta().getDisplayName() + "!");
     }
 
-    // Utility or service class method
+
     public ItemStack createBlockItem(String blockTypeId) {
         BlockType blockType = registry.getBlockType(blockTypeId);
         if (blockType == null) {
@@ -226,7 +220,7 @@ public class CustomBlockManager implements Listener {
             meta.setCustomModelDataComponent(component);
 
             NamespacedKey key = registry.getKey(blockTypeId);
-            meta.getPersistentDataContainer().set(key, PersistentDataType.BYTE, (byte) 1);
+            PersistentData.flag(meta, key.getKey());
 
             item.setItemMeta(meta);
         }
@@ -269,7 +263,7 @@ public class CustomBlockManager implements Listener {
             if (item.getType() != blockType.getItemMaterial()) continue;
 
             NamespacedKey key = registry.getKey(entry.getKey());
-            if (!meta.getPersistentDataContainer().has(key, PersistentDataType.BYTE)) continue;
+            if (!PersistentData.isFlagged(meta, key.getKey())) continue;
 
             event.setCancelled(true);
 
@@ -310,9 +304,47 @@ public class CustomBlockManager implements Listener {
         if (!(entity instanceof Interaction)) return;
         
         Interaction interaction = (Interaction) entity;
+        
         for (int i = 0; i < blocks.size(); i++) {
             CustomBlock block = blocks.get(i);
-            if (block.getInteractionUUID().equals(entity.getUniqueId())) {
+            if (block.getInteractionUUID() != null && block.getInteractionUUID().equals(entity.getUniqueId())) {
+                Bukkit.getRegionScheduler().run(plugin, interaction.getLocation(), task -> {
+                    org.bukkit.entity.Entity ent = Bukkit.getEntity(interaction.getUniqueId());
+                    if (ent instanceof Interaction inter) {
+                        inter.setResponsive(false);
+                        inter.setResponsive(true);
+                    }
+                });
+                
+                handleBlockInteraction(block, i, event.getPlayer(), event);
+                return;
+            }
+        }
+
+        Location interactionLoc = interaction.getLocation();
+        for (int i = 0; i < blocks.size(); i++) {
+            CustomBlock block = blocks.get(i);
+            Location blockLoc = block.getSpawnLocation();
+            if (blockLoc.getWorld().equals(interactionLoc.getWorld()) &&
+                blockLoc.distance(interactionLoc) < 0.5) {
+
+                block.setInteractionUUID(entity.getUniqueId());
+
+                for (Entity nearbyEntity : blockLoc.getWorld().getNearbyEntities(blockLoc, 1, 1, 1)) {
+                    if (nearbyEntity instanceof org.bukkit.entity.ItemDisplay) {
+                        if (nearbyEntity.getLocation().distance(blockLoc) < 0.5) {
+                            block.setDisplayUUID(nearbyEntity.getUniqueId());
+                            plugin.getLogger().info("Updated display and interaction UUIDs for block at " + blockLoc);
+                            break;
+                        }
+                    }
+                }
+
+                if (block instanceof InteractiveSurface surface) {
+                    surface.updateItemDisplayUUIDs();
+                    plugin.getLogger().info("Updated item display UUIDs for InteractiveSurface");
+                }
+                
                 Bukkit.getRegionScheduler().run(plugin, interaction.getLocation(), task -> {
                     org.bukkit.entity.Entity ent = Bukkit.getEntity(interaction.getUniqueId());
                     if (ent instanceof Interaction inter) {
@@ -335,10 +367,52 @@ public class CustomBlockManager implements Listener {
         
         Player player = (Player) event.getDamager();
         Interaction interaction = (Interaction) event.getEntity();
-        
+
         for (int i = 0; i < blocks.size(); i++) {
             CustomBlock block = blocks.get(i);
-            if (block.getInteractionUUID().equals(interaction.getUniqueId())) {
+            if (block.getInteractionUUID() != null && block.getInteractionUUID().equals(interaction.getUniqueId())) {
+                event.setCancelled(true);
+
+                if (block.getBlockLocation().getBlock().getType() != Material.BARRIER) {
+                    BlockType blockType = registry.getBlockType(block.getBlockType());
+                    if (blockType != null) {
+                        ItemStack dropItem = blockType.getDropItem();
+                        if (dropItem != null) {
+                            block.getSpawnLocation().getWorld().dropItemNaturally(block.getSpawnLocation(), dropItem);
+                        }
+                    }
+                    
+                    block.remove();
+                    blocks.remove(i);
+                    block.onRemoved();
+                    MessageUtil.send(player, "§cCustom block removed");
+                }
+                return;
+            }
+        }
+
+        Location interactionLoc = interaction.getLocation();
+        for (int i = 0; i < blocks.size(); i++) {
+            CustomBlock block = blocks.get(i);
+            Location blockLoc = block.getSpawnLocation();
+            if (blockLoc.getWorld().equals(interactionLoc.getWorld()) &&
+                blockLoc.distance(interactionLoc) < 0.5) {
+
+                block.setInteractionUUID(interaction.getUniqueId());
+
+                for (Entity nearbyEntity : blockLoc.getWorld().getNearbyEntities(blockLoc, 1, 1, 1)) {
+                    if (nearbyEntity instanceof org.bukkit.entity.ItemDisplay) {
+                        if (nearbyEntity.getLocation().distance(blockLoc) < 0.5) {
+                            block.setDisplayUUID(nearbyEntity.getUniqueId());
+                            break;
+                        }
+                    }
+                }
+
+                if (block instanceof InteractiveSurface surface) {
+                    surface.updateItemDisplayUUIDs();
+                }
+                
                 event.setCancelled(true);
 
                 if (block.getBlockLocation().getBlock().getType() != Material.BARRIER) {

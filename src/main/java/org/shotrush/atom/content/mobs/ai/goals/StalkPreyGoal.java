@@ -10,7 +10,6 @@ import org.bukkit.entity.Mob;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
-import org.shotrush.atom.content.mobs.ai.vision.VisionSystem;
 
 import java.util.EnumSet;
 
@@ -89,7 +88,7 @@ public class StalkPreyGoal implements Goal<Mob> {
             mob.getPathfinder().moveTo(stalkTarget, STALK_SPEED);
         }
         
-        if (VisionSystem.canSee((Mob) prey, mob)) {
+        if (canSee(prey, mob)) {
             mob.getPathfinder().stopPathfinding();
             
             if (Math.random() < 0.3) {
@@ -117,6 +116,15 @@ public class StalkPreyGoal implements Goal<Mob> {
         }
         
         return preyLoc.clone();
+    }
+    
+    private boolean canSee(LivingEntity observer, LivingEntity target) {
+        Vector observerDirection = observer.getLocation().getDirection().normalize();
+        Vector toTarget = target.getLocation().toVector().subtract(observer.getLocation().toVector()).normalize();
+        
+        double angle = Math.toDegrees(Math.acos(observerDirection.dot(toTarget)));
+        
+        return angle < 90;
     }
     
     @Override

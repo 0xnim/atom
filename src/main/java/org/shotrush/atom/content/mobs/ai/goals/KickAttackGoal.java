@@ -11,7 +11,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
-import org.shotrush.atom.content.mobs.ai.vision.VisionSystem;
 
 import java.util.EnumSet;
 
@@ -54,7 +53,16 @@ public class KickAttackGoal implements Goal<Mob> {
         
         if (distance >= KICK_RANGE) return false;
         
-        return VisionSystem.isInBehindArc(mob, target, BEHIND_ARC_ANGLE);
+        return isTargetBehind(mob, target, BEHIND_ARC_ANGLE);
+    }
+    
+    private boolean isTargetBehind(Mob mob, LivingEntity target, double arcAngle) {
+        Vector mobDirection = mob.getLocation().getDirection().normalize();
+        Vector toTarget = target.getLocation().toVector().subtract(mob.getLocation().toVector()).normalize();
+        
+        double angle = Math.toDegrees(Math.acos(mobDirection.dot(toTarget)));
+        
+        return angle > (180 - arcAngle / 2);
     }
     
     @Override

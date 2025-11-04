@@ -15,12 +15,8 @@ import org.shotrush.atom.content.mobs.ai.combat.FatigueSystem;
 import org.shotrush.atom.content.mobs.ai.combat.InjurySystem;
 import org.shotrush.atom.content.mobs.ai.combat.MoraleSystem;
 import org.shotrush.atom.content.mobs.ai.config.SpeciesBehavior;
-import org.shotrush.atom.content.mobs.ai.environment.EnvironmentalContext;
 import org.shotrush.atom.content.mobs.ai.goals.*;
 import org.bukkit.entity.EntityType;
-import org.shotrush.atom.content.mobs.ai.lifecycle.LifeCycleManager;
-import org.shotrush.atom.content.mobs.ai.memory.MemoryManager;
-import org.shotrush.atom.content.mobs.ai.needs.NeedsManager;
 import org.shotrush.atom.content.mobs.herd.Herd;
 import org.shotrush.atom.content.mobs.herd.HerdManager;
 import org.shotrush.atom.content.mobs.herd.HerdRole;
@@ -37,9 +33,6 @@ public class AnimalBehaviorNew implements Listener {
     private final InjurySystem injurySystem;
     private final FatigueSystem fatigueSystem;
     private final MoraleSystem moraleSystem;
-    private final NeedsManager needsManager;
-    private final MemoryManager memoryManager;
-    private final LifeCycleManager lifeCycleManager;
     private static final Set<EntityType> COMMON_ANIMALS = new HashSet<>();
     private final Set<UUID> trackedAnimals = new HashSet<>();
     
@@ -75,9 +68,6 @@ public class AnimalBehaviorNew implements Listener {
         this.injurySystem = new InjurySystem(plugin);
         this.fatigueSystem = new FatigueSystem(plugin);
         this.moraleSystem = new MoraleSystem(plugin, herdManager);
-        this.needsManager = new NeedsManager(plugin);
-        this.memoryManager = new MemoryManager(plugin);
-        this.lifeCycleManager = new LifeCycleManager(plugin);
     }
     
     @EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST)
@@ -146,22 +136,14 @@ public class AnimalBehaviorNew implements Listener {
     private void registerGoals(Mob mob, SpeciesBehavior behavior, boolean isAggressive, HerdRole role) {
         com.destroystokyo.paper.entity.ai.MobGoals goalSelector = Bukkit.getMobGoals();
         com.destroystokyo.paper.entity.ai.MobGoals targetSelector = Bukkit.getMobGoals();
-        
-        goalSelector.addGoal(mob, 0, new RestWhenExhaustedGoal(mob, plugin, needsManager));
+
         goalSelector.addGoal(mob, 0, new DeathEffectsGoal(mob, plugin, herdManager, moraleSystem));
         goalSelector.addGoal(mob, 0, new HerdPanicGoal(mob, plugin, herdManager, behavior, moraleSystem));
-        
-        goalSelector.addGoal(mob, 1, new SeekShelterGoal(mob, plugin));
-        goalSelector.addGoal(mob, 1, new MotherProtectionGoal(mob, plugin, lifeCycleManager.getFamilyRelationships()));
+
         goalSelector.addGoal(mob, 1, new AvoidPlayerWhenInjuredGoal(mob, plugin, behavior));
         
-        if (isHerbivore(mob.getType())) {
-            goalSelector.addGoal(mob, 2, new GrazingGoal(mob, plugin, needsManager));
-        }
-        goalSelector.addGoal(mob, 2, new SeekWaterGoal(mob, plugin, needsManager));
-        
         if (isCarnivore(mob.getType())) {
-            goalSelector.addGoal(mob, 2, new HuntPreyGoal(mob, plugin, needsManager, behavior));
+            goalSelector.addGoal(mob, 2, new HuntPreyGoal(mob, plugin, behavior));
             goalSelector.addGoal(mob, 2, new TrackWoundedPreyGoal(mob, plugin, injurySystem));
         }
         
@@ -175,12 +157,10 @@ public class AnimalBehaviorNew implements Listener {
         }
         
         if (isCarnivore(mob.getType())) {
-            goalSelector.addGoal(mob, 3, new ScavengeGoal(mob, plugin, needsManager));
             goalSelector.addGoal(mob, 3, new StalkPreyGoal(mob, plugin));
         }
         
         goalSelector.addGoal(mob, 3, new ReunionGoal(mob, plugin, herdManager, behavior));
-        goalSelector.addGoal(mob, 3, new SleepGoal(mob, plugin, needsManager));
         
         if (role == HerdRole.FOLLOWER) {
             goalSelector.addGoal(mob, 4, new StayNearHerdGoal(mob, plugin, herdManager, behavior));
@@ -189,12 +169,6 @@ public class AnimalBehaviorNew implements Listener {
             goalSelector.addGoal(mob, 4, new TerritoryDefenseGoal(mob, plugin, herdManager));
             goalSelector.addGoal(mob, 6, new HerdLeaderWanderGoal(mob, plugin, herdManager));
         }
-        
-        goalSelector.addGoal(mob, 7, new ShareFoodGoal(mob, plugin, herdManager, lifeCycleManager.getFamilyRelationships(), needsManager));
-        
-        goalSelector.addGoal(mob, 8, new PlayBehaviorGoal(mob, plugin, lifeCycleManager, lifeCycleManager.getFamilyRelationships()));
-        
-        goalSelector.addGoal(mob, 10, new TimeBasedActivityGoal(mob, plugin, getActivityPattern(mob.getType())));
         
         registerSpecialGoals(mob, behavior, goalSelector, isAggressive);
         
@@ -349,8 +323,6 @@ public class AnimalBehaviorNew implements Listener {
         UUID animalId = animal.getUniqueId();
         
         herdManager.leaveHerd(animalId);
-        needsManager.removeNeeds(animalId);
-        lifeCycleManager.removeAnimal(animalId);
         trackedAnimals.remove(animalId);
         
         plugin.getLogger().info(">>> Animal died: " + animal.getType() + " - cleaned up all systems");
@@ -421,10 +393,6 @@ public class AnimalBehaviorNew implements Listener {
         
         herdManager.getPersistence().saveHerdData(animal, herd.id(), role == HerdRole.LEADER, isAggressive, maxStamina, stamina);
         
-        needsManager.getNeeds(animal);
-        
-        lifeCycleManager.registerAnimal(animal);
-        
         trackedAnimals.add(animal.getUniqueId());
         
         registerGoals(mob, behavior, isAggressive, role);
@@ -440,14 +408,6 @@ public class AnimalBehaviorNew implements Listener {
     
     public HerdManager getHerdManager() {
         return herdManager;
-    }
-    
-    public NeedsManager getNeedsManager() {
-        return needsManager;
-    }
-    
-    public MemoryManager getMemoryManager() {
-        return memoryManager;
     }
     
     private boolean isHerbivore(EntityType type) {
@@ -467,13 +427,5 @@ public class AnimalBehaviorNew implements Listener {
     
     private boolean isPackHunter(EntityType type) {
         return type == EntityType.WOLF;
-    }
-    
-    private EnvironmentalContext.ActivityPattern getActivityPattern(EntityType type) {
-        return switch (type) {
-            case WOLF, FOX, CAT, OCELOT -> EnvironmentalContext.ActivityPattern.NOCTURNAL;
-            case RABBIT -> EnvironmentalContext.ActivityPattern.CREPUSCULAR;
-            default -> EnvironmentalContext.ActivityPattern.DIURNAL;
-        };
     }
 }

@@ -55,13 +55,16 @@ public class CraftingBasket extends InteractiveSurface {
 
     @Override
     public void spawn(Atom plugin, RegionAccessor accessor) {
+        System.out.println("[DEBUG] CraftingBasket.spawn() called at " + spawnLocation);
         cleanupExistingEntities();
         ItemDisplay display = (ItemDisplay) accessor.spawnEntity(spawnLocation, EntityType.ITEM_DISPLAY);
         ItemStack basketItem = createItemWithCustomModel(Material.STONE_BUTTON, "crafting_basket");
 
         spawnDisplay(display, plugin, basketItem, new Vector3f(0, 0.5f, 0), new AxisAngle4f(), new Vector3f(1f, 1f, 1f), false, 1f, 0.2f);
+        
+        System.out.println("[DEBUG] Basket spawned with display UUID: " + displayUUID + ", interaction UUID: " + interactionUUID);
 
-        /* // Handled by InteractiveSurface.spawn()
+        /*
         for (PlacedItem item : placedItems) {
             spawnItemDisplay(item);
         }
@@ -87,25 +90,45 @@ public class CraftingBasket extends InteractiveSurface {
 
     @Override
     public boolean isValid() {
-        if (interactionUUID == null || displayUUID == null) return false;
+        if (interactionUUID == null || displayUUID == null) {
+            System.out.println("[DEBUG] CraftingBasket.isValid() - UUIDs are null");
+            return false;
+        }
         Entity interaction = Bukkit.getEntity(interactionUUID);
         Entity display = Bukkit.getEntity(displayUUID);
-        return interaction != null && display != null && !interaction.isDead() && !display.isDead();
+        boolean valid = interaction != null && display != null && !interaction.isDead() && !display.isDead();
+        if (!valid) {
+            System.out.println("[DEBUG] CraftingBasket.isValid() - Entities not found or dead. interaction=" + interaction + ", display=" + display);
+        }
+        return valid;
     }
 
     @Override
     protected ItemStack checkRecipe() {
         RecipeManager recipeManager = Atom.getInstance().getRecipeManager();
-        if (recipeManager == null) return null;
+        if (recipeManager == null) {
+            System.out.println("[DEBUG] RecipeManager is null!");
+            return null;
+        }
 
         List<ItemStack> items = new ArrayList<>();
         for (PlacedItem placedItem : placedItems) {
             items.add(placedItem.getItem());
         }
+        
+        System.out.println("[DEBUG] Checking recipe with " + items.size() + " items:");
+        for (ItemStack item : items) {
+            System.out.println("[DEBUG]   - " + item.getType() + " x" + item.getAmount() + 
+                (item.hasItemMeta() && item.getItemMeta().hasDisplayName() ? 
+                " (" + item.getItemMeta().getDisplayName() + ")" : ""));
+        }
 
         ItemStack result = recipeManager.findMatch(items);
         if (result != null) {
+            System.out.println("[DEBUG] Recipe match found: " + result);
             applyQualityInheritance(result);
+        } else {
+            System.out.println("[DEBUG] No recipe match found");
         }
         return result;
     }
@@ -157,14 +180,18 @@ public class CraftingBasket extends InteractiveSurface {
 
     @Override
     public org.shotrush.atom.core.blocks.CustomBlock deserialize(String data) {
+        System.out.println("[DEBUG] Deserializing CraftingBasket from: " + data);
         Object[] parsed = parseDeserializeData(data);
-        if (parsed == null) return null;
+        if (parsed == null) {
+            System.out.println("[DEBUG] Failed to parse base data");
+            return null;
+        }
 
         CraftingBasket basket = new CraftingBasket((Location) parsed[1], (BlockFace) parsed[2]);
-
-        // Deserialize additional data into the new instance
         String[] parts = data.split(";");
         basket.deserializeAdditionalData(parts, 5);
+        
+        System.out.println("[DEBUG] Deserialized basket with " + basket.placedItems.size() + " items");
 
         return basket;
     }

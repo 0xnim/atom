@@ -12,7 +12,6 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.content.mobs.ai.config.SpeciesBehavior;
-import org.shotrush.atom.content.mobs.ai.needs.NeedsManager;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -24,7 +23,6 @@ public class HuntPreyGoal implements Goal<Mob>, Listener {
     private final GoalKey<Mob> key;
     private final Mob mob;
     private final Plugin plugin;
-    private final NeedsManager needsManager;
     private final SpeciesBehavior behavior;
     private LivingEntity preyTarget;
     private static final Set<EntityType> PREY_TYPES = Set.of(
@@ -32,10 +30,9 @@ public class HuntPreyGoal implements Goal<Mob>, Listener {
     );
     private static final Set<UUID> HUNTING_MOBS = ConcurrentHashMap.newKeySet();
     
-    public HuntPreyGoal(Mob mob, Plugin plugin, NeedsManager needsManager, SpeciesBehavior behavior) {
+    public HuntPreyGoal(Mob mob, Plugin plugin, SpeciesBehavior behavior) {
         this.mob = mob;
         this.plugin = plugin;
-        this.needsManager = needsManager;
         this.behavior = behavior;
         this.key = GoalKey.of(Mob.class, new NamespacedKey(plugin, "hunt_prey"));
     }
@@ -52,9 +49,6 @@ public class HuntPreyGoal implements Goal<Mob>, Listener {
         if (mob.getTarget() instanceof Player) {
             return false;
         }
-        
-        var needs = needsManager.getNeeds(animal);
-        if (!needs.isHungry()) return false;
         
         preyTarget = findNearestPrey();
         return preyTarget != null;
@@ -112,8 +106,6 @@ public class HuntPreyGoal implements Goal<Mob>, Listener {
             double chaseSpeed = behavior.getChaseSpeed(0.0);
             mob.getPathfinder().moveTo(preyLoc, chaseSpeed);
         }
-        
-        needsManager.drainFromChasing(animal);
     }
     
     private LivingEntity findNearestPrey() {
@@ -145,9 +137,6 @@ public class HuntPreyGoal implements Goal<Mob>, Listener {
         
         Entity killerEntity = plugin.getServer().getEntity(killerId);
         if (!(killerEntity instanceof Animals animal)) return;
-        
-        var needs = needsManager.getNeeds(animal);
-        needs.eat(50);
         
         HUNTING_MOBS.remove(killerId);
     }

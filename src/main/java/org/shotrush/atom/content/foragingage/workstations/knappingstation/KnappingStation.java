@@ -48,7 +48,7 @@ public class KnappingStation extends InteractiveSurface {
 
         spawnDisplay(display, plugin, stationItem, new Vector3f(0, 0.5f, 0), new AxisAngle4f(), new Vector3f(1f, 1f, 1f), true, 0.65f, 0.75f);
 
-        /* // Handled by InteractiveSurface.spawn()
+        /*
         for (PlacedItem item : placedItems) {
             spawnItemDisplay(item);
         }
@@ -157,8 +157,6 @@ public class KnappingStation extends InteractiveSurface {
         if (parsed == null) return null;
         
         KnappingStation station = new KnappingStation((Location) parsed[1], (BlockFace) parsed[2]);
-        
-        // Now deserialize the additional data into the new instance
         String[] parts = data.split(";");
         station.deserializeAdditionalData(parts, 5);
         

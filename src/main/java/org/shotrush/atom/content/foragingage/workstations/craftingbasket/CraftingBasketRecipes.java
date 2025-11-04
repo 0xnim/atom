@@ -9,24 +9,27 @@ import org.shotrush.atom.core.recipe.ShapelessRecipe;
 import org.shotrush.atom.core.recipe.annotation.AutoRegister;
 import org.shotrush.atom.core.util.ItemUtil;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-@AutoRegister(priority = 50)
+@AutoRegister(priority = 1)
 public class CraftingBasketRecipes implements RecipeProvider {
     
     @Override
     public List<Recipe> getRecipes() {
-        List<Recipe> recipes = new ArrayList<>();
-        recipes.add(createSpearRecipe());
-        return recipes;
+        return Arrays.asList(
+            createSpearRecipe()
+        );
     }
     
     private Recipe createSpearRecipe() {
         ItemStack spear = Atom.getInstance().getItemRegistry().createItem("wood_spear");
         if (spear == null) {
+            System.out.println("[DEBUG] wood_spear item not found in registry, using fallback");
             spear = ItemUtil.createItemWithCustomModel(Material.TRIDENT, "spear");
         }
+        
+        System.out.println("[DEBUG] Creating spear recipe with result: " + spear);
         
         return new ShapelessRecipe.Builder()
             .id("spear")

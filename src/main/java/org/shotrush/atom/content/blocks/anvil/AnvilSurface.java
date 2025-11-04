@@ -40,10 +40,9 @@ public class AnvilSurface extends InteractiveSurface {
     
     @Override
     public Vector3f calculatePlacement(Player player, int itemCount) {
-        // Fixed positions for 2 items
         float[][] positions = {
-                {-0.25f, 0.6f, 0f},  // Left position
-                {0.25f, 0.6f, 0f}    // Right position
+                {-0.25f, 0.6f, 0f},
+                {0.25f, 0.6f, 0f}
         };
         
         if (itemCount < positions.length) {
@@ -59,7 +58,7 @@ public class AnvilSurface extends InteractiveSurface {
         ItemStack anvilItem = new ItemStack(Material.ANVIL);
 
         spawnDisplay(base, plugin, anvilItem, new Vector3f(0, 0.5f, 0), new AxisAngle4f(), new Vector3f(1, 1, 1), true, 1f, 1f);
-        /* // Handled by InteractiveSurface.spawn()
+        /*
         for (PlacedItem item : placedItems) {
             spawnItemDisplay(item);
         }
@@ -172,8 +171,6 @@ public class AnvilSurface extends InteractiveSurface {
         if (parsed == null) return null;
 
         AnvilSurface surface = new AnvilSurface((Location) parsed[1], (BlockFace) parsed[2]);
-
-        // Deserialize additional data into the new instance
         String[] parts = data.split(";");
         surface.deserializeAdditionalData(parts, 5);
 

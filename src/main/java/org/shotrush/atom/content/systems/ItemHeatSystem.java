@@ -12,16 +12,12 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
+import org.shotrush.atom.core.data.PersistentData;
 import org.shotrush.atom.Atom;
 import org.shotrush.atom.core.systems.annotation.AutoRegisterSystem;
-
 @AutoRegisterSystem(priority = 3)
 public class ItemHeatSystem implements Listener {
-    
     private final Atom plugin;
-    private static final NamespacedKey HEAT_KEY = new NamespacedKey("atom", "item_heat");
     private static final NamespacedKey HEAT_MODIFIER_KEY = new NamespacedKey("atom", "heat_modifier");
     
     public ItemHeatSystem(org.bukkit.plugin.Plugin plugin) {
@@ -197,10 +193,7 @@ public class ItemHeatSystem implements Listener {
     public static double getItemHeat(ItemStack item) {
         if (item == null || !item.hasItemMeta()) return 0.0;
         
-        ItemMeta meta = item.getItemMeta();
-        PersistentDataContainer container = meta.getPersistentDataContainer();
-        
-        return container.getOrDefault(HEAT_KEY, PersistentDataType.DOUBLE, 0.0);
+        return PersistentData.getDouble(item.getItemMeta(), "item_heat", 0.0);
     }
     
     public static void setItemHeat(ItemStack item, double heat) {
@@ -209,8 +202,7 @@ public class ItemHeatSystem implements Listener {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return;
         
-        PersistentDataContainer container = meta.getPersistentDataContainer();
-        container.set(HEAT_KEY, PersistentDataType.DOUBLE, heat);
+        PersistentData.set(meta, "item_heat", heat);
         
         item.setItemMeta(meta);
     }

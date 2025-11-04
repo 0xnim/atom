@@ -32,7 +32,9 @@ public class ShapelessRecipe implements Recipe {
     
     @Override
     public boolean matches(List<ItemStack> items) {
+        System.out.println("[DEBUG] ShapelessRecipe.matches for " + id + ": items=" + items.size() + ", ingredients=" + ingredients.size());
         if (items.size() != ingredients.size()) {
+            System.out.println("[DEBUG]   Size mismatch!");
             return false;
         }
         
@@ -44,14 +46,22 @@ public class ShapelessRecipe implements Recipe {
             
             for (int i = 0; i < itemsCopy.size(); i++) {
                 ItemStack item = itemsCopy.get(i);
+                System.out.println("[DEBUG]   Checking ingredient " + 
+                    (ingredient.getCustomItemId() != null ? ingredient.getCustomItemId() : ingredient.getMaterial()) + 
+                    " against " + item.getType());
                 if (ingredient.matches(item)) {
                     itemsCopy.remove(i);
                     found = true;
+                    System.out.println("[DEBUG]     Match!");
                     break;
+                } else {
+                    System.out.println("[DEBUG]     No match");
                 }
             }
             
             if (!found) {
+                System.out.println("[DEBUG]   Ingredient not found: " + 
+                    (ingredient.getCustomItemId() != null ? ingredient.getCustomItemId() : ingredient.getMaterial()));
                 return false;
             }
         }

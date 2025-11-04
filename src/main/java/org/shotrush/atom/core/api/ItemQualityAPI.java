@@ -1,10 +1,8 @@
 package org.shotrush.atom.core.api;
 
-import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
+import org.shotrush.atom.core.data.PersistentData;
 import org.shotrush.atom.core.items.ItemQuality;
 
 import java.util.ArrayList;
@@ -12,15 +10,10 @@ import java.util.List;
 
 public class ItemQualityAPI {
     
-    private static final NamespacedKey QUALITY_KEY = new NamespacedKey("atom", "item_quality");
-    
     public static ItemQuality getQuality(ItemStack item) {
         if (item == null || !item.hasItemMeta()) return null;
         
-        ItemMeta meta = item.getItemMeta();
-        PersistentDataContainer container = meta.getPersistentDataContainer();
-        
-        String qualityName = container.get(QUALITY_KEY, PersistentDataType.STRING);
+        String qualityName = PersistentData.getString(item.getItemMeta(), "item_quality", null);
         if (qualityName == null) return null;
         
         try {
@@ -36,8 +29,7 @@ public class ItemQualityAPI {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return;
         
-        PersistentDataContainer container = meta.getPersistentDataContainer();
-        container.set(QUALITY_KEY, PersistentDataType.STRING, quality.name());
+        PersistentData.set(meta, "item_quality", quality.name());
         
         updateLore(meta, quality);
         item.setItemMeta(meta);
@@ -51,8 +43,7 @@ public class ItemQualityAPI {
         if (item == null || !item.hasItemMeta()) return;
         
         ItemMeta meta = item.getItemMeta();
-        PersistentDataContainer container = meta.getPersistentDataContainer();
-        container.remove(QUALITY_KEY);
+        PersistentData.remove(meta, "item_quality");
         
         List<String> lore = meta.hasLore() ? meta.getLore() : new ArrayList<>();
         lore.removeIf(line -> line.contains("Quality"));

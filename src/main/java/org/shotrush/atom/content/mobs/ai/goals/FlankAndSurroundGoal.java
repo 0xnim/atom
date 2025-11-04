@@ -13,7 +13,6 @@ import org.bukkit.entity.Wolf;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
-import org.shotrush.atom.content.mobs.ai.vision.VisionSystem;
 import org.shotrush.atom.content.mobs.herd.Herd;
 import org.shotrush.atom.content.mobs.herd.HerdManager;
 
@@ -133,7 +132,7 @@ public class FlankAndSurroundGoal implements Goal<Mob> {
             if (packMember.getUniqueId().equals(mob.getUniqueId())) {
                 assignedPosition = surroundPosition;
                 
-                if (VisionSystem.isInBehindArc(target instanceof Mob ? (Mob) target : null, mob, 90)) {
+                if (isTargetBehind(target, mob, 90)) {
                     mob.setMetadata("pack_role", new FixedMetadataValue(plugin, "ATTACKER"));
                 } else {
                     mob.setMetadata("pack_role", new FixedMetadataValue(plugin, "DISTRACTOR"));
@@ -178,6 +177,15 @@ public class FlankAndSurroundGoal implements Goal<Mob> {
                 mob.lookAt(target);
             }
         }
+    }
+    
+    private boolean isTargetBehind(LivingEntity observer, LivingEntity target, double arcAngle) {
+        Vector observerDirection = observer.getLocation().getDirection().normalize();
+        Vector toTarget = target.getLocation().toVector().subtract(observer.getLocation().toVector()).normalize();
+        
+        double angle = Math.toDegrees(Math.acos(observerDirection.dot(toTarget)));
+        
+        return angle > (180 - arcAngle / 2);
     }
     
     @Override

@@ -21,22 +21,22 @@ public record SpeciesBehavior(
     
     public enum SpecialMechanic {
         NONE,
-        STAMPEDE,           // Cow - coordinated herd fleeing
-        COUNTER_CHARGE,     // Pig - charges when cornered
-        RAM_CHARGE,         // Sheep/Goat - charging attack
-        FLIGHT_BURST,       // Chicken - short flight when panicking
-        ZIGZAG_FLEE,        // Rabbit - erratic flee pattern
-        BURROW_HIDE,        // Rabbit - despawn when safe
-        KICK_ATTACK,        // Horse - rear kick
-        BRAY_ALERT,         // Donkey - warns herd
-        SPIT_ATTACK,        // Llama - ranged spit
-        PACK_HUNTING,       // Wolf - coordinated attacks
-        HOWL_CALL,          // Wolf - calls pack
-        POUNCE_ATTACK,      // Fox - leap attack on small prey
-        TREE_CLIMB,         // Cat/Ocelot - climbs when fleeing
-        CUB_PROTECTION,     // Polar Bear - enrages near cub
-        ROLL_DEFENSE,       // Armadillo - invulnerable roll
-        DASH_ABILITY        // Camel - sprint bursts
+        STAMPEDE,
+        COUNTER_CHARGE,
+        RAM_CHARGE,
+        FLIGHT_BURST,
+        ZIGZAG_FLEE,
+        BURROW_HIDE,
+        KICK_ATTACK,
+        BRAY_ALERT,
+        SPIT_ATTACK,
+        PACK_HUNTING,
+        HOWL_CALL,
+        POUNCE_ATTACK,
+        TREE_CLIMB,
+        CUB_PROTECTION,
+        ROLL_DEFENSE,
+        DASH_ABILITY
     }
     
     public double getAggressionChance(double domesticationFactor) {

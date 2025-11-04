@@ -1,12 +1,10 @@
 package org.shotrush.atom.content.foragingage.items;
 
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
+import org.shotrush.atom.core.data.PersistentData;
 import org.shotrush.atom.core.items.CustomItem;
 import org.shotrush.atom.core.items.annotation.AutoRegister;
 
@@ -17,8 +15,6 @@ import java.util.List;
 @AutoRegister(priority = 1)
 public class Waterskin extends CustomItem {
     
-    private static final NamespacedKey WATER_AMOUNT_KEY = new NamespacedKey("atom", "water_amount");
-    private static final NamespacedKey IS_PURIFIED_KEY = new NamespacedKey("atom", "water_purified");
     private static final int MAX_WATER = 5;
     
     public Waterskin(Plugin plugin) {
@@ -53,23 +49,18 @@ public class Waterskin extends CustomItem {
     @Override
     protected void applyCustomMeta(ItemMeta meta) {
         org.shotrush.atom.core.util.ItemUtil.setCustomModelName(meta, "waterskin");
-        PersistentDataContainer container = meta.getPersistentDataContainer();
-        container.set(WATER_AMOUNT_KEY, PersistentDataType.INTEGER, 0);
-        container.set(IS_PURIFIED_KEY, PersistentDataType.BOOLEAN, false);
+        PersistentData.set(meta, "water_amount", 0);
+        PersistentData.set(meta, "water_purified", false);
     }
     
     public static int getWaterAmount(ItemStack item) {
         if (item == null || !item.hasItemMeta()) return 0;
-        ItemMeta meta = item.getItemMeta();
-        PersistentDataContainer container = meta.getPersistentDataContainer();
-        return container.getOrDefault(WATER_AMOUNT_KEY, PersistentDataType.INTEGER, 0);
+        return PersistentData.getInt(item.getItemMeta(), "water_amount", 0);
     }
     
     public static boolean isPurified(ItemStack item) {
         if (item == null || !item.hasItemMeta()) return false;
-        ItemMeta meta = item.getItemMeta();
-        PersistentDataContainer container = meta.getPersistentDataContainer();
-        return container.getOrDefault(IS_PURIFIED_KEY, PersistentDataType.BOOLEAN, false);
+        return PersistentData.getBoolean(item.getItemMeta(), "water_purified", false);
     }
     
     public static void setWater(ItemStack item, int amount, boolean purified) {
@@ -77,9 +68,8 @@ public class Waterskin extends CustomItem {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return;
         
-        PersistentDataContainer container = meta.getPersistentDataContainer();
-        container.set(WATER_AMOUNT_KEY, PersistentDataType.INTEGER, Math.min(amount, MAX_WATER));
-        container.set(IS_PURIFIED_KEY, PersistentDataType.BOOLEAN, purified);
+        PersistentData.set(meta, "water_amount", Math.min(amount, MAX_WATER));
+        PersistentData.set(meta, "water_purified", purified);
         
         updateLore(meta, amount, purified);
         item.setItemMeta(meta);

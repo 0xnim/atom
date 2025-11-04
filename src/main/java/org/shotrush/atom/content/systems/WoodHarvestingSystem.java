@@ -1,0 +1,293 @@
+package org.shotrush.atom.content.systems;
+
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.type.PointedDripstone;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
+import org.shotrush.atom.Atom;
+import org.shotrush.atom.content.foragingage.items.SharpenedFlint;
+import org.shotrush.atom.core.items.CustomItemRegistry;
+import org.shotrush.atom.core.systems.annotation.AutoRegisterSystem;
+import org.shotrush.atom.core.util.MessageUtil;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@AutoRegisterSystem(priority = 2)
+public class WoodHarvestingSystem implements Listener {
+    
+    private final Plugin plugin;
+    private final Map<Location, Integer> woodDamageStates = new HashMap<>();
+    
+    public WoodHarvestingSystem(Plugin plugin) {
+        this.plugin = plugin;
+    }
+    
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBlockPlace(BlockPlaceEvent event) {
+        Block placed = event.getBlock();
+        Location loc = placed.getLocation();
+        woodDamageStates.remove(loc);
+    }
+    
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPistonExtend(BlockPistonExtendEvent event) {
+        BlockFace direction = event.getDirection();
+        for (Block block : event.getBlocks()) {
+            if (block.getType() == Material.POINTED_DRIPSTONE) {
+                Block targetBlock = block.getRelative(direction);
+                if (isWoodBlock(targetBlock.getType())) {
+                    plugin.getLogger().info("[WoodHarvesting] Piston pushing dripstone into wood!");
+                    splitWoodBlock(targetBlock);
+                }
+            }
+        }
+    }
+    
+    
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPlayerInteractBlock(PlayerInteractEvent event) {
+        if (event.getAction() != Action.LEFT_CLICK_BLOCK) return;
+        
+        Block block = event.getClickedBlock();
+        if (block == null || !isWoodBlock(block.getType())) return;
+        
+        Player player = event.getPlayer();
+        ItemStack item = player.getInventory().getItemInMainHand();
+        if (!isUsingSharpenedFlint(item)) {
+            MessageUtil.send(player, "§cYou need a Sharpened Flint to harvest wood!");
+            return;
+        }
+        handleWoodDamageStage(block, player);
+        event.setCancelled(true);
+    }
+    
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBlockBreak(BlockBreakEvent event) {
+        Block broken = event.getBlock();
+
+        if (isWoodBlock(broken.getType()) || broken.getType().name().contains("STRIPPED") || broken.getType().name().contains("FENCE")) {
+            Player player = event.getPlayer();
+            ItemStack item = player.getInventory().getItemInMainHand();
+
+            if (!isUsingSharpenedFlint(item)) {
+                event.setDropItems(false);
+                player.sendActionBar("§cYou need a Sharpened Flint to harvest wood!");
+                return;
+            }
+            event.setCancelled(true);
+            handleWoodDamageStage(broken, player);
+        }
+    }
+    
+    private boolean isUsingSharpenedFlint(ItemStack item) {
+        if (item == null || item.getType() != Material.FLINT) {
+            return false;
+        }
+        
+        CustomItemRegistry registry = Atom.instance.getItemRegistry();
+        if (registry != null) {
+            SharpenedFlint sharpenedFlint = (SharpenedFlint) registry.getItem("sharpened_flint");
+            if (sharpenedFlint != null && sharpenedFlint.isCustomItem(item)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    private void checkAndSplitWoodAbove(Block dripstone) {
+        if (dripstone.getBlockData() instanceof PointedDripstone pointedDripstone) {
+            plugin.getLogger().info("[WoodHarvesting] Dripstone direction: " + pointedDripstone.getVerticalDirection());
+            
+            BlockFace direction = pointedDripstone.getVerticalDirection();
+            Block targetBlock = null;
+            if (direction == BlockFace.UP) {
+                targetBlock = dripstone.getRelative(BlockFace.UP);
+                plugin.getLogger().info("[WoodHarvesting] Checking block above: " + targetBlock.getType());
+            }
+            else if (direction == BlockFace.DOWN) {
+                targetBlock = dripstone.getRelative(BlockFace.DOWN);
+                plugin.getLogger().info("[WoodHarvesting] Checking block below: " + targetBlock.getType());
+            }
+            
+            if (targetBlock != null && isWoodBlock(targetBlock.getType())) {
+                plugin.getLogger().info("[WoodHarvesting] Splitting wood block!");
+                splitWoodBlock(targetBlock);
+            } else {
+                plugin.getLogger().info("[WoodHarvesting] No wood block found in dripstone's direction");
+            }
+        } else {
+            plugin.getLogger().info("[WoodHarvesting] Block is not PointedDripstone data?");
+        }
+    }
+    
+    public boolean isWoodBlock(Material material) {
+        String name = material.name();
+        return name.endsWith("_LOG") || name.endsWith("_WOOD");
+    }
+    
+    private void splitWoodBlock(Block woodBlock) {
+        Material woodType = woodBlock.getType();
+        Material plankType = getPlankTypeFromWood(woodType);
+        
+        if (plankType == null) return;
+        
+        Location loc = woodBlock.getLocation();
+        woodBlock.setType(Material.AIR);
+
+        ItemStack planks = new ItemStack(plankType, 1);
+        loc.getWorld().dropItemNaturally(loc.add(0.5, 0.5, 0.5), planks);
+
+        loc.getWorld().playSound(loc, Sound.BLOCK_WOOD_BREAK, 1.0f, 1.0f);
+
+        loc.getWorld().spawnParticle(Particle.BLOCK, 
+            loc, 20, 0.3, 0.3, 0.3, 0.05, 
+            woodType.createBlockData());
+    }
+    
+    private Material getPlankTypeFromWood(Material woodType) {
+        String woodName = woodType.name();
+
+        if (woodName.contains("OAK")) return Material.OAK_PLANKS;
+        if (woodName.contains("SPRUCE")) return Material.SPRUCE_PLANKS;
+        if (woodName.contains("BIRCH")) return Material.BIRCH_PLANKS;
+        if (woodName.contains("JUNGLE")) return Material.JUNGLE_PLANKS;
+        if (woodName.contains("ACACIA")) return Material.ACACIA_PLANKS;
+        if (woodName.contains("DARK_OAK")) return Material.DARK_OAK_PLANKS;
+        if (woodName.contains("MANGROVE")) return Material.MANGROVE_PLANKS;
+        if (woodName.contains("CHERRY")) return Material.CHERRY_PLANKS;
+        if (woodName.contains("BAMBOO")) return Material.BAMBOO_PLANKS;
+        if (woodName.contains("CRIMSON")) return Material.CRIMSON_PLANKS;
+        if (woodName.contains("WARPED")) return Material.WARPED_PLANKS;
+
+        return Material.OAK_PLANKS;
+    }
+    
+    private void handleWoodDamageStage(Block block, Player player) {
+        Location loc = block.getLocation();
+        Material currentType = block.getType();
+        String typeName = currentType.name();
+        int currentStage = 0;
+        if (typeName.contains("FENCE")) {
+            currentStage = 2;
+        } else if (typeName.contains("STRIPPED")) {
+            currentStage = 1;
+        } else if (isWoodBlock(currentType)) {
+            currentStage = woodDamageStates.getOrDefault(loc, 0);
+        }
+        
+        currentStage++;
+        plugin.getLogger().info("[WoodHarvesting] Block: " + currentType + ", Stage: " + currentStage);
+        
+        switch (currentStage) {
+            case 1:
+                Material strippedType = getStrippedWoodType(currentType);
+                if (strippedType != null) {
+                    block.setType(strippedType);
+                    woodDamageStates.put(loc, currentStage);
+                    
+                    block.getWorld().playSound(loc, Sound.ITEM_AXE_STRIP, 1.0f, 1.0f);
+                    block.getWorld().spawnParticle(Particle.BLOCK, 
+                        loc.add(0.5, 0.5, 0.5), 10, 0.2, 0.2, 0.2, 0.05,
+                        currentType.createBlockData());
+                    
+                    player.sendActionBar("§7Wood partially damaged (1/3)");
+                }
+                break;
+                
+            case 2:
+                Material fenceType = getFenceType(currentType);
+                if (fenceType != null) {
+                    block.setType(fenceType);
+                    woodDamageStates.put(loc, currentStage);
+                    
+                    block.getWorld().playSound(loc, Sound.BLOCK_WOOD_HIT, 1.0f, 0.8f);
+                    block.getWorld().spawnParticle(Particle.BLOCK, 
+                        loc.add(0.5, 0.5, 0.5), 15, 0.3, 0.3, 0.3, 0.05,
+                        currentType.createBlockData());
+                    
+                    player.sendActionBar("§7Wood heavily damaged (2/3)");
+                }
+                break;
+                
+            case 3:
+            default:
+                Material plankType = getPlankTypeFromWood(currentType);
+                if (plankType != null) {
+                    woodDamageStates.remove(loc);
+                    
+                    block.setType(Material.AIR);
+                    
+                    ItemStack planks = new ItemStack(plankType, 1);
+                    block.getWorld().dropItemNaturally(loc.add(0.5, 0.5, 0.5), planks);
+                    
+                    block.getWorld().playSound(loc, Sound.BLOCK_WOOD_BREAK, 1.0f, 1.0f);
+                    block.getWorld().spawnParticle(Particle.BLOCK, 
+                        loc, 20, 0.3, 0.3, 0.3, 0.1,
+                        currentType.createBlockData());
+                    
+                    player.sendActionBar("§aWood harvested!");
+                }
+                break;
+        }
+    }
+    
+    private Material getStrippedWoodType(Material woodType) {
+        String name = woodType.name();
+        
+        if (name.contains("STRIPPED")) return null;
+        
+        if (name.endsWith("_LOG")) {
+            String prefix = name.substring(0, name.length() - 4);
+            try {
+                return Material.valueOf("STRIPPED_" + prefix + "_LOG");
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        }
+        
+        if (name.endsWith("_WOOD")) {
+            String prefix = name.substring(0, name.length() - 5);
+            try {
+                return Material.valueOf("STRIPPED_" + prefix + "_WOOD");
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        }
+        
+        return null;
+    }
+    
+    private Material getFenceType(Material woodType) {
+        String name = woodType.name();
+        
+        if (name.contains("OAK")) return Material.OAK_FENCE;
+        if (name.contains("SPRUCE")) return Material.SPRUCE_FENCE;
+        if (name.contains("BIRCH")) return Material.BIRCH_FENCE;
+        if (name.contains("JUNGLE")) return Material.JUNGLE_FENCE;
+        if (name.contains("ACACIA")) return Material.ACACIA_FENCE;
+        if (name.contains("DARK_OAK")) return Material.DARK_OAK_FENCE;
+        if (name.contains("MANGROVE")) return Material.MANGROVE_FENCE;
+        if (name.contains("CHERRY")) return Material.CHERRY_FENCE;
+        if (name.contains("BAMBOO")) return Material.BAMBOO_FENCE;
+        if (name.contains("CRIMSON")) return Material.CRIMSON_FENCE;
+        if (name.contains("WARPED")) return Material.WARPED_FENCE;
+        
+        return Material.OAK_FENCE;
+    }
+}

@@ -27,13 +27,7 @@ public class DurabilityUtil {
         }
     }
     
-    /**
-     * Applies a fixed amount of durability damage to an item.
-     * 
-     * @param item The item to damage
-     * @param amount The amount of damage to apply
-     * @return true if the item broke, false otherwise
-     */
+
     public static boolean damage(ItemStack item, int amount) {
         if (item == null || !(item.getItemMeta() instanceof Damageable damageable)) {
             return false;
@@ -52,12 +46,7 @@ public class DurabilityUtil {
         }
     }
     
-    /**
-     * Gets the remaining durability of an item.
-     * 
-     * @param item The item to check
-     * @return The remaining durability, or -1 if the item is not damageable
-     */
+
     public static int getRemainingDurability(ItemStack item) {
         if (item == null || !(item.getItemMeta() instanceof Damageable damageable)) {
             return -1;
@@ -69,12 +58,7 @@ public class DurabilityUtil {
         return maxDurability - currentDamage;
     }
     
-    /**
-     * Gets the durability percentage of an item.
-     * 
-     * @param item The item to check
-     * @return The durability percentage (0.0 to 1.0), or -1 if not damageable
-     */
+
     public static double getDurabilityPercentage(ItemStack item) {
         if (item == null || !(item.getItemMeta() instanceof Damageable damageable)) {
             return -1;
