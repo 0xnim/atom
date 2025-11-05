@@ -2,6 +2,7 @@ package org.shotrush.atom.core.blocks;
 
 import lombok.Setter;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class InteractiveSurface extends CustomBlock {
     protected final List<PlacedItem> placedItems = new ArrayList<>();
@@ -64,16 +66,8 @@ public abstract class InteractiveSurface extends CustomBlock {
 
 
             if (!placedItems.isEmpty()) {
-                plugin.getLogger().info(String.format(
-                        "[InteractiveSurface] Restoring %d placed items for %s at %s",
-                        placedItems.size(), getIdentifier(), blockLocation
-                ));
-                respawnAllItemDisplays();
-            } else {
-                plugin.getLogger().info(String.format(
-                        "[InteractiveSurface] No placed items to restore for %s at %s",
-                        getIdentifier(), blockLocation
-                ));
+                // Use updateItemDisplayUUIDs to remove old displays and spawn fresh ones
+                updateItemDisplayUUIDs();
             }
 
         });
@@ -158,24 +152,46 @@ public abstract class InteractiveSurface extends CustomBlock {
     }
 
     protected void spawnItemDisplay(PlacedItem item) {
-        Location itemLoc = spawnLocation.clone().add(item.getPosition().x, item.getPosition().y, item.getPosition().z);
-        if (itemLoc.getWorld() == null) {
-            Atom.getInstance().getLogger().warning("Cannot spawn item display - world is null");
-            return;
-        }
-        org.shotrush.atom.core.api.scheduler.SchedulerAPI.runTask(itemLoc, () -> {
-            org.bukkit.entity.ItemDisplay display = (org.bukkit.entity.ItemDisplay) itemLoc.getWorld().spawnEntity(itemLoc, org.bukkit.entity.EntityType.ITEM_DISPLAY);
+        if (spawnLocation.getWorld() == null) return;
+
+        Location displayLoc = spawnLocation.clone().add(
+            item.getPosition().x,
+            item.getPosition().y,
+            item.getPosition().z
+        );
+
+        org.shotrush.atom.core.api.scheduler.SchedulerAPI.runTask(displayLoc, () -> {
+            ItemDisplay display = (ItemDisplay) displayLoc.getWorld().spawnEntity(displayLoc, org.bukkit.entity.EntityType.ITEM_DISPLAY);
             display.setItemStack(item.getItem());
+            display.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.NONE);
+            display.setBillboard(org.bukkit.entity.Display.Billboard.FIXED);
+
+            
             org.joml.AxisAngle4f rotation = getItemDisplayRotation(item);
             org.joml.Vector3f translation = getItemDisplayTranslation(item);
             org.joml.Vector3f scale = getItemDisplayScale(item);
-
-            display.setTransformation(new org.bukkit.util.Transformation(
+            
+            org.bukkit.util.Transformation transformation = new org.bukkit.util.Transformation(
                 translation,
                 rotation,
                 scale,
-                new org.joml.AxisAngle4f()
-            ));
+                new org.joml.AxisAngle4f(0, 0, 0, 1)
+            );
+            display.setTransformation(transformation);
+
+            display.setViewRange(64.0f);
+            display.setShadowRadius(0.0f);
+            display.setShadowStrength(0.0f);
+            
+            
+            if (interactionUUID != null) {
+                display.getPersistentDataContainer().set(
+                    org.bukkit.NamespacedKey.fromString("parent_workstation", Atom.getInstance()),
+                    org.bukkit.persistence.PersistentDataType.STRING,
+                    interactionUUID.toString()
+                );
+            }
+
             item.setDisplayUUID(display.getUniqueId());
         });
     }
@@ -185,7 +201,7 @@ public abstract class InteractiveSurface extends CustomBlock {
     }
 
     protected org.joml.Vector3f getItemDisplayTranslation(PlacedItem item) {
-        return new org.joml.Vector3f(0, 0, 0);
+        return new org.joml.Vector3f(0.05f, 0, 0);
     }
 
     protected org.joml.Vector3f getItemDisplayScale(PlacedItem item) {
@@ -193,117 +209,62 @@ public abstract class InteractiveSurface extends CustomBlock {
     }
 
     protected void removeItemDisplay(PlacedItem item) {
-        if (item.getDisplayUUID() != null) {
-
-            org.bukkit.entity.Entity entity = org.bukkit.Bukkit.getEntity(item.getDisplayUUID());
-            
-            if (entity != null) {
-
-                org.shotrush.atom.core.api.scheduler.SchedulerAPI.runTask(entity.getLocation(), () -> {
-
-                    org.bukkit.entity.Entity ent = org.bukkit.Bukkit.getEntity(item.getDisplayUUID());
-                    if (ent != null) {
-
-                        ent.remove();
-                        
-
-                        Location expectedLoc = spawnLocation.clone().add(item.getPosition().x, item.getPosition().y, item.getPosition().z);
-                        for (Entity nearby : expectedLoc.getWorld().getNearbyEntities(expectedLoc, 0.5, 0.5, 0.5)) {
-                            if (nearby instanceof ItemDisplay && nearby.getUniqueId().equals(item.getDisplayUUID())) {
-                                nearby.remove();
-                            }
-                        }
-                        
-                        Atom.getInstance().getLogger().info("Removed item display with UUID: " + item.getDisplayUUID());
-                    } else {
-                        Atom.getInstance().getLogger().warning("Could not find entity to remove with UUID: " + item.getDisplayUUID());
+        Vector3f pos = item.getPosition();
+        Location expectedLoc = spawnLocation.clone().add(pos.x, pos.y, pos.z);
+        
+        if (expectedLoc.getWorld() == null) return;
+        
+        org.shotrush.atom.core.api.scheduler.SchedulerAPI.runTask(expectedLoc, () -> {
+            for (Entity nearby : expectedLoc.getWorld().getNearbyEntities(expectedLoc, 0.5, 0.5, 0.5)) {
+                if (nearby instanceof org.bukkit.entity.ItemDisplay itemDisplay && !nearby.getUniqueId().equals(displayUUID)) {
+                    String parentUUID = itemDisplay.getPersistentDataContainer().get(
+                        Objects.requireNonNull(NamespacedKey.fromString("parent_workstation", Atom.getInstance())),
+                        org.bukkit.persistence.PersistentDataType.STRING
+                    );
+                    if (parentUUID == null || (interactionUUID != null && parentUUID.equals(interactionUUID.toString()))) {
+                        nearby.remove();
                     }
-                });
-            } else {
-
-                Location expectedLoc = spawnLocation.clone().add(item.getPosition().x, item.getPosition().y, item.getPosition().z);
-                
-                org.shotrush.atom.core.api.scheduler.SchedulerAPI.runTask(expectedLoc, () -> {
-                    boolean found = false;
-                 
-                    for (Entity nearby : expectedLoc.getWorld().getNearbyEntities(expectedLoc, 1.0, 1.0, 1.0)) {
-                        if (nearby instanceof ItemDisplay && !nearby.getUniqueId().equals(displayUUID)) {
-
-                            nearby.remove();
-                            found = true;
-                            Atom.getInstance().getLogger().info("Removed item display by location (UUID was stale)");
-                        }
-                    }
-                    if (!found) {
-                        Atom.getInstance().getLogger().warning("Could not find any item display to remove at expected location");
-                    }
-                });
+                }
             }
-        } else {
-            
-            Vector3f pos = item.getPosition();
-            Location expectedLoc = spawnLocation.clone().add(pos.x, pos.y, pos.z);
-            if (expectedLoc.getWorld() != null) {
-                org.shotrush.atom.core.api.scheduler.SchedulerAPI.runTask(expectedLoc, () -> {
-                    boolean found = false;
-                    for (Entity nearby : expectedLoc.getWorld().getNearbyEntities(expectedLoc, 1.0, 1.0, 1.0)) {
-                        if (nearby instanceof ItemDisplay && !nearby.getUniqueId().equals(displayUUID)) {
-                            
-                            nearby.remove();
-                            found = true;
-                        }
-                    }
-                    
-                    expectedLoc.getWorld().dropItemNaturally(spawnLocation, item.getItem());
-                    Atom.getInstance().getLogger().info("Dropped item with null UUID naturally");
-                });
-            }
-        }
+        });
     }
 
     public List<PlacedItem> getPlacedItems() {
         return new ArrayList<>(placedItems);
     }
 
-    public void respawnAllItemDisplays() {
-        for (PlacedItem item : placedItems) {
-            if (item.getDisplayUUID() == null) {
-                spawnItemDisplay(item);
-            }
-        }
-    }
 
     public void updateItemDisplayUUIDs() {
-
         if (spawnLocation.getWorld() == null) return;
 
-        Atom.getInstance().getLogger().info("Updating item display UUIDs for " + placedItems.size() + " items");
 
-
-        List<org.bukkit.entity.ItemDisplay> toRemove = new ArrayList<>();
-        for (Entity entity : spawnLocation.getWorld().getNearbyEntities(spawnLocation, 2, 2, 2)) {
-            if (entity instanceof org.bukkit.entity.ItemDisplay && !entity.getUniqueId().equals(displayUUID)) {
-                toRemove.add((org.bukkit.entity.ItemDisplay) entity);
-            }
-        }
-        
-        Atom.getInstance().getLogger().info("Removing " + toRemove.size() + " stale ItemDisplay entities");
-        for (org.bukkit.entity.ItemDisplay display : toRemove) {
-            display.remove();
-        }
-        
-
+        // Clear UUIDs first
         for (PlacedItem item : placedItems) {
             item.setDisplayUUID(null);
         }
-        
 
-        org.shotrush.atom.core.api.scheduler.SchedulerAPI.runTaskLater(spawnLocation, () -> {
+        // Schedule removal task
+        org.shotrush.atom.core.api.scheduler.SchedulerAPI.runTask(spawnLocation, () -> {
+            // Remove ALL ItemDisplay entities at exact item positions (ignore parent UUID since it changes on restart)
             for (PlacedItem item : placedItems) {
-                spawnItemDisplay(item);
+                Vector3f pos = item.getPosition();
+                Location itemLoc = spawnLocation.clone().add(pos.x, pos.y, pos.z);
+                
+                // Remove ALL ItemDisplay entities at this position
+                for (Entity entity : itemLoc.getWorld().getNearbyEntities(itemLoc, 0.2, 0.2, 0.2)) {
+                    if (entity instanceof org.bukkit.entity.ItemDisplay) {
+                        entity.remove();
+                    }
+                }
             }
-            Atom.getInstance().getLogger().info("Respawned " + placedItems.size() + " item displays");
-        }, 2L);
+            
+            // Then spawn new ones after a delay
+            org.shotrush.atom.core.api.scheduler.SchedulerAPI.runTaskLater(spawnLocation, () -> {
+                for (PlacedItem item : placedItems) {
+                    spawnItemDisplay(item);
+                }
+            }, 5L);
+        });
     }
 
     @Override
@@ -350,11 +311,6 @@ public abstract class InteractiveSurface extends CustomBlock {
                 ItemStack item = itemFromBase64(base64);
                 Vector3f position = new Vector3f(x, y, z);
                 placedItems.add(new PlacedItem(item, position, yaw));
-                
-                Atom.getInstance().getLogger().info(String.format(
-                    "[InteractiveSurface] Deserialized item: %s at position (%.2f, %.2f, %.2f)",
-                    item.getType(), x, y, z
-                ));
             }
         } catch (Exception e) {
             Atom.getInstance().getLogger().warning("Failed to deserialize placed items: " + e.getMessage());

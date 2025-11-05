@@ -18,11 +18,18 @@ public class CraftingBasketRecipes implements RecipeProvider {
     
     @Override
     public List<Recipe> getRecipes() {
-        return Arrays.asList(
-            createSpearRecipe(),
-            createPressureFlakerRecipe(),
-            createKnifeRecipe()
-        );
+        List<Recipe> recipes = new java.util.ArrayList<>();
+        
+        Recipe spear = createSpearRecipe();
+        if (spear != null) recipes.add(spear);
+        
+        Recipe pressureFlaker = createPressureFlakerRecipe();
+        if (pressureFlaker != null) recipes.add(pressureFlaker);
+        
+        Recipe knife = createKnifeRecipe();
+        if (knife != null) recipes.add(knife);
+        
+        return recipes;
     }
     
     private Recipe createSpearRecipe() {
@@ -44,8 +51,11 @@ public class CraftingBasketRecipes implements RecipeProvider {
     private Recipe createPressureFlakerRecipe() {
         ItemStack pressureFlaker = Atom.getInstance().getItemRegistry().createItem("pressure_flaker");
         if (pressureFlaker == null) {
+            Atom.getInstance().getLogger().warning("Failed to create pressure_flaker item for recipe!");
             return null;
         }
+        
+        Atom.getInstance().getLogger().info("Creating pressure_flaker recipe with bone ingredient");
         
         return new ShapelessRecipe.Builder()
             .id("pressure_flaker")

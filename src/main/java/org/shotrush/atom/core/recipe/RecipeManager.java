@@ -10,6 +10,7 @@ public class RecipeManager {
     
     public void registerRecipe(Recipe recipe) {
         recipes.put(recipe.getId(), recipe);
+        org.shotrush.atom.Atom.getInstance().getLogger().info("[RecipeManager] Registered recipe: " + recipe.getId());
     }
     
     public void unregisterRecipe(String id) {

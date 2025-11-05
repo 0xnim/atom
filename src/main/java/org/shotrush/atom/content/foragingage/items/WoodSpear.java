@@ -51,21 +51,4 @@ public class WoodSpear extends CustomItem {
         meta.setItemModel(NamespacedKey.minecraft("stick"));
         org.shotrush.atom.core.util.ItemUtil.setCustomModelName(meta, "wood_spear");
     }
-    
-    public void damageItem(ItemStack item, Player player) {
-        if (item == null || item.getAmount() <= 0) return;
-        
-        int currentAmount = item.getAmount();
-        
-        if (Math.random() < 0.5) {
-            item.setAmount(currentAmount - 1);
-            
-            if (currentAmount - 1 <= 0) {
-                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
-                ActionBarManager.send(player,"§cYour Wooden Spear broke!");
-            } else {
-                player.getWorld().playSound(player.getLocation(), Sound.BLOCK_WOOD_BREAK, 0.5f, 1.2f);
-            }
-        }
-    }
 }

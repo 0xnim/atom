@@ -125,7 +125,13 @@ public class ChaseAndMeleeAttackGoal implements Goal<Mob> {
     
     private void performAttack(LivingEntity target) {
         mob.lookAt(target);
-        mob.attack(target);
+        
+        try {
+            mob.attack(target);
+        } catch (IllegalArgumentException e) {
+            double damage = 2.0;
+            target.damage(damage, mob);
+        }
         
         mob.swingMainHand();
     }

@@ -32,6 +32,7 @@ public class GravitySystem implements Listener {
         Block placed = event.getBlock();
         
         if (!placed.getType().isSolid()) return;
+        if (placed.getType() == Material.BLACK_STAINED_GLASS) return;
         
         org.shotrush.atom.core.api.scheduler.SchedulerAPI.runTaskLater(placed.getLocation(), () -> {
             if (!placed.getType().isSolid()) return;
@@ -53,6 +54,7 @@ public class GravitySystem implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         Block broken = event.getBlock();
         if (!broken.getType().isSolid()) return;
+        if (broken.getType() == Material.BLACK_STAINED_GLASS) return;
         
         event.setDropItems(false);
         Location loc = broken.getLocation();
@@ -90,6 +92,7 @@ public class GravitySystem implements Listener {
             Block current = queue.poll();
             if (collected.contains(current)) continue;
             if (!current.getType().isSolid()) continue;
+            if (current.getType() == Material.BLACK_STAINED_GLASS) continue;
             
             collected.add(current);
             
@@ -126,7 +129,7 @@ public class GravitySystem implements Listener {
             
             for (BlockFace face : new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST}) {
                 Block adjacent = current.getRelative(face);
-                if (adjacent.getType().isSolid() && !visited.contains(adjacent.getLocation())) {
+                if (adjacent.getType().isSolid() && adjacent.getType() != Material.BLACK_STAINED_GLASS && !visited.contains(adjacent.getLocation())) {
                     distances.put(adjacent, currentDistance + 1);
                     queue.add(adjacent);
                 }
@@ -146,6 +149,7 @@ public class GravitySystem implements Listener {
             Block current = queue.poll();
             if (collected.contains(current)) continue;
             if (!current.getType().isSolid()) continue;
+            if (current.getType() == Material.BLACK_STAINED_GLASS) continue;
             
             int distance = getHorizontalDistanceFromSupport(current);
             if (distance < MAX_HORIZONTAL_DISTANCE) continue;
@@ -155,7 +159,7 @@ public class GravitySystem implements Listener {
             for (BlockFace face : BlockFace.values()) {
                 if (face == BlockFace.SELF) continue;
                 Block adjacent = current.getRelative(face);
-                if (adjacent.getType().isSolid() && !collected.contains(adjacent)) {
+                if (adjacent.getType().isSolid() && adjacent.getType() != Material.BLACK_STAINED_GLASS && !collected.contains(adjacent)) {
                     queue.add(adjacent);
                 }
             }

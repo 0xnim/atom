@@ -80,6 +80,7 @@ public class RecipeIngredient {
             return false;
         }
         
+        
         if (customItemId != null) {
             CustomItem customItem = Atom.getInstance().getItemRegistry().getItem(customItemId);
             if (customItem == null || !customItem.isCustomItem(item)) {
@@ -95,9 +96,11 @@ public class RecipeIngredient {
             return true;
         }
         
+        
         if (material != null && item.getType() != material) {
             return false;
         }
+        
         
         if (customModelData != null) {
             if (!item.hasItemMeta()) {

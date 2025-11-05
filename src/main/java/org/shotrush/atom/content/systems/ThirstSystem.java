@@ -208,7 +208,7 @@ public class ThirstSystem implements Listener {
         int gained = newThirst - currentThirst;
         
         if (gained > 0) {
-            player.sendActionBar(net.kyori.adventure.text.Component.text("§b+§f" + gained + " §bThirst"));
+            org.shotrush.atom.core.ui.ActionBarManager.send(player, "§b+§f" + gained + " §bThirst");
         }
         
         player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 200, 0, false, false));
@@ -225,7 +225,7 @@ public class ThirstSystem implements Listener {
         int gained = newThirst - currentThirst;
         
         if (gained > 0) {
-            player.sendActionBar(net.kyori.adventure.text.Component.text("§b+§f" + gained + " §bThirst §7(Purified)"));
+            org.shotrush.atom.core.ui.ActionBarManager.send(player, "§b+§f" + gained + " §bThirst §7(Purified)");
         }
     }
     

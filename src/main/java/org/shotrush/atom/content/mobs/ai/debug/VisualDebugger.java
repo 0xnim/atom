@@ -167,15 +167,14 @@ public class VisualDebugger {
             if (player == null) continue;
             
             if (player.getLocation().distanceSquared(mob.getLocation()) < 1600) {
-                player.sendActionBar(Component.text(
-                    mob.getType().name() + "#" + mob.getEntityId() + ": " + tracked.currentGoal,
-                    tracked.state == GoalState.AGGRESSIVE ? NamedTextColor.RED :
-                    tracked.state == GoalState.PEACEFUL ? NamedTextColor.GREEN :
-                    tracked.state == GoalState.NEEDS_DRIVEN ? NamedTextColor.BLUE :
-                    tracked.state == GoalState.ENVIRONMENTAL ? NamedTextColor.YELLOW :
-                    tracked.state == GoalState.SOCIAL ? NamedTextColor.LIGHT_PURPLE :
-                    NamedTextColor.WHITE
-                ));
+                String color = tracked.state == GoalState.AGGRESSIVE ? "§c" :
+                    tracked.state == GoalState.PEACEFUL ? "§a" :
+                    tracked.state == GoalState.NEEDS_DRIVEN ? "§9" :
+                    tracked.state == GoalState.ENVIRONMENTAL ? "§e" :
+                    tracked.state == GoalState.SOCIAL ? "§d" :
+                    "§f";
+                org.shotrush.atom.core.ui.ActionBarManager.send(player, 
+                    color + mob.getType().name() + "#" + mob.getEntityId() + ": " + tracked.currentGoal);
                 
                 updateBossBar(player, tracked, mob);
             }

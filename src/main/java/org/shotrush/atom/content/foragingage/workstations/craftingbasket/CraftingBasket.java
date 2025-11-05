@@ -87,9 +87,7 @@ public class CraftingBasket extends InteractiveSurface {
     
     protected ItemStack checkRecipe() {
         RecipeManager recipeManager = Atom.getInstance().getRecipeManager();
-        if (recipeManager == null) {
-            return null;
-        }
+        if (recipeManager == null) return null;
 
         List<ItemStack> items = new ArrayList<>();
         for (PlacedItem placedItem : placedItems) {
@@ -130,7 +128,15 @@ public class CraftingBasket extends InteractiveSurface {
                 return true;
             }
         } else {
-            player.playSound(spawnLocation, Sound.BLOCK_BAMBOO_WOOD_BUTTON_CLICK_OFF, 1.0f, 0.5f);
+            if (!placedItems.isEmpty()) {
+                for (PlacedItem item : new java.util.ArrayList<>(placedItems)) {
+                    spawnLocation.getWorld().dropItemNaturally(spawnLocation, item.getItem());
+                }
+                clearAllItems();
+                player.playSound(spawnLocation, Sound.BLOCK_BAMBOO_WOOD_BUTTON_CLICK_OFF, 1.0f, 0.5f);
+                org.shotrush.atom.core.ui.ActionBarManager.send(player, "§cNo valid recipe!");
+                return true;
+            }
             return false;
         }
     }
@@ -140,12 +146,19 @@ public class CraftingBasket extends InteractiveSurface {
         ItemStack hand = player.getInventory().getItemInMainHand();
 
         if (sneaking) {
-            ItemStack removed = removeLastItem();
-            if (removed != null) {
-                spawnLocation.getWorld().dropItemNaturally(spawnLocation, removed);
-                return true;
+            
+            if (hand.getType() == Material.AIR) {
+                return onCrouchRightClick(player);
             }
-            return false;
+            
+            else {
+                ItemStack removed = removeLastItem();
+                if (removed != null) {
+                    spawnLocation.getWorld().dropItemNaturally(spawnLocation, removed);
+                    return true;
+                }
+                return false;
+            }
         }
 
         if (hand.getType() == Material.AIR) return false;

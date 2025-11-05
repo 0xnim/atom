@@ -38,15 +38,7 @@ public class SpearProjectileListener implements Listener {
         assert shooter != null;
         
         ItemStack thrownItem = item.clone();
-        
-        if (spearItem instanceof org.shotrush.atom.content.foragingage.items.WoodSpear woodSpear) {
-            woodSpear.damageItem(thrownItem, shooter);
-        }
-        
-        if (thrownItem.getType() == Material.AIR || thrownItem.getAmount() <= 0) {
-            trident.remove();
-            return;
-        }
+        thrownItem.setAmount(1);
         
         ItemStack itemInHand = shooter.getInventory().getItemInMainHand();
         if (itemInHand.isSimilar(item)) {

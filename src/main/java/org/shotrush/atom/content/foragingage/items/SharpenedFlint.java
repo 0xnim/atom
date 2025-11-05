@@ -59,7 +59,7 @@ public class SharpenedFlint extends CustomItem {
             
             if (currentAmount - 1 <= 0) {
                 player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
-                player.sendActionBar("§cYour Sharpened Flint broke!");
+                org.shotrush.atom.core.ui.ActionBarManager.send(player, "§cYour Sharpened Flint broke!");
             } else {
                 player.getWorld().playSound(player.getLocation(), Sound.BLOCK_STONE_HIT, 0.5f, 1.2f);
             }

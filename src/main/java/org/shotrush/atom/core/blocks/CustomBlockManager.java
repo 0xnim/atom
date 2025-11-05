@@ -128,29 +128,27 @@ public class CustomBlockManager implements Listener {
         
         org.shotrush.atom.core.api.scheduler.SchedulerAPI.runGlobalTaskLater(() -> {
             int spawnedCount = 0;
-            int respawnedCount = 0;
             
             for (CustomBlock block : blocks) {
                 if (block.getSpawnLocation().getWorld() != null) {
+                    block.setDisplayUUID(null);
+                    block.setInteractionUUID(null);
+
+                    if (block instanceof InteractiveSurface surface) {
+                        for (InteractiveSurface.PlacedItem item : surface.getPlacedItems()) {
+                            item.setDisplayUUID(null);
+                        }
+                        plugin.getLogger().info("Cleared stale UUIDs for " + block.getIdentifier());
+                    } else {
+                        plugin.getLogger().info("Cleared stale UUIDs for " + block.getIdentifier());
+                    }
+                    
                     block.spawn(plugin);
                     spawnedCount++;
-
-                    
-                    org.shotrush.atom.core.api.scheduler.SchedulerAPI.runTaskLater(block.getSpawnLocation(), () -> {
-                        updateBlockEntityUUIDs(block);
-                        if (block instanceof InteractiveSurface surface) {
-                            surface.updateItemDisplayUUIDs();
-                        }
-                        plugin.getLogger().info("Updated entity UUIDs for " + block.getIdentifier() + " at " + block.getBlockLocation());
-                    }, 5L);
-                    respawnedCount++;
                 }
             }
             
             plugin.getLogger().info("Spawned " + spawnedCount + " block(s) after world load");
-            if (respawnedCount > 0) {
-                plugin.getLogger().info("Respawned " + respawnedCount + " item display(s)");
-            }
 
 
             CogManager cogManager = new CogManager(plugin);
