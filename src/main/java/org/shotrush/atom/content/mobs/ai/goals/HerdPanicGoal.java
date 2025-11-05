@@ -66,14 +66,25 @@ public class HerdPanicGoal implements Goal<Mob> {
     @Override
     public boolean shouldStayActive() {
         if (!mob.isValid() || mob.isDead()) return false;
-        
+
+        if (moraleSystem != null && moraleSystem.isMoraleBroken(mob)) {
+            return true;
+        }
         Optional<Herd> herdOpt = herdManager.getHerd(mob.getUniqueId());
         if (herdOpt.isPresent() && herdOpt.get().isPanicking()) {
             return true;
         }
-        
+
         double healthPercent = mob.getHealth() / mob.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH).getValue();
-        return healthPercent < behavior.panicHealthThreshold() * 1.5;
+        if (healthPercent < behavior.panicHealthThreshold() * 1.5) {
+            return true;
+        }
+
+        if (mob.hasMetadata("fleeing") && mob.getMetadata("fleeing").get(0).asBoolean()) {
+            return true;
+        }
+        
+        return false;
     }
     
     @Override
@@ -111,7 +122,12 @@ public class HerdPanicGoal implements Goal<Mob> {
         
         drainStamina();
         
+        
         if (fleeTarget != null && fleeTarget.getWorld() != null) {
+            
+            if (mob.getLocation().distance(fleeTarget) < 3.0) {
+                computeFleeTarget();
+            }
             mob.getPathfinder().moveTo(fleeTarget, speed);
         }
     }

@@ -1,5 +1,7 @@
 package org.shotrush.atom.core.api.combat;
 
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -11,8 +13,10 @@ public class TemperatureEffectsAPI {
         
         if (temperature >= 100) {
             player.setFireTicks(40);
+            spawnSweatParticles(player, 3);
         } else if (temperature >= 50) {
             player.setFireTicks(20);
+            spawnSweatParticles(player, 1);
         }
     }
     
@@ -24,11 +28,13 @@ public class TemperatureEffectsAPI {
             player.addPotionEffect(new PotionEffect(
                 PotionEffectType.SLOWNESS, 40, 1, false, false
             ));
+            spawnColdParticles(player, 3);
         } else if (temperature <= -10) {
             player.damage(1.0);
             player.addPotionEffect(new PotionEffect(
                 PotionEffectType.SLOWNESS, 40, 0, false, false
             ));
+            spawnColdParticles(player, 1);
         }
     }
     
@@ -41,10 +47,16 @@ public class TemperatureEffectsAPI {
             player.addPotionEffect(new PotionEffect(
                 PotionEffectType.NAUSEA, 100, 0, false, false
             ));
+            spawnSweatParticles(player, 5);
         } else if (bodyTemp >= 39.0) {
             player.addPotionEffect(new PotionEffect(
                 PotionEffectType.SLOWNESS, 40, 0, false, false
             ));
+            spawnSweatParticles(player, 2);
+        }
+        
+        else if (bodyTemp >= 38.0) {
+            spawnSweatParticles(player, 1);
         }
         
         else if (bodyTemp <= 33.0) {
@@ -53,15 +65,18 @@ public class TemperatureEffectsAPI {
                 PotionEffectType.SLOWNESS, 40, 2, false, false
             ));
             player.setFreezeTicks(Math.min(player.getFreezeTicks() + 10, 140));
+            spawnColdParticles(player, 5);
         } else if (bodyTemp <= 34.5) {
             player.addPotionEffect(new PotionEffect(
                 PotionEffectType.SLOWNESS, 40, 1, false, false
             ));
             player.setFreezeTicks(Math.min(player.getFreezeTicks() + 5, 140));
+            spawnColdParticles(player, 3);
         } else if (bodyTemp <= 35.5) {
             player.addPotionEffect(new PotionEffect(
                 PotionEffectType.SLOWNESS, 40, 0, false, false
             ));
+            spawnColdParticles(player, 1);
         }
     }
     
@@ -79,5 +94,45 @@ public class TemperatureEffectsAPI {
         if (temp >= 38.5 || temp <= 34.0) return "§6";
         if (temp >= 38.0 || temp <= 35.5) return "§e";
         return "§a";
+    }
+    
+    private static void spawnSweatParticles(Player player, int count) {
+        Location loc = player.getLocation().add(0, 1.5, 0);
+        player.getWorld().spawnParticle(
+            Particle.DRIPPING_WATER,
+            loc,
+            count,
+            0.3, 0.3, 0.3,
+            0.05
+        );
+    }
+    
+    private static void spawnColdParticles(Player player, int count) {
+        
+        Location loc = player.getEyeLocation();
+        
+        
+        org.bukkit.util.Vector direction = loc.getDirection();
+        
+        
+        loc.add(direction.multiply(0.3));
+        
+        
+        player.getWorld().spawnParticle(
+            Particle.CLOUD,
+            loc,
+            count,
+            0.1, 0.1, 0.1,
+            0.02
+        );
+        
+        
+        player.getWorld().spawnParticle(
+            Particle.SNOWFLAKE,
+            loc,
+            count / 2,
+            0.15, 0.15, 0.15,
+            0.01
+        );
     }
 }

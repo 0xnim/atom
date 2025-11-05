@@ -126,9 +126,17 @@ public class ItemHeatSystem implements Listener {
         double currentHeat = playerItemHeatCache.computeIfAbsent(playerId, k -> new HashMap<>())
             .computeIfAbsent(slot, k -> getItemHeat(item));
         
-        
-        double targetTemp = 20.0; 
         org.bukkit.Location loc = player.getLocation();
+        
+        
+        double bodyTemp = 37.0;
+        PlayerTemperatureSystem tempSystem = PlayerTemperatureSystem.getInstance();
+        if (tempSystem != null) {
+            bodyTemp = tempSystem.getPlayerTemperature(player);
+        }
+        
+        
+        double targetTemp = bodyTemp - 17.0; 
         
         
         double heatFromSources = org.shotrush.atom.core.api.world.EnvironmentalFactorAPI
@@ -137,12 +145,10 @@ public class ItemHeatSystem implements Listener {
         
         
         double heatDifference = targetTemp - currentHeat;
-        double heatChange = heatDifference * 0.05; 
+        double heatChange = heatDifference * 0.08; 
         double newHeat = currentHeat + heatChange;
         
-        
         newHeat = Math.max(-100, Math.min(500, newHeat));
-        
         
         playerItemHeatCache.get(playerId).put(slot, newHeat);
     }
@@ -416,5 +422,40 @@ public class ItemHeatSystem implements Listener {
                 setItemHeat(item, cachedHeat);
             }
         }
+    }
+    
+    public static void startItemDisplayHeatTracking(org.bukkit.entity.ItemDisplay itemDisplay) {
+        org.shotrush.atom.core.api.scheduler.SchedulerAPI.runTaskTimer(itemDisplay, task -> {
+            if (itemDisplay.isDead() || !itemDisplay.isValid()) {
+                task.cancel();
+                return;
+            }
+            
+            ItemStack itemStack = itemDisplay.getItemStack();
+            if (itemStack == null || itemStack.getType() == Material.AIR) {
+                task.cancel();
+                return;
+            }
+            
+            double currentHeat = getItemHeat(itemStack);
+            org.bukkit.Location loc = itemDisplay.getLocation();
+            
+            double heatFromSources = org.shotrush.atom.core.api.world.EnvironmentalFactorAPI
+                .getNearbyHeatSources(loc, 6);
+            
+            double ambientTemp = 20.0;
+            double targetTemp = ambientTemp + (heatFromSources * 10);
+            
+            double heatDifference = targetTemp - currentHeat;
+            double heatChange = heatDifference * 0.05;
+            double newHeat = currentHeat + heatChange;
+            
+            newHeat = Math.max(-100, Math.min(500, newHeat));
+            
+            if (Math.abs(newHeat - currentHeat) > 0.5) {
+                setItemHeat(itemStack, newHeat);
+                itemDisplay.setItemStack(itemStack);
+            }
+        }, 20L, 20L);
     }
 }

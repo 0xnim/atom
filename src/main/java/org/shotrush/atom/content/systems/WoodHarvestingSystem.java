@@ -126,7 +126,8 @@ public class WoodHarvestingSystem implements Listener {
         if (registry != null) {
             SharpenedFlint sharpenedFlint = (SharpenedFlint) registry.getItem("sharpened_flint");
             if (sharpenedFlint != null) {
-                sharpenedFlint.damageItem(item, player);
+                
+                sharpenedFlint.damageItem(item, player, 0.15);
             }
         }
     }

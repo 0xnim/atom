@@ -50,11 +50,15 @@ public class SharpenedFlint extends CustomItem {
     }
     
     public void damageItem(ItemStack item, Player player) {
+        damageItem(item, player, 0.4);
+    }
+    
+    public void damageItem(ItemStack item, Player player, double breakChance) {
         if (item == null || item.getAmount() <= 0) return;
         
         int currentAmount = item.getAmount();
         
-        if (Math.random() < 0.4) {
+        if (Math.random() < breakChance) {
             item.setAmount(currentAmount - 1);
             
             if (currentAmount - 1 <= 0) {

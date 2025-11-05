@@ -66,7 +66,7 @@ public abstract class InteractiveSurface extends CustomBlock {
 
 
             if (!placedItems.isEmpty()) {
-                // Use updateItemDisplayUUIDs to remove old displays and spawn fresh ones
+                
                 updateItemDisplayUUIDs();
             }
 
@@ -193,6 +193,8 @@ public abstract class InteractiveSurface extends CustomBlock {
             }
 
             item.setDisplayUUID(display.getUniqueId());
+
+            org.shotrush.atom.content.systems.ItemHeatSystem.startItemDisplayHeatTracking(display);
         });
     }
 
@@ -238,19 +240,19 @@ public abstract class InteractiveSurface extends CustomBlock {
         if (spawnLocation.getWorld() == null) return;
 
 
-        // Clear UUIDs first
+        
         for (PlacedItem item : placedItems) {
             item.setDisplayUUID(null);
         }
 
-        // Schedule removal task
+        
         org.shotrush.atom.core.api.scheduler.SchedulerAPI.runTask(spawnLocation, () -> {
-            // Remove ALL ItemDisplay entities at exact item positions (ignore parent UUID since it changes on restart)
+            
             for (PlacedItem item : placedItems) {
                 Vector3f pos = item.getPosition();
                 Location itemLoc = spawnLocation.clone().add(pos.x, pos.y, pos.z);
                 
-                // Remove ALL ItemDisplay entities at this position
+                
                 for (Entity entity : itemLoc.getWorld().getNearbyEntities(itemLoc, 0.2, 0.2, 0.2)) {
                     if (entity instanceof org.bukkit.entity.ItemDisplay) {
                         entity.remove();
@@ -258,7 +260,7 @@ public abstract class InteractiveSurface extends CustomBlock {
                 }
             }
             
-            // Then spawn new ones after a delay
+            
             org.shotrush.atom.core.api.scheduler.SchedulerAPI.runTaskLater(spawnLocation, () -> {
                 for (PlacedItem item : placedItems) {
                     spawnItemDisplay(item);

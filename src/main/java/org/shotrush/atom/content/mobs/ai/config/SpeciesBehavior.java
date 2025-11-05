@@ -66,7 +66,7 @@ public record SpeciesBehavior(
     
     static {
         BEHAVIORS.put(EntityType.COW, new SpeciesBehavior(
-            2, 15, 0.05, 0.60, 1.25, 1.0, 6.0, 10.0, 6000, 8.0, SpecialMechanic.STAMPEDE
+            2, 15, 0.05, 0.60, 1.50, 1.0, 6.0, 10.0, 6000, 8.0, SpecialMechanic.STAMPEDE
         ));
         
         BEHAVIORS.put(EntityType.PIG, new SpeciesBehavior(
