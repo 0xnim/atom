@@ -7,17 +7,25 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 import org.shotrush.atom.Atom;
+import org.shotrush.atom.core.api.annotation.RegisterSystem;
 import org.shotrush.atom.core.items.CustomItem;
 import org.shotrush.atom.core.projectiles.CustomProjectile;
 
+@RegisterSystem(
+    id = "spear_projectile_listener",
+    priority = 3,
+    toggleable = true,
+    description = "Handles spear throwing mechanics"
+)
 public class SpearProjectileListener implements Listener {
     
     private final Atom plugin;
     
-    public SpearProjectileListener(Atom plugin) {
-        this.plugin = plugin;
+    public SpearProjectileListener(Plugin plugin) {
+        this.plugin = (Atom) plugin;
     }
     
     @EventHandler

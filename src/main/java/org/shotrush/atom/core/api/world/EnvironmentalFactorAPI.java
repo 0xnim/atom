@@ -99,7 +99,8 @@ public class EnvironmentalFactorAPI {
                     
                     if (distance == 0) continue;
                     
-                    double influence = 1.0 / distance;
+                    
+                    double influence = 1.0 / (distance * distance);
                     Material type = block.getType();
                     
                     if (type == Material.FIRE || type == Material.SOUL_FIRE) {
@@ -111,16 +112,26 @@ public class EnvironmentalFactorAPI {
                     } else if (type == Material.CAMPFIRE || type == Material.SOUL_CAMPFIRE) {
                         org.bukkit.block.data.Lightable campfire = (org.bukkit.block.data.Lightable) block.getBlockData();
                         if (campfire.isLit()) {
-                            heatChange += 4.4 * influence;
+                            
+                            if (distance < 2.0) {
+                                heatChange += 2.2 * influence;
+                            }
                         }
                     }
                     
+                    
                     else if (type == Material.WATER || type == Material.BUBBLE_COLUMN) {
-                        heatChange -= 0.33 * influence;
+                        if (distance < 1.5) {
+                            heatChange -= 0.15 * influence;
+                        }
                     } else if (type == Material.ICE || type == Material.PACKED_ICE || type == Material.BLUE_ICE) {
-                        heatChange -= 0.85 * influence;
+                        if (distance < 1.5) {
+                            heatChange -= 0.4 * influence;
+                        }
                     } else if (type == Material.SNOW || type == Material.SNOW_BLOCK || type == Material.POWDER_SNOW) {
-                        heatChange -= 0.55 * influence;
+                        if (distance < 1.5) {
+                            heatChange -= 0.25 * influence;
+                        }
                     }
                 }
             }

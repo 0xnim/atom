@@ -6,7 +6,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.core.data.PersistentData;
 
-import java.util.Arrays;
 import java.util.List;
 
 public abstract class CustomItem {

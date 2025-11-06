@@ -2,83 +2,87 @@ package org.shotrush.atom.content.foragingage.workstations.craftingbasket;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.Atom;
 import org.shotrush.atom.core.items.ItemQuality;
-import org.shotrush.atom.core.recipe.Recipe;
-import org.shotrush.atom.core.recipe.RecipeProvider;
-import org.shotrush.atom.core.recipe.ShapelessRecipe;
-import org.shotrush.atom.core.recipe.annotation.AutoRegister;
-import org.shotrush.atom.core.util.ItemUtil;
+import org.shotrush.atom.core.recipe.BukkitRecipeBuilder;
 
-import java.util.Arrays;
-import java.util.List;
+import org.shotrush.atom.core.api.annotation.RegisterSystem;
 
-@AutoRegister(priority = 1)
-public class CraftingBasketRecipes implements RecipeProvider {
+
+@RegisterSystem(
+    id = "crafting_basket_recipes",
+    priority = 1,
+    toggleable = false,
+    description = "Registers crafting basket recipes"
+)
+public class CraftingBasketRecipes {
     
-    @Override
-    public List<Recipe> getRecipes() {
-        List<Recipe> recipes = new java.util.ArrayList<>();
+    public CraftingBasketRecipes(Plugin plugin) {
         
-        Recipe spear = createSpearRecipe();
-        if (spear != null) recipes.add(spear);
-        
-        Recipe pressureFlaker = createPressureFlakerRecipe();
-        if (pressureFlaker != null) recipes.add(pressureFlaker);
-        
-        Recipe knife = createKnifeRecipe();
-        if (knife != null) recipes.add(knife);
-        
-        return recipes;
+        registerBukkitRecipes();
     }
     
-    private Recipe createSpearRecipe() {
-        ItemStack spear = Atom.getInstance().getItemRegistry().createItem("wood_spear");
-        if (spear == null) {
-            spear = ItemUtil.createItemWithCustomModel(Material.TRIDENT, "spear");
-        }
-        
-        return new ShapelessRecipe.Builder()
-            .id("spear")
-            .result(spear)
-            .addIngredient("sharpened_flint")
-            .addIngredient(Material.STICK)
-            .addIngredient(Material.STICK) 
-            .addIngredient(Material.VINE)
-            .build();
+    
+    private void registerBukkitRecipes() {
+        registerSpearBukkitRecipe();
+        registerPressureFlakerBukkitRecipe();
+        registerKnifeBukkitRecipe();
+        registerWaterskinBukkitRecipe();
     }
     
-    private Recipe createPressureFlakerRecipe() {
-        ItemStack pressureFlaker = Atom.getInstance().getItemRegistry().createItem("pressure_flaker");
-        if (pressureFlaker == null) {
-            Atom.getInstance().getLogger().warning("Failed to create pressure_flaker item for recipe!");
-            return null;
-        }
+    private void registerSpearBukkitRecipe() {
         
-        Atom.getInstance().getLogger().info("Creating pressure_flaker recipe with bone ingredient");
         
-        return new ShapelessRecipe.Builder()
-            .id("pressure_flaker")
-            .result(pressureFlaker)
-            .addIngredient("bone")
-            .build();
+        
+        
+        BukkitRecipeBuilder.shaped("spear")
+            .result("wood_spear")
+            .shape(
+                "  F",
+                " SV",
+                "S  "
+            )
+            .setIngredient('F', "sharpened_flint")
+            .setIngredient('S', Material.STICK)
+            .setIngredientChoice('V', "stabilized_leather", Material.VINE)  
+            .register();
     }
     
-    private Recipe createKnifeRecipe() {
-        ItemStack knife = Atom.getInstance().getItemRegistry().createItem("knife");
-        if (knife == null) {
-            return null;
-        }
+    private void registerPressureFlakerBukkitRecipe() {
+        BukkitRecipeBuilder.shapeless("pressure_flaker")
+            .result("pressure_flaker")
+            .ingredient("bone")
+            .register();
+    }
+    
+    private void registerKnifeBukkitRecipe() {
         
-        return new ShapelessRecipe.Builder()
-            .id("knife")
-            .result(knife)
-            .addIngredient("sharpened_flint", ItemQuality.HIGH)
-            .addIngredient(Material.STICK)
-            .anyOf()
-                .add("stabilized_leather")
-                .add(Material.VINE)
-                .done()
-            .build();
+        
+        
+        BukkitRecipeBuilder.shaped("knife")
+            .result("knife")
+            .shape(
+                "  F",
+                " SL"
+            )
+            .setIngredient('F', "sharpened_flint", ItemQuality.HIGH)
+            .setIngredient('S', Material.STICK)
+            .setIngredient('L', "stabilized_leather")
+            .register();
+    }
+    
+    private void registerWaterskinBukkitRecipe() {
+        
+        
+        
+        BukkitRecipeBuilder.shaped("waterskin")
+            .result("waterskin")
+            .shape(
+                "L L",
+                " L "
+            )
+            .setIngredient('L', "stabilized_leather")
+            .register();
     }
 }

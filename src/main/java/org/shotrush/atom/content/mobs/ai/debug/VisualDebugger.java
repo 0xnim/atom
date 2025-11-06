@@ -9,6 +9,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.shotrush.atom.Atom;
+import org.shotrush.atom.core.util.ActionBarManager;
 
 import java.util.Map;
 import java.util.Set;
@@ -173,7 +174,7 @@ public class VisualDebugger {
                     tracked.state == GoalState.ENVIRONMENTAL ? "§e" :
                     tracked.state == GoalState.SOCIAL ? "§d" :
                     "§f";
-                org.shotrush.atom.core.ui.ActionBarManager.send(player, 
+                ActionBarManager.send(player,
                     color + mob.getType().name() + "#" + mob.getEntityId() + ": " + tracked.currentGoal);
                 
                 updateBossBar(player, tracked, mob);

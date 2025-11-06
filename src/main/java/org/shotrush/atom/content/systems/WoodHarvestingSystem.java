@@ -20,13 +20,18 @@ import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.Atom;
 import org.shotrush.atom.content.foragingage.items.SharpenedFlint;
 import org.shotrush.atom.core.items.CustomItemRegistry;
-import org.shotrush.atom.core.systems.annotation.AutoRegisterSystem;
-import org.shotrush.atom.core.ui.ActionBarManager;
+import org.shotrush.atom.core.util.ActionBarManager;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.shotrush.atom.core.api.annotation.RegisterSystem;
 
-@AutoRegisterSystem(priority = 2)
+@RegisterSystem(
+    id = "wood_harvesting_system",
+    priority = 2,
+    toggleable = true,
+    description = "Handles tree chopping mechanics"
+)
 public class WoodHarvestingSystem implements Listener {
     
     private final Plugin plugin;

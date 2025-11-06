@@ -5,12 +5,24 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.Plugin;
+import org.shotrush.atom.core.api.annotation.RegisterSystem;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+@RegisterSystem(
+    id = "right_click_detector",
+    priority = 0,
+    toggleable = false,
+    description = "Detects and tracks player right-click events"
+)
 public class RightClickDetector implements Listener {
+    
+    public RightClickDetector(Plugin plugin) {
+        
+    }
     
     private static class ClickData {
         long lastAllowTime = 0;

@@ -14,7 +14,7 @@ import org.shotrush.atom.Atom;
 import org.shotrush.atom.core.blocks.InteractiveSurface;
 import org.shotrush.atom.core.blocks.annotation.AutoRegister;
 import org.shotrush.atom.core.items.CustomItem;
-import org.shotrush.atom.core.ui.ActionBarManager;
+import org.shotrush.atom.core.util.ActionBarManager;
 
 @AutoRegister(priority = 32)
 public class KnappingStation extends InteractiveSurface {

@@ -2,16 +2,14 @@ package org.shotrush.atom.content.blocks.anvil;
 
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 import org.shotrush.atom.Atom;
-import org.shotrush.atom.core.ui.ActionBarManager;
+import org.shotrush.atom.core.util.ActionBarManager;
 import org.shotrush.atom.core.blocks.CustomBlock;
 import org.shotrush.atom.core.blocks.InteractiveSurface;
 import org.shotrush.atom.core.blocks.annotation.AutoRegister;

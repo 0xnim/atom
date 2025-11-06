@@ -1,5 +1,6 @@
 package org.shotrush.atom.content.mobs;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
@@ -25,11 +26,20 @@ import org.shotrush.atom.content.mobs.ai.debug.DebugLevel;
 import org.shotrush.atom.content.mobs.ai.debug.DebugManager;
 
 import java.util.*;
+import org.bukkit.plugin.Plugin;
+import org.shotrush.atom.core.api.annotation.RegisterSystem;
 
+@RegisterSystem(
+    id = "animal_behavior",
+    priority = 4,
+    toggleable = true,
+    provides = {"herd_manager"},
+    description = "Advanced animal AI with herding behavior"
+)
 public class AnimalBehaviorNew implements Listener {
     
     private final Atom plugin;
-    private final HerdManager herdManager;
+    private static HerdManager herdManager;
     private final InjurySystem injurySystem;
     private final FatigueSystem fatigueSystem;
     private final MoraleSystem moraleSystem;
@@ -62,9 +72,9 @@ public class AnimalBehaviorNew implements Listener {
         COMMON_ANIMALS.add(EntityType.ARMADILLO);
     }
     
-    public AnimalBehaviorNew(Atom plugin) {
-        this.plugin = plugin;
-        this.herdManager = new HerdManager(plugin);
+    public AnimalBehaviorNew(Plugin plugin) {
+        this.plugin = (Atom) plugin;
+        herdManager = new HerdManager((Atom) plugin);
         this.injurySystem = new InjurySystem(plugin);
         this.fatigueSystem = new FatigueSystem(plugin);
         this.moraleSystem = new MoraleSystem(plugin, herdManager);

@@ -10,21 +10,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
-import org.shotrush.atom.content.foragingage.throwing.SpearProjectileListener;
-import org.shotrush.atom.content.mobs.AnimalBehaviorNew;
-import org.shotrush.atom.content.mobs.AnimalDomestication;
-import org.shotrush.atom.content.mobs.MobScale;
 import org.shotrush.atom.content.mobs.ai.debug.MobAIDebugCommand;
 import org.shotrush.atom.content.mobs.ai.debug.VisualDebugger;
 import org.shotrush.atom.content.mobs.commands.HerdCommand;
-import org.shotrush.atom.core.AutoRegisterManager;
+import org.shotrush.atom.content.mobs.herd.HerdManager;
 import org.shotrush.atom.core.age.AgeManager;
 import org.shotrush.atom.core.blocks.CustomBlockManager;
 import org.shotrush.atom.core.items.CustomItemRegistry;
-import org.shotrush.atom.core.recipe.RecipeManager;
-import org.shotrush.atom.core.skin.SkinListener;
 import org.shotrush.atom.core.storage.DataStorage;
-import org.shotrush.atom.core.util.RightClickDetector;
 import org.shotrush.atom.world.RockChunkGenerator;
 
 public final class Atom extends JavaPlugin {
@@ -40,63 +33,51 @@ public final class Atom extends JavaPlugin {
     private DataStorage dataStorage;
     @Getter
     private AgeManager ageManager;
-    @Getter
-    private RecipeManager recipeManager;
 
     @Override
     public void onEnable() {
         instance = this;
 
         
-        org.shotrush.atom.core.api.scheduler.SchedulerAPI.init(this);
-        org.shotrush.atom.core.api.BlockBreakSpeedAPI.initialize(this);
+        org.shotrush.atom.core.api.AtomAPI.initialize(this);
         
-        dataStorage = new DataStorage(this);
-        ageManager = new AgeManager(this, dataStorage);
-        itemRegistry = new CustomItemRegistry(this);
-        blockManager = new CustomBlockManager(this);
-        recipeManager = new RecipeManager();
         
-        AutoRegisterManager.registerAges(this, ageManager);
-        AutoRegisterManager.registerItems(this, itemRegistry);
-        AutoRegisterManager.registerBlocks(this, blockManager.getRegistry());
-        AutoRegisterManager.registerRecipes(this, recipeManager);
-        AutoRegisterManager.registerSystems(this);
+        dataStorage = org.shotrush.atom.core.api.AtomAPI.getDataStorage();
+        ageManager = org.shotrush.atom.core.api.AtomAPI.getAgeManager();
+        itemRegistry = org.shotrush.atom.core.api.AtomAPI.getItemRegistry();
+        blockManager = org.shotrush.atom.core.api.AtomAPI.getBlockManager();
         
-        getServer().getPluginManager().registerEvents(new RightClickDetector(), this);
-        getServer().getPluginManager().registerEvents(new SkinListener(), this);
-        getServer().getPluginManager().registerEvents(new MobScale(this), this);
         
-        AnimalBehaviorNew animalBehavior = new AnimalBehaviorNew(this);
-        AnimalDomestication animalDomestication = new AnimalDomestication(this, animalBehavior.getHerdManager());
-        getServer().getPluginManager().registerEvents(animalBehavior, this);
-        getServer().getPluginManager().registerEvents(animalDomestication, this);
+        org.shotrush.atom.core.api.AtomAPI.registerAges();
+        org.shotrush.atom.core.api.AtomAPI.registerItems();
+        org.shotrush.atom.core.api.AtomAPI.registerBlocks();
+        org.shotrush.atom.core.api.AtomAPI.registerSystems();
         
-        getServer().getPluginManager().registerEvents(new SpearProjectileListener(this), this);
-        
-        setupCommands(animalBehavior);
+        setupCommands();
         getLogger().info("Atom plugin has been enabled!");
     }
     
-    private void setupCommands(AnimalBehaviorNew animalBehavior) {
+    private void setupCommands() {
         PaperCommandManager commandManager = new PaperCommandManager(this);
-        AutoRegisterManager.registerCommands(this, commandManager);
-        commandManager.registerCommand(new HerdCommand(animalBehavior.getHerdManager()));
         
-        VisualDebugger visualDebugger = new VisualDebugger(this);
-        commandManager.registerCommand(new MobAIDebugCommand(
-            visualDebugger,
-            animalBehavior.getHerdManager()
-        ));
+        
+        org.shotrush.atom.core.api.AtomAPI.registerCommands(commandManager);
+        
+        
+        HerdManager herdManager = org.shotrush.atom.core.api.AtomAPI.Systems.getService("herd_manager", HerdManager.class);
+        if (herdManager != null) {
+            commandManager.registerCommand(new HerdCommand(herdManager));
+            
+            VisualDebugger visualDebugger = new VisualDebugger(this);
+            commandManager.registerCommand(new MobAIDebugCommand(visualDebugger, herdManager));
+        }
     }
     public void onDisable() {
-        if (blockManager != null) {
-            blockManager.stopGlobalUpdate();
-            blockManager.cleanupAllDisplays();
-            blockManager.saveBlocks();
-        }
         
         saveAllPlayerData();
+        
+        
+        org.shotrush.atom.core.api.AtomAPI.shutdown();
         
         getLogger().info("Atom plugin has been disabled!");
     }

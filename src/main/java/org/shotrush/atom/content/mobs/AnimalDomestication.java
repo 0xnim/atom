@@ -7,21 +7,32 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityBreedEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.Atom;
 import org.shotrush.atom.content.mobs.herd.Herd;
 import org.shotrush.atom.content.mobs.herd.HerdManager;
+import org.shotrush.atom.core.api.annotation.RegisterSystem;
 
 import java.util.Optional;
 
+@RegisterSystem(
+    id = "animal_domestication",
+    priority = 5,
+    toggleable = true,
+    dependencies = {"animal_behavior"},
+    requires = {"herd_manager"},
+    description = "Handles animal breeding and domestication"
+)
 public class AnimalDomestication implements Listener {
     
     private final Atom plugin;
     private final HerdManager herdManager;
     private static final int MAX_DOMESTICATION_LEVEL = 5;
     
-    public AnimalDomestication(Atom plugin, HerdManager herdManager) {
-        this.plugin = plugin;
-        this.herdManager = herdManager;
+    public AnimalDomestication(Plugin plugin) {
+        this.plugin = (Atom) plugin;
+        
+        this.herdManager = org.shotrush.atom.core.api.AtomAPI.Systems.getService("herd_manager", HerdManager.class);
     }
     
     @EventHandler

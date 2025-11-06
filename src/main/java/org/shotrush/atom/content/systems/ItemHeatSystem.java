@@ -15,11 +15,20 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.shotrush.atom.core.data.PersistentData;
 import org.shotrush.atom.Atom;
-import org.shotrush.atom.core.systems.annotation.AutoRegisterSystem;
+import org.shotrush.atom.core.util.ActionBarManager;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-@AutoRegisterSystem(priority = 3)
+import org.shotrush.atom.core.api.annotation.RegisterSystem;
+
+@RegisterSystem(
+    id = "item_heat_system",
+    priority = 3,
+    dependencies = {"action_bar_manager"},
+    toggleable = true,
+    description = "Manages item temperature and heat mechanics"
+)
 public class ItemHeatSystem implements Listener {
     @Getter
     private static ItemHeatSystem instance;
@@ -191,7 +200,7 @@ public class ItemHeatSystem implements Listener {
             heat = getItemHeat(item);
         }
         
-        org.shotrush.atom.core.ui.ActionBarManager manager = org.shotrush.atom.core.ui.ActionBarManager.getInstance();
+        ActionBarManager manager = ActionBarManager.getInstance();
         if (manager == null) return;
         
         
@@ -232,7 +241,7 @@ public class ItemHeatSystem implements Listener {
     private void displayHeatActionBar(Player player, ItemStack item) {
         double heat = getItemHeat(item);
         
-        org.shotrush.atom.core.ui.ActionBarManager manager = org.shotrush.atom.core.ui.ActionBarManager.getInstance();
+        ActionBarManager manager = ActionBarManager.getInstance();
         if (manager == null) return;
         
         
@@ -335,21 +344,27 @@ public class ItemHeatSystem implements Listener {
         org.bukkit.Location loc = player.getLocation();
         
         
-        double environmentalHeat = org.shotrush.atom.core.api.world.EnvironmentalFactorAPI
-            .getNearbyHeatSources(loc, 5);
+        double tempChange = 0.0;
         
-        double ambientTemp = 20.0;
-        double targetTemp = ambientTemp + (environmentalHeat * 10); 
+        
+        org.bukkit.block.Biome biome = loc.getBlock().getBiome();
+        tempChange += org.shotrush.atom.core.api.world.EnvironmentalFactorAPI.getBiomeTemperature(biome);
+        tempChange += org.shotrush.atom.core.api.world.EnvironmentalFactorAPI.getDayNightModifier(loc.getWorld());
+        tempChange += org.shotrush.atom.core.api.world.EnvironmentalFactorAPI.getLightLevelModifier(loc);
+        tempChange += org.shotrush.atom.core.api.world.EnvironmentalFactorAPI.getWaterIceModifier(player, loc);
+        tempChange += org.shotrush.atom.core.api.world.EnvironmentalFactorAPI.getNearbyHeatSources(loc, 5);
+        
+        
+        double targetTemp = 20.0 + (tempChange * 2.0);
         
         
         double heatDifference = targetTemp - currentHeat;
-        double heatChange = heatDifference * 0.05; 
-        
+        double heatChange = heatDifference * 0.08; 
         
         double newHeat = currentHeat + heatChange;
         
         
-        newHeat = Math.max(-100, Math.min(500, newHeat));
+        newHeat = Math.max(-150, Math.min(600, newHeat));
         
         
         if (Math.abs(newHeat - currentHeat) > 0.5) {

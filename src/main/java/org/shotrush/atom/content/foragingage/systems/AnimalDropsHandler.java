@@ -13,13 +13,18 @@ import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.Atom;
 import org.shotrush.atom.content.foragingage.items.BoneItem;
 import org.shotrush.atom.content.foragingage.items.LeatherItem;
-import org.shotrush.atom.core.systems.annotation.AutoRegisterSystem;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import org.shotrush.atom.core.api.annotation.RegisterSystem;
 
-@AutoRegisterSystem(priority = 5)
+@RegisterSystem(
+    id = "animal_drops_handler",
+    priority = 5,
+    toggleable = true,
+    description = "Replaces vanilla animal drops with custom drops"
+)
 public class AnimalDropsHandler implements Listener {
     
     private final Atom plugin;
@@ -89,22 +94,22 @@ public class AnimalDropsHandler implements Listener {
     
     private int getBoneCount(EntityType type) {
         return switch (type) {
-            case COW, HORSE, DONKEY, MULE, LLAMA, CAMEL -> random.nextInt(2) + 2; 
+            case COW, HORSE, DONKEY, MULE, LLAMA, CAMEL -> random.nextInt(2) + 1; 
             case PIG, SHEEP, GOAT, WOLF, FOX -> random.nextInt(2) + 1; 
             case CHICKEN, RABBIT, CAT, OCELOT -> random.nextInt(2); 
-            case POLAR_BEAR, PANDA -> random.nextInt(3) + 2; 
+            case POLAR_BEAR, PANDA -> random.nextInt(2) + 2; 
             default -> 1;
         };
     }
     
     private int getLeatherCount(EntityType type) {
         return switch (type) {
-            case COW, HORSE, DONKEY, MULE, LLAMA, CAMEL -> random.nextInt(3) + 2; 
-            case PIG, SHEEP, GOAT -> random.nextInt(2) + 2; 
-            case POLAR_BEAR, PANDA -> random.nextInt(4) + 3; 
+            case COW, HORSE, DONKEY, MULE, LLAMA, CAMEL -> random.nextInt(3) + 3; 
+            case PIG, SHEEP, GOAT -> random.nextInt(3) + 2; 
+            case POLAR_BEAR, PANDA -> random.nextInt(4) + 4; 
             case CHICKEN, RABBIT -> random.nextInt(2) + 1; 
-            case WOLF, FOX, CAT, OCELOT -> random.nextInt(2) + 1; 
-            default -> 1;
+            case WOLF, FOX, CAT, OCELOT -> random.nextInt(2) + 2; 
+            default -> 2;
         };
     }
     

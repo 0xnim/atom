@@ -5,11 +5,23 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.Atom;
+import org.shotrush.atom.core.api.annotation.RegisterSystem;
 
 import java.util.Objects;
 
+@RegisterSystem(
+    id = "skin_listener",
+    priority = 1,
+    toggleable = true,
+    description = "Applies default skins to players on join"
+)
 public class SkinListener implements Listener {
+    
+    public SkinListener(Plugin plugin) {
+        
+    }
     
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {

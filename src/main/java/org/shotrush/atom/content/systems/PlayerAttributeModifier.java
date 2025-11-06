@@ -7,12 +7,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.shotrush.atom.core.systems.annotation.AutoRegisterSystem;
+import org.bukkit.plugin.Plugin;
+import org.shotrush.atom.core.api.annotation.RegisterSystem;
 
-@AutoRegisterSystem(priority = 1)
+@RegisterSystem(
+    id = "player_attribute_modifier",
+    priority = 1,
+    toggleable = false,
+    description = "Modifies player attributes on join"
+)
 public class PlayerAttributeModifier implements Listener {
     
     private static final NamespacedKey MODIFIER_KEY = new NamespacedKey("atom", "default_modifier");
+    
+    public PlayerAttributeModifier(Plugin plugin) {
+        
+    }
     
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {

@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.shotrush.atom.Atom;
 import org.shotrush.atom.commands.annotation.AutoRegister;
 import org.shotrush.atom.core.skin.SkinAPI;
-import org.shotrush.atom.core.ui.ActionBarManager;
+import org.shotrush.atom.core.util.ActionBarManager;
 
 @AutoRegister(priority = 60)
 @CommandAlias("skin")

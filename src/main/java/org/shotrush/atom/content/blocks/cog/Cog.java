@@ -15,7 +15,7 @@ import org.shotrush.atom.Atom;
 import org.shotrush.atom.core.blocks.CustomBlock;
 import org.shotrush.atom.core.blocks.annotation.AutoRegister;
 import org.shotrush.atom.core.blocks.util.BlockRotationUtil;
-import org.shotrush.atom.core.ui.ActionBarManager;
+import org.shotrush.atom.core.util.ActionBarManager;
 
 ;
 

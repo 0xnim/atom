@@ -1,15 +1,20 @@
-package org.shotrush.atom.core.ui;
+package org.shotrush.atom.core.util;
 
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.shotrush.atom.core.systems.annotation.AutoRegisterSystem;
+import org.shotrush.atom.core.api.annotation.RegisterSystem;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-@AutoRegisterSystem(priority = 0)
+@RegisterSystem(
+    id = "action_bar_manager",
+    priority = 0,
+    toggleable = false,
+    description = "Manages action bar messages for players"
+)
 public class ActionBarManager {
     
     @Getter

@@ -28,7 +28,7 @@ public class Waterskin extends CustomItem {
     
     @Override
     public Material getMaterial() {
-        return Material.BUNDLE;
+        return Material.POTION;
     }
     
     @Override
@@ -64,7 +64,7 @@ public class Waterskin extends CustomItem {
     }
     
     public static void setWater(ItemStack item, int amount, boolean purified) {
-        if (item == null || item.getType() != Material.BUNDLE) return;
+        if (item == null || item.getType() != Material.POTION) return;
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return;
         

@@ -1,7 +1,6 @@
 package org.shotrush.atom.content.systems;
 
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,10 +11,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.potion.PotionEffectType;
-import org.shotrush.atom.core.systems.annotation.AutoRegisterSystem;
+import org.shotrush.atom.core.api.annotation.RegisterSystem;
+import org.shotrush.atom.core.util.ActionBarManager;
 
-@AutoRegisterSystem(priority = 4)
+@RegisterSystem(
+    id = "player_temperature_system",
+    priority = 4,
+    dependencies = {"action_bar_manager"},
+    toggleable = true,
+    description = "Manages player body temperature"
+)
 public class PlayerTemperatureSystem implements Listener {
     
     @Getter
@@ -116,7 +121,7 @@ public class PlayerTemperatureSystem implements Listener {
     private void applyTemperatureEffects(Player player, double temp) {
         org.shotrush.atom.core.api.combat.TemperatureEffectsAPI.applyBodyTemperatureEffects(player, temp);
         
-        org.shotrush.atom.core.ui.ActionBarManager manager = org.shotrush.atom.core.ui.ActionBarManager.getInstance();
+        ActionBarManager manager = ActionBarManager.getInstance();
         if (manager == null) return;
         
         String tempDisplay = String.format("%.1f°C", temp);

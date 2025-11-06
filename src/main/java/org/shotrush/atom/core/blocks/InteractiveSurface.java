@@ -13,7 +13,7 @@ import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.joml.Vector3f;
 import org.shotrush.atom.Atom;
-import org.shotrush.atom.core.ui.ActionBarManager;
+import org.shotrush.atom.core.util.ActionBarManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,6 +36,12 @@ public abstract class InteractiveSurface extends CustomBlock {
 
     @Override
     public boolean onInteract(Player player, boolean sneaking) {
+        
+        if (useGuiMode() && !sneaking) {
+            openGui(player);
+            return true;
+        }
+        
         if (sneaking) {
             return onCrouchRightClick(player);
         }
@@ -76,6 +82,16 @@ public abstract class InteractiveSurface extends CustomBlock {
     public abstract int getMaxItems();
     public abstract boolean canPlaceItem(ItemStack item);
     public abstract Vector3f calculatePlacement(Player player, int itemCount);
+    
+    
+    protected boolean useGuiMode() {
+        return false;
+    }
+    
+    
+    protected void openGui(Player player) {
+        player.openWorkbench(spawnLocation, true);
+    }
 
     protected boolean onCrouchRightClick(Player player) {
         ItemStack result = checkRecipe();
@@ -186,7 +202,7 @@ public abstract class InteractiveSurface extends CustomBlock {
             
             if (interactionUUID != null) {
                 display.getPersistentDataContainer().set(
-                    org.bukkit.NamespacedKey.fromString("parent_workstation", Atom.getInstance()),
+                        Objects.requireNonNull(NamespacedKey.fromString("parent_workstation", Atom.getInstance())),
                     org.bukkit.persistence.PersistentDataType.STRING,
                     interactionUUID.toString()
                 );

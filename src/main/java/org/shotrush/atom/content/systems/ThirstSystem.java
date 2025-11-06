@@ -1,7 +1,6 @@
 package org.shotrush.atom.content.systems;
 
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,9 +16,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.shotrush.atom.core.systems.annotation.AutoRegisterSystem;
+import org.shotrush.atom.core.api.annotation.RegisterSystem;
+import org.shotrush.atom.core.util.ActionBarManager;
 
-@AutoRegisterSystem(priority = 2)
+@RegisterSystem(
+    id = "thirst_system",
+    priority = 2,
+    dependencies = {"action_bar_manager"},
+    toggleable = true,
+    description = "Manages player thirst mechanics"
+)
 public class ThirstSystem implements Listener {
     
     @Getter
@@ -208,7 +214,7 @@ public class ThirstSystem implements Listener {
         int gained = newThirst - currentThirst;
         
         if (gained > 0) {
-            org.shotrush.atom.core.ui.ActionBarManager.send(player, "§b+§f" + gained + " §bThirst");
+            ActionBarManager.send(player, "§b+§f" + gained + " §bThirst");
         }
         
         player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 200, 0, false, false));
@@ -225,7 +231,7 @@ public class ThirstSystem implements Listener {
         int gained = newThirst - currentThirst;
         
         if (gained > 0) {
-            org.shotrush.atom.core.ui.ActionBarManager.send(player, "§b+§f" + gained + " §bThirst §7(Purified)");
+            ActionBarManager.send(player, "§b+§f" + gained + " §bThirst §7(Purified)");
         }
     }
     

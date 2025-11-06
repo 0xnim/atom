@@ -13,14 +13,19 @@ import org.shotrush.atom.Atom;
 import org.shotrush.atom.core.api.item.ItemQualityAPI;
 import org.shotrush.atom.core.items.CustomItem;
 import org.shotrush.atom.core.items.ItemQuality;
-import org.shotrush.atom.core.systems.annotation.AutoRegisterSystem;
-import org.shotrush.atom.core.ui.ActionBarManager;
+import org.shotrush.atom.core.util.ActionBarManager;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import org.shotrush.atom.core.api.annotation.RegisterSystem;
 
-@AutoRegisterSystem(priority = 5)
+@RegisterSystem(
+    id = "knapping_handler",
+    priority = 5,
+    toggleable = true,
+    description = "Handles flint knapping mechanics"
+)
 public class KnappingHandler implements Listener {
     
     private static final Map<UUID, KnappingProgress> activeKnapping = new HashMap<>();

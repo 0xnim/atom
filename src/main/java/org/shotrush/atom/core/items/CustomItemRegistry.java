@@ -32,8 +32,20 @@ public class CustomItemRegistry {
         return null;
     }
     
+    public CustomItem getCustomItem(ItemStack itemStack) {
+        return getItem(itemStack);
+    }
+    
     public ItemStack createItem(String identifier) {
         CustomItem item = items.get(identifier);
         return item != null ? item.create() : null;
+    }
+    
+    public Collection<CustomItem> getAllItems() {
+        return items.values();
+    }
+    
+    public Set<String> getAllIdentifiers() {
+        return items.keySet();
     }
 }

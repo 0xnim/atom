@@ -6,13 +6,23 @@ import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.core.api.item.ItemQualityAPI;
 import org.shotrush.atom.core.api.item.QualityInheritanceAPI;
 import org.shotrush.atom.core.items.ItemQuality;
-import org.shotrush.atom.core.systems.annotation.AutoRegisterSystem;
+import org.shotrush.atom.core.api.annotation.RegisterSystem;
 
-@AutoRegisterSystem(priority = 5)
+@RegisterSystem(
+    id = "quality_inheritance_listener",
+    priority = 5,
+    toggleable = true,
+    description = "Handles item quality inheritance in crafting"
+)
 public class QualityInheritanceListener implements Listener {
+    
+    public QualityInheritanceListener(Plugin plugin) {
+        
+    }
     
     @EventHandler
     public void onPrepareItemCraft(PrepareItemCraftEvent event) {

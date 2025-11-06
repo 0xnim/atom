@@ -14,6 +14,7 @@ import org.shotrush.atom.Atom;
 import org.shotrush.atom.core.blocks.InteractiveSurface;
 import org.shotrush.atom.core.blocks.annotation.AutoRegister;
 import org.shotrush.atom.core.items.CustomItem;
+import org.shotrush.atom.core.util.ActionBarManager;
 
 @AutoRegister(priority = 34)
 public class LeatherBed extends InteractiveSurface {
@@ -36,12 +37,17 @@ public class LeatherBed extends InteractiveSurface {
         if (item == null) return false;
         
         CustomItem uncuredLeather = Atom.getInstance().getItemRegistry().getItem("uncured_leather");
-        return uncuredLeather != null && uncuredLeather.isCustomItem(item);
+        CustomItem stabilizedLeather = Atom.getInstance().getItemRegistry().getItem("stabilized_leather");
+        
+        
+        return (uncuredLeather != null && uncuredLeather.isCustomItem(item)) ||
+               (item.getType() == Material.LEATHER) ||
+               (stabilizedLeather != null && stabilizedLeather.isCustomItem(item));
     }
 
     @Override
     public Vector3f calculatePlacement(Player player, int itemCount) {
-        return new Vector3f(0f, 0.75f, 0.60f);
+        return new Vector3f(-0.05f, 0.75f, 0.60f);
     }
 
     @Override
@@ -92,12 +98,41 @@ public class LeatherBed extends InteractiveSurface {
             ItemStack removed = removeLastItem();
             if (removed != null) {
                 player.getInventory().addItem(removed);
+                LeatherBedHandler.cancelCuring(spawnLocation);
                 return true;
             }
             return false;
         }
 
         if (hand.getType() == Material.WOODEN_HOE || hand.getType() == Material.AIR) return false;
+        
+        
+        CustomItem sharpenedFlint = Atom.getInstance().getItemRegistry().getItem("sharpened_flint");
+        CustomItem knife = Atom.getInstance().getItemRegistry().getItem("knife");
+        
+        boolean isSharpenedFlint = sharpenedFlint != null && sharpenedFlint.isCustomItem(hand);
+        boolean isKnife = knife != null && knife.isCustomItem(hand);
+        
+        if ((isSharpenedFlint || isKnife)) {
+            if (placedItems.isEmpty()) {
+                ActionBarManager.send(player, "§cPlace uncured leather first!");
+                return true;
+            }
+            
+            InteractiveSurface.PlacedItem placedItem = placedItems.get(0);
+            CustomItem uncuredLeather = Atom.getInstance().getItemRegistry().getItem("uncured_leather");
+            
+            if (uncuredLeather == null || !uncuredLeather.isCustomItem(placedItem.getItem())) {
+                ActionBarManager.send(player, "§cYou can only scrape uncured leather!");
+                return true;
+            }
+            
+            if (!LeatherBedHandler.isBrushing(player)) {
+                LeatherBedHandler.startBrushing(player, this, hand);
+            }
+            
+            return false; 
+        }
         
         if (!canPlaceItem(hand)) return false;
 
@@ -126,8 +161,9 @@ public class LeatherBed extends InteractiveSurface {
     @Override
     public String[] getLore() {
         return new String[]{
-                "§7Place leather to dry",
-                "§8Right-click with uncured leather"
+                "§7Place leather to process and cure",
+                "§8Right-click with uncured leather to place",
+                "§8Use sharpened flint or knife to scrape"
         };
     }
 

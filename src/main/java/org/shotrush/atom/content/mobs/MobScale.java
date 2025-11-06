@@ -5,14 +5,22 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.Atom;
+import org.shotrush.atom.core.api.annotation.RegisterSystem;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+@RegisterSystem(
+    id = "mob_scale",
+    priority = 2,
+    toggleable = true,
+    description = "Scales mob sizes for better realism"
+)
 public class MobScale implements Listener {
-    private final Atom plugin;
+    private final Plugin plugin;
     private static final Map<EntityType, Double> MOB_SCALES = new HashMap<>();
     
     static {
@@ -92,7 +100,7 @@ public class MobScale implements Listener {
         MOB_SCALES.put(EntityType.ALLAY, 0.28);          
     }
     
-    public MobScale(Atom plugin) {
+    public MobScale(Plugin plugin) {
         this.plugin = plugin;
     }
     

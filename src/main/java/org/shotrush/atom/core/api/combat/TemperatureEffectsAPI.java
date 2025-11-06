@@ -109,30 +109,21 @@ public class TemperatureEffectsAPI {
     
     private static void spawnColdParticles(Player player, int count) {
         
-        Location loc = player.getEyeLocation();
+        Location loc = player.getLocation().add(0, 1.5, 0);
         
         
-        org.bukkit.util.Vector direction = loc.getDirection();
+        org.bukkit.util.Vector direction = player.getEyeLocation().getDirection();
         
         
-        loc.add(direction.multiply(0.3));
+        loc.add(direction.multiply(0.4));
         
         
         player.getWorld().spawnParticle(
             Particle.CLOUD,
             loc,
             count,
-            0.1, 0.1, 0.1,
-            0.02
-        );
-        
-        
-        player.getWorld().spawnParticle(
-            Particle.SNOWFLAKE,
-            loc,
-            count / 2,
-            0.15, 0.15, 0.15,
-            0.01
+            0.15, 0.08, 0.15,  
+            0.01  
         );
     }
 }

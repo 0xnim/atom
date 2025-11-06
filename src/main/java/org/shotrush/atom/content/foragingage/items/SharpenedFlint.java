@@ -1,5 +1,8 @@
 package org.shotrush.atom.content.foragingage.items;
 
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.Consumable;
+import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -8,6 +11,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.core.items.CustomItem;
 import org.shotrush.atom.core.items.annotation.AutoRegister;
+import org.shotrush.atom.core.util.ActionBarManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -49,6 +53,21 @@ public class SharpenedFlint extends CustomItem {
         org.shotrush.atom.core.util.ItemUtil.setCustomModelName(meta, "sharpened_flint");
     }
     
+    @Override
+    public ItemStack create() {
+        ItemStack item = super.create();
+        
+        
+        Consumable consumable = Consumable.consumable()
+            .consumeSeconds(10000.0f)
+            .animation(ItemUseAnimation.BRUSH)
+            .hasConsumeParticles(false)
+            .build();
+        item.setData(DataComponentTypes.CONSUMABLE, consumable);
+        
+        return item;
+    }
+    
     public void damageItem(ItemStack item, Player player) {
         damageItem(item, player, 0.4);
     }
@@ -63,7 +82,7 @@ public class SharpenedFlint extends CustomItem {
             
             if (currentAmount - 1 <= 0) {
                 player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
-                org.shotrush.atom.core.ui.ActionBarManager.send(player, "§cYour Sharpened Flint broke!");
+                ActionBarManager.send(player, "§cYour Sharpened Flint broke!");
             } else {
                 player.getWorld().playSound(player.getLocation(), Sound.BLOCK_STONE_HIT, 0.5f, 1.2f);
             }

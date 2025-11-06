@@ -13,11 +13,16 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
-import org.shotrush.atom.core.systems.annotation.AutoRegisterSystem;
 
 import java.util.*;
+import org.shotrush.atom.core.api.annotation.RegisterSystem;
 
-@AutoRegisterSystem(priority = 1)
+@RegisterSystem(
+    id = "gravity_system",
+    priority = 1,
+    toggleable = true,
+    description = "Handles block gravity mechanics"
+)
 public class GravitySystem implements Listener {
     
     private final Plugin plugin;

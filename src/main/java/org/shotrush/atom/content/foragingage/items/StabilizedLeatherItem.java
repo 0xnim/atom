@@ -42,7 +42,7 @@ public class StabilizedLeatherItem extends CustomItem {
 
     @Override
     protected void applyCustomMeta(ItemMeta meta) {
-        
+        org.shotrush.atom.core.util.ItemUtil.setCustomModelName(meta, "leather_cured");
     }
     
     public static void setAnimalSource(ItemMeta meta, String animalType) {

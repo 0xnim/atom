@@ -11,9 +11,6 @@ import org.shotrush.atom.core.blocks.BlockType;
 import org.shotrush.atom.core.blocks.CustomBlockRegistry;
 import org.shotrush.atom.core.items.CustomItem;
 import org.shotrush.atom.core.items.CustomItemRegistry;
-import org.shotrush.atom.core.recipe.Recipe;
-import org.shotrush.atom.core.recipe.RecipeManager;
-import org.shotrush.atom.core.recipe.RecipeProvider;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -150,70 +147,8 @@ public class AutoRegisterManager {
         }
     }
     
-    public static void registerRecipes(Plugin plugin, RecipeManager recipeManager) {
-        plugin.getLogger().info("=== STARTING RECIPE REGISTRATION ===");
-        Reflections reflections = new Reflections("org.shotrush.atom");
-
-        Set<Class<?>> annotatedClasses = reflections.getTypesAnnotatedWith(
-            org.shotrush.atom.core.recipe.annotation.AutoRegister.class
-        );
-        
-        List<Class<?>> sortedClasses = new ArrayList<>(annotatedClasses);
-        sortedClasses.sort(Comparator.comparingInt(cls -> 
-            cls.getAnnotation(org.shotrush.atom.core.recipe.annotation.AutoRegister.class).priority()
-        ));
-        
-        for (Class<?> clazz : sortedClasses) {
-            if (RecipeProvider.class.isAssignableFrom(clazz)) {
-                try {
-                    RecipeProvider provider = (RecipeProvider) clazz.getConstructor().newInstance();
-                    List<Recipe> recipes = provider.getRecipes();
-                    for (Recipe recipe : recipes) {
-                        recipeManager.registerRecipe(recipe);
-                        plugin.getLogger().info("Auto-registered recipe: " + recipe.getId());
-                    }
-                } catch (Exception e) {
-                    plugin.getLogger().warning("Failed to auto-register recipe provider: " + clazz.getName());
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        Set<Method> annotatedMethods = reflections.getMethodsAnnotatedWith(
-            org.shotrush.atom.core.recipe.annotation.RegisterRecipe.class
-        );
-        
-        plugin.getLogger().info("Found " + annotatedMethods.size() + " methods with @RegisterRecipe annotation");
-        
-        List<Method> sortedMethods = new ArrayList<>(annotatedMethods);
-        sortedMethods.sort(Comparator.comparingInt(method -> 
-            method.getAnnotation(org.shotrush.atom.core.recipe.annotation.RegisterRecipe.class).priority()
-        ));
-        
-        for (Method method : sortedMethods) {
-            plugin.getLogger().info("Processing method: " + method.getDeclaringClass().getName() + "." + method.getName());
-            if (Modifier.isStatic(method.getModifiers()) && 
-                Recipe.class.isAssignableFrom(method.getReturnType()) &&
-                method.getParameterCount() == 0) {
-                try {
-                    Recipe recipe = (Recipe) method.invoke(null);
-                    if (recipe != null) {
-                        recipeManager.registerRecipe(recipe);
-                        plugin.getLogger().info("Auto-registered recipe from method: " + method.getName() + " -> " + recipe.getId());
-                    } else {
-                        plugin.getLogger().warning("Method " + method.getName() + " returned null recipe");
-                    }
-                } catch (Exception e) {
-                    plugin.getLogger().warning("Failed to register recipe from method: " + method.getName());
-                    e.printStackTrace();
-                }
-            } else {
-                plugin.getLogger().warning("Method " + method.getName() + " doesn't meet requirements: static=" + 
-                    Modifier.isStatic(method.getModifiers()) + ", returns Recipe=" + 
-                    Recipe.class.isAssignableFrom(method.getReturnType()) + ", params=" + method.getParameterCount());
-            }
-        }
-    }
+    
+    
     
     public static void registerSystems(Plugin plugin) {
         Reflections reflections = new Reflections("org.shotrush.atom");

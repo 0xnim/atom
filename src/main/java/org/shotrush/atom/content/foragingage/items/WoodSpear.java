@@ -2,14 +2,10 @@ package org.shotrush.atom.content.foragingage.items;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Sound;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.core.items.CustomItem;
 import org.shotrush.atom.core.items.annotation.AutoRegister;
-import org.shotrush.atom.core.ui.ActionBarManager;
 
 import java.util.Arrays;
 import java.util.List;

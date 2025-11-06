@@ -1,6 +1,14 @@
 package org.shotrush.atom.content.foragingage.items;
 
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.Consumable;
+import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.core.items.CustomItem;
@@ -23,7 +31,7 @@ public class KnifeItem extends CustomItem {
     
     @Override
     public Material getMaterial() {
-        return Material.IRON_SWORD;
+        return Material.WOODEN_SWORD;
     }
     
     @Override
@@ -44,5 +52,18 @@ public class KnifeItem extends CustomItem {
     @Override
     protected void applyCustomMeta(ItemMeta meta) {
         org.shotrush.atom.core.util.ItemUtil.setCustomModelName(meta, "flint_knife");
+    }
+    
+    @Override
+    public ItemStack create() {
+        ItemStack item = super.create();
+
+        Consumable consumable = Consumable.consumable()
+            .consumeSeconds(10000.0f)
+            .animation(ItemUseAnimation.BRUSH)
+            .build();
+        item.setData(DataComponentTypes.CONSUMABLE, consumable);
+        
+        return item;
     }
 }

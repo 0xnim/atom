@@ -20,7 +20,7 @@ import org.shotrush.atom.Atom;
 import org.shotrush.atom.content.blocks.cog.CogManager;
 import org.shotrush.atom.core.blocks.annotation.AutoRegister;
 import org.shotrush.atom.core.data.PersistentData;
-import org.shotrush.atom.core.ui.ActionBarManager;
+import org.shotrush.atom.core.util.ActionBarManager;
 
 import java.lang.reflect.Constructor;
 import java.util.*;

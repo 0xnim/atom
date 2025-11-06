@@ -7,7 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import org.shotrush.atom.Atom;
 import org.shotrush.atom.commands.annotation.AutoRegister;
 import org.shotrush.atom.core.items.CustomItem;
-import org.shotrush.atom.core.ui.ActionBarManager;
+import org.shotrush.atom.core.util.ActionBarManager;
 
 @AutoRegister(priority = 6)
 @CommandAlias("spear|woodspear")
