@@ -29,7 +29,7 @@ public class AgeAnnouncementHandler implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         
-        // Delay announcement slightly to ensure player is fully loaded
+        
         org.shotrush.atom.core.api.scheduler.SchedulerAPI.runTaskLater(player, () -> {
             String currentAge = getCurrentAge();
             String lastSeenAge = PlayerDataAPI.getString(player, LAST_SEEN_AGE_KEY, "");
@@ -38,28 +38,26 @@ public class AgeAnnouncementHandler implements Listener {
                 announceAgeToPlayer(player, currentAge);
                 PlayerDataAPI.setString(player, LAST_SEEN_AGE_KEY, currentAge);
             }
-        }, 40L); // 2 seconds delay
+        }, 40L); 
     }
     
-    /**
-     * Announces an age switch to the entire server
-     */
+    
     public static void announceAgeSwitch(String previousAge, String newAge) {
         if (instance == null) return;
         
         String previousDisplayName = getAgeDisplayName(previousAge);
         String newDisplayName = getAgeDisplayName(newAge);
         
-        // Send title to all players
+        
         for (Player player : Bukkit.getOnlinePlayers()) {
-            // Main title - elegant and royal
+            
             player.sendTitle(
                 "§f§lThe Progress of Humanity",
                 "§7" + previousDisplayName + " §8→ §f" + newDisplayName,
                 20, 120, 40
             );
             
-            // Elegant sound progression
+            
             player.playSound(player.getLocation(), org.bukkit.Sound.BLOCK_BELL_USE, 1.0f, 0.8f);
             org.shotrush.atom.core.api.scheduler.SchedulerAPI.runTaskLater(player, () -> {
                 player.playSound(player.getLocation(), org.bukkit.Sound.BLOCK_BELL_USE, 1.0f, 1.0f);
@@ -72,36 +70,30 @@ public class AgeAnnouncementHandler implements Listener {
         }
     }
     
-    /**
-     * Announces the current age to a specific player
-     */
+    
     private void announceAgeToPlayer(Player player, String age) {
         String displayName = getAgeDisplayName(age);
         
-        // Send title
+        
         player.sendTitle(
             "§f§lThe Current Age",
             "§7" + displayName,
             20, 100, 30
         );
         
-        // Elegant bell sound
+        
         player.playSound(player.getLocation(), org.bukkit.Sound.BLOCK_BELL_USE, 1.0f, 1.0f);
     }
     
-    /**
-     * Gets the current age from the server
-     */
+    
     private String getCurrentAge() {
-        // This should integrate with your age system
-        // For now, return a default value
+        
+        
         return PlayerDataAPI.getString(Bukkit.getOnlinePlayers().iterator().hasNext() ? 
             Bukkit.getOnlinePlayers().iterator().next() : null, "current_age", "foraging_age");
     }
     
-    /**
-     * Gets the display name for an age
-     */
+    
     private static String getAgeDisplayName(String age) {
         switch (age.toLowerCase()) {
             case "foraging_age":
@@ -124,9 +116,7 @@ public class AgeAnnouncementHandler implements Listener {
         }
     }
     
-    /**
-     * Gets the description for an age
-     */
+    
     private static String getAgeDescription(String age) {
         switch (age.toLowerCase()) {
             case "foraging_age":

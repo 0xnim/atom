@@ -78,11 +78,9 @@ public class CustomBlockTypeDropHandler implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onCustomBlockBreak(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player)) return;
-        if (!(event.getEntity() instanceof Interaction)) return;
+        if (!(event.getEntity() instanceof Interaction interaction)) return;
+
         
-        Interaction interaction = (Interaction) event.getEntity();
-        
-        // Find the custom block associated with this interaction
         CustomBlockManager manager = plugin.getBlockManager();
         if (manager == null) return;
         
@@ -90,17 +88,17 @@ public class CustomBlockTypeDropHandler implements Listener {
             if (block.getInteractionUUID() != null && 
                 block.getInteractionUUID().equals(interaction.getUniqueId())) {
                 
-                // Check if this block type has custom drops
+                
                 DropConfigWithAge dropConfig = customDrops.get(block.getClass());
                 if (dropConfig == null) return;
                 
-                // Check age restriction
+                
                 String currentAge = plugin.getAgeManager().getCurrentAge().getId();
                 if (!dropConfig.allowedAges.isEmpty() && !dropConfig.allowedAges.contains(currentAge)) {
                     return;
                 }
                 
-                // Process each drop
+                
                 for (DropConfig drop : dropConfig.drops) {
                     if (random.nextDouble() <= drop.chance) {
                         int amount = drop.min;
@@ -110,7 +108,7 @@ public class CustomBlockTypeDropHandler implements Listener {
                         
                         ItemStack itemToDrop;
                         
-                        // Check if it's a custom item or vanilla material
+                        
                         if (!drop.customItemId.isEmpty()) {
                             itemToDrop = plugin.getItemRegistry().createItem(drop.customItemId);
                             if (itemToDrop == null) {

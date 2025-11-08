@@ -36,7 +36,7 @@ public class RecipeUnlockHandler implements Listener {
     private static final Map<NamespacedKey, List<RecipeChoice>> recipeIngredients = new HashMap<>();
     
     public RecipeUnlockHandler(Plugin plugin) {
-        // Extract recipe ingredients after server startup
+        
         org.shotrush.atom.core.api.scheduler.SchedulerAPI.runGlobalTaskLater(this::extractRecipeIngredients, 40L);
     }
     

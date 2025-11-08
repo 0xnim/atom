@@ -264,7 +264,7 @@ public class ThirstSystem implements Listener {
         if (player.isInWater() || player.getEyeLocation().getBlock().getType() == Material.WATER) {
             player.setRemainingAir(Math.min(300, airValue));
         } else {
-            // Allow air to reach 0 when thirst is 0
+            
             player.setRemainingAir(airValue);
         }
         

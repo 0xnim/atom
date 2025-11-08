@@ -21,10 +21,10 @@ public class Campfire extends CustomBlock implements Listener {
     
     private boolean lit;
     private long lastFuelTime;
-    private static final long BURN_DURATION = 120000; // 2 minutes in milliseconds
+    private static final long BURN_DURATION = 120000; 
     private static final String LIGHTING_ITEM = "pebble";
     
-    // Static listener registration
+    
     static {
         Atom plugin = Atom.getInstance();
         if (plugin != null) {
@@ -35,13 +35,13 @@ public class Campfire extends CustomBlock implements Listener {
     public Campfire(Location spawnLocation, Location blockLocation, BlockFace blockFace) {
         super(spawnLocation, blockLocation, blockFace);
         this.lit = false;
-        this.lastFuelTime = System.currentTimeMillis(); // Start with fuel (straw included in craft)
+        this.lastFuelTime = System.currentTimeMillis(); 
     }
     
     public Campfire(Location spawnLocation, BlockFace blockFace) {
         super(spawnLocation, blockFace);
         this.lit = false;
-        this.lastFuelTime = System.currentTimeMillis(); // Start with fuel (straw included in craft)
+        this.lastFuelTime = System.currentTimeMillis(); 
     }
     
     public boolean isLit() {
@@ -50,6 +50,7 @@ public class Campfire extends CustomBlock implements Listener {
     
     public void light() {
         this.lit = true;
+        this.lastFuelTime = System.currentTimeMillis(); 
         updateVisual();
     }
     
@@ -78,9 +79,9 @@ public class Campfire extends CustomBlock implements Listener {
     @Override
     public boolean onWrenchInteract(Player player, boolean sneaking) {
         if (sneaking) {
-            return false; // Allow default removal behavior
+            return false; 
         }
-        return false; // Don't handle wrench interaction
+        return false; 
     }
     
     @Override
@@ -94,31 +95,11 @@ public class Campfire extends CustomBlock implements Listener {
             ActionBarManager.send(player, "§7The campfire has burned out");
         }
         
-        // Check for straw to add fuel
-        CustomItem straw = Atom.getInstance().getItemRegistry().getItem("straw");
-        if (straw != null && straw.isCustomItem(heldItem)) {
-            if (!sneaking) {
-                addFuel();
-                heldItem.setAmount(heldItem.getAmount() - 1);
-                
-                long remainingTime = BURN_DURATION - (System.currentTimeMillis() - lastFuelTime);
-                int remainingMinutes = (int) (remainingTime / 60000);
-                int remainingSeconds = (int) ((remainingTime % 60000) / 1000);
-                
-                ActionBarManager.send(player, "§aFuel added! Burns for " + remainingMinutes + "m " + remainingSeconds + "s");
-                return true;
-            }
-        }
         
-        // Check for lighting item - start the lighting process
         CustomItem lightingItem = Atom.getInstance().getItemRegistry().getItem(LIGHTING_ITEM);
         if (lightingItem != null && lightingItem.isCustomItem(heldItem)) {
-            Atom.getInstance().getLogger().info("Pebble detected, starting lighting for " + player.getName());
             if (!CampfireHandler.isLighting(player)) {
-                Atom.getInstance().getLogger().info("Starting campfire lighting process");
                 CampfireHandler.startLighting(player, this);
-            } else {
-                Atom.getInstance().getLogger().info("Player is already lighting");
             }
             return true;
         }
@@ -175,7 +156,7 @@ public class Campfire extends CustomBlock implements Listener {
     public String[] getLore() {
         return new String[]{
             "§7A campfire for warmth and cooking",
-            "§7Add straw for fuel",
+            "§7Burns for 2 minutes",
             "§7Light with a pebble"
         };
     }
@@ -199,7 +180,7 @@ public class Campfire extends CustomBlock implements Listener {
         return this;
     }
     
-    // Static listener class for campfire interactions
+    
     private static class CampfireInteractionListener implements Listener {
         @EventHandler
         public void onCampfireInteract(PlayerInteractEvent event) {
@@ -207,7 +188,7 @@ public class Campfire extends CustomBlock implements Listener {
             if (event.getClickedBlock() == null) return;
             if (event.getClickedBlock().getType() != Material.CAMPFIRE) return;
             
-            // Find if this is our custom campfire
+            
             Location clickedLoc = event.getClickedBlock().getLocation();
             Campfire campfire = Atom.getInstance().getBlockManager().getBlocks().stream()
                 .filter(b -> b instanceof Campfire)
@@ -220,7 +201,7 @@ public class Campfire extends CustomBlock implements Listener {
             
             Atom.getInstance().getLogger().info("Found custom campfire at " + clickedLoc);
             
-            // Handle the interaction
+            
             Player player = event.getPlayer();
             campfire.onInteract(player, player.isSneaking());
         }

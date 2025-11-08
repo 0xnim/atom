@@ -44,15 +44,15 @@ public class WaterskinHandler implements Listener {
         if (event.getAction() == Action.RIGHT_CLICK_AIR || 
             event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             
-            // Use raytrace to check if looking at water
+            
             org.bukkit.util.RayTraceResult result = player.rayTraceBlocks(5, org.bukkit.FluidCollisionMode.SOURCE_ONLY);
             
             if (result != null && result.getHitBlock() != null && isWaterSource(result.getHitBlock().getType())) {
-                // Fill waterskin
+                
                 fillWaterskin(player, item, result.getHitBlock());
                 event.setCancelled(true);
             } else if (Waterskin.getWaterAmount(item) > 0) {
-                // Drink waterskin
+                
                 drinkWaterskin(player, item);
                 event.setCancelled(true);
             }

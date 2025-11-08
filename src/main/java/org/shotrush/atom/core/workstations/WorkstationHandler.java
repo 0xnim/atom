@@ -155,7 +155,7 @@ public abstract class WorkstationHandler<T extends WorkstationHandler.WorkProgre
     }
     
     protected void onProcessingCancelled(Player player) {
-        // Override in subclass if needed
+        
     }
     
     public boolean isProcessing(Player player) {

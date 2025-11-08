@@ -58,15 +58,15 @@ public class CustomEntityDropHandler implements Listener {
         Set<String> allowedAges = new HashSet<>(Arrays.asList(annotation.ages()));
         Set<EntityType> targetEntities = new HashSet<>();
         
-        // Add specific entities
+        
         targetEntities.addAll(Arrays.asList(annotation.entities()));
         
-        // Add entities from categories
+        
         for (CustomEntityDrops.EntityCategory category : annotation.categories()) {
             targetEntities.addAll(getEntitiesFromCategory(category));
         }
         
-        // Register drops for all target entities
+        
         for (EntityType entityType : targetEntities) {
             List<DropConfigWithAge> drops = customDrops.computeIfAbsent(entityType, k -> new ArrayList<>());
             
@@ -123,10 +123,10 @@ public class CustomEntityDropHandler implements Listener {
         
         List<DropConfigWithAge> drops = customDrops.get(entityType);
         
-        // Get current age
+        
         String currentAge = Atom.getInstance().getAgeManager().getCurrentAge().getId();
         
-        // Filter drops by age
+        
         List<DropConfigWithAge> applicableDrops = new ArrayList<>();
         boolean shouldReplaceVanilla = false;
         
@@ -143,13 +143,13 @@ public class CustomEntityDropHandler implements Listener {
             return;
         }
         
-        // Replace vanilla drops if configured
+        
         if (shouldReplaceVanilla) {
             event.getDrops().clear();
             event.setDroppedExp(random.nextInt(3) + 1);
         }
         
-        // Add custom drops
+        
         String animalName = getAnimalDisplayName(entityType);
         
         for (DropConfigWithAge drop : applicableDrops) {
@@ -165,7 +165,7 @@ public class CustomEntityDropHandler implements Listener {
                 if (itemToDrop != null) {
                     itemToDrop.setAmount(amount);
                     
-                    // Add animal source metadata for bone and leather
+                    
                     ItemMeta meta = itemToDrop.getItemMeta();
                     if (meta != null) {
                         if (drop.customItemId.equals("bone")) {

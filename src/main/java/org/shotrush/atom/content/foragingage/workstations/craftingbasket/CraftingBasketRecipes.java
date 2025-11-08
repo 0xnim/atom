@@ -136,18 +136,18 @@ public class CraftingBasketRecipes {
     }
     
     private void registerStrawCampfireRecipe() {
-        // Register a campfire recipe for straw so it can be placed on campfires
+        
         ItemStack strawItem = Atom.getInstance().getItemRegistry().createItem("straw");
         if (strawItem != null) {
             org.bukkit.NamespacedKey key = new org.bukkit.NamespacedKey(Atom.getInstance(), "straw_campfire");
-            // 120000ms = 120 seconds = 2 minutes, convert to ticks (20 ticks/second)
-            int cookingTimeTicks = (120000 / 1000) * 20; // 2400 ticks
+            
+            int cookingTimeTicks = (120000 / 1000) * 20; 
             org.bukkit.inventory.CampfireRecipe recipe = new org.bukkit.inventory.CampfireRecipe(
                 key,
-                strawItem, // Result (same as input, no transformation)
+                strawItem, 
                 new org.bukkit.inventory.RecipeChoice.ExactChoice(strawItem),
-                0.0f, // No experience
-                cookingTimeTicks // 2 minutes = 2400 ticks
+                0.0f, 
+                cookingTimeTicks 
             );
             org.bukkit.Bukkit.addRecipe(recipe);
         }

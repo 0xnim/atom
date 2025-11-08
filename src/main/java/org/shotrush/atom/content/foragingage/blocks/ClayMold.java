@@ -16,7 +16,7 @@ import org.shotrush.atom.core.blocks.annotation.AutoRegister;
 public class ClayMold extends CustomBlock {
     
     private boolean filled;
-    private String oreType; // Type of ore in the mold (e.g., "Copper", "Iron", etc.)
+    private String oreType; 
     
     public ClayMold(Location spawnLocation, Location blockLocation, BlockFace blockFace) {
         this(spawnLocation, blockLocation, blockFace, false, null);
@@ -49,7 +49,7 @@ public class ClayMold extends CustomBlock {
     public void setFilled(boolean filled, String oreType) {
         this.filled = filled;
         this.oreType = oreType;
-        // Respawn the display with the new model
+        
         if (spawnLocation.getWorld() != null) {
             spawn(Atom.getInstance());
         }

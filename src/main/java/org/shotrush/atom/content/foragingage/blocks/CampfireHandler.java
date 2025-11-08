@@ -47,7 +47,7 @@ public class CampfireHandler extends WorkstationHandler<CampfireHandler.Lighting
         Location particleLoc = location.clone().add(0, 0.5, 0);
         world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, particleLoc, 3, 0.1, 0.1, 0.1, 0.01);
         
-        // Occasional spark
+        
         if (Math.random() < 0.3) {
             world.spawnParticle(Particle.LAVA, particleLoc, 1, 0.1, 0.1, 0.1, 0);
         }
@@ -62,7 +62,7 @@ public class CampfireHandler extends WorkstationHandler<CampfireHandler.Lighting
         Campfire campfire;
         
         LightingProgress(long startTime, Location location, Campfire campfire) {
-            super(startTime, 8 + (int)(Math.random() * 5), location); // 8-12 strikes
+            super(startTime, 8 + (int)(Math.random() * 5), location); 
             this.campfire = campfire;
         }
     }
@@ -103,7 +103,7 @@ public class CampfireHandler extends WorkstationHandler<CampfireHandler.Lighting
     }
     
     private static void finishLighting(Player player, Campfire campfire) {
-        // Small chance to fail
+        
         if (Math.random() < 0.15) {
             ActionBarManager.send(player, "§cThe sparks didn't catch! Try again.");
             ActionBarManager.clearStatus(player);
@@ -111,14 +111,14 @@ public class CampfireHandler extends WorkstationHandler<CampfireHandler.Lighting
             return;
         }
         
-        // Success!
+        
         campfire.light();
         ActionBarManager.send(player, "§aThe campfire ignites!");
         ActionBarManager.clearStatus(player);
         player.playSound(player.getLocation(), Sound.ITEM_FLINTANDSTEEL_USE, 1.0f, 1.0f);
         player.playSound(player.getLocation(), Sound.BLOCK_FIRE_AMBIENT, 1.0f, 1.0f);
         
-        // Spawn ignition particles
+        
         World world = campfire.getSpawnLocation().getWorld();
         if (world != null) {
             Location particleLoc = campfire.getSpawnLocation().clone().add(0, 0.5, 0);

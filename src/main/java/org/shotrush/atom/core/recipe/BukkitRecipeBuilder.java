@@ -77,7 +77,7 @@ public class BukkitRecipeBuilder {
     
     public BukkitRecipeBuilder ingredient(ItemStack customItem) {
         if (isShaped) throw new IllegalStateException("Use shape() and setIngredient() for shaped recipes");
-        shapelessIngredients.add(new RecipeChoice.ExactChoice(customItem));
+        shapelessIngredients.add(new CustomItemChoice(customItem));
         return this;
     }
     
@@ -88,7 +88,7 @@ public class BukkitRecipeBuilder {
         if (item == null) {
             throw new IllegalArgumentException("Custom item not found: " + customItemId);
         }
-        shapelessIngredients.add(new RecipeChoice.ExactChoice(item));
+        shapelessIngredients.add(new CustomItemChoice(item));
         return this;
     }
     
@@ -105,7 +105,7 @@ public class BukkitRecipeBuilder {
             org.shotrush.atom.core.data.PersistentData.set(item.getItemMeta(), "quality", quality.name());
         }
         
-        shapelessIngredients.add(new RecipeChoice.ExactChoice(item));
+        shapelessIngredients.add(new CustomItemChoice(item));
         return this;
     }
     
@@ -152,7 +152,7 @@ public class BukkitRecipeBuilder {
     
     public BukkitRecipeBuilder setIngredient(char key, ItemStack customItem) {
         if (!isShaped) throw new IllegalStateException("Use ingredient() for shapeless recipes");
-        shapedIngredients.put(key, new RecipeChoice.ExactChoice(customItem));
+        shapedIngredients.put(key, new CustomItemChoice(customItem));
         return this;
     }
     
@@ -163,7 +163,7 @@ public class BukkitRecipeBuilder {
         if (item == null) {
             throw new IllegalArgumentException("Custom item not found: " + customItemId);
         }
-        shapedIngredients.put(key, new RecipeChoice.ExactChoice(item));
+        shapedIngredients.put(key, new CustomItemChoice(item));
         return this;
     }
     
@@ -180,7 +180,7 @@ public class BukkitRecipeBuilder {
             org.shotrush.atom.core.data.PersistentData.set(item.getItemMeta(), "quality", quality.name());
         }
         
-        shapedIngredients.put(key, new RecipeChoice.ExactChoice(item));
+        shapedIngredients.put(key, new CustomItemChoice(item));
         return this;
     }
     
