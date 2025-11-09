@@ -19,12 +19,13 @@ categories:
     icon: atom:pebble
     list:
       - '#atom:animal_product'
+      - 'atom:knapping_station'
       - 'atom:sharpened_flint'
       - 'atom:pebble'
       - 'atom:flint_knife'
+      - 'atom:flint_spear'
       - 'atom:straw'
       - 'atom:pressure_flaker'
-      - 'atom:flint_spear'
   atom:copper:
     name: <!i><white><lang:category.copper.name></white>
     hidden: true
