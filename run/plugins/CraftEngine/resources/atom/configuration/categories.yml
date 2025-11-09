@@ -6,6 +6,7 @@ categories:
       - <!i><gray><i18n:category.atom.lore>
     icon: atom:sharpened_flint
     list:
+      - '#atom:animal_product'
       - '#atom:foraging'
   atom:foraging:
     name: <!i><white><i18n:category.foraging.name></white>
@@ -14,5 +15,8 @@ categories:
       - <!i><gray><i18n:category.foraging.lore>
     icon: atom:pebble
     list:
+      - '#atom:animal_product'
       - 'atom:sharpened_flint'
       - 'atom:pebble'
+      - 'atom:flint_knife'
+

@@ -18,18 +18,12 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
-import net.momirealms.craftengine.bukkit.api.CraftEngineItems;
-import net.momirealms.craftengine.bukkit.item.BukkitItemManager;
-import org.shotrush.atom.Atom;
-import org.shotrush.atom.content.foragingage.items.SharpenedFlint;
-import org.shotrush.atom.core.items.CustomItemRegistry;
+import org.shotrush.atom.content.foraging.items.SharpenedFlint;
 import org.shotrush.atom.core.util.ActionBarManager;
 
 import java.util.HashMap;
 import java.util.Map;
 import org.shotrush.atom.core.api.annotation.RegisterSystem;
-import org.shotrush.atom.item.Items;
-import org.shotrush.atom.item.ItemsKt;
 
 @RegisterSystem(
     id = "wood_harvesting_system",

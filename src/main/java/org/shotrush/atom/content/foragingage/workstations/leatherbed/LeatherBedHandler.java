@@ -8,7 +8,7 @@ import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.Atom;
 import org.shotrush.atom.content.foragingage.items.LeatherItem;
 import org.shotrush.atom.content.foragingage.items.MeatItem;
-import org.shotrush.atom.content.foragingage.items.SharpenedFlint;
+import org.shotrush.atom.content.foraging.items.SharpenedFlint;
 import org.shotrush.atom.core.blocks.InteractiveSurface;
 import org.shotrush.atom.core.items.CustomItem;
 import org.shotrush.atom.core.util.ActionBarManager;
@@ -135,8 +135,7 @@ public class LeatherBedHandler extends WorkstationHandler<LeatherBedHandler.Brus
         if (leatherItem.hasItemMeta()) {
             animalSource = LeatherItem.getAnimalSource(leatherItem.getItemMeta());
         }
-        
-        
+
         ItemStack meat = Atom.getInstance().getItemRegistry().createItem("raw_meat");
         if (meat != null) {
             if (animalSource != null && meat.hasItemMeta()) {

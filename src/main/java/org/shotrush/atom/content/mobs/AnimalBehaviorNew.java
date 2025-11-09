@@ -29,13 +29,13 @@ import java.util.*;
 import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.core.api.annotation.RegisterSystem;
 
-@RegisterSystem(
-    id = "animal_behavior",
-    priority = 4,
-    toggleable = true,
-    provides = {"herd_manager"},
-    description = "Advanced animal AI with herding behavior"
-)
+//@RegisterSystem(
+//    id = "animal_behavior",
+//    priority = 4,
+//    toggleable = true,
+//    provides = {"herd_manager"},
+//    description = "Advanced animal AI with herding behavior"
+//)
 public class AnimalBehaviorNew implements Listener {
     
     private final Atom plugin;

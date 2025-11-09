@@ -4,10 +4,16 @@ import net.momirealms.craftengine.bukkit.api.CraftEngineItems
 import net.momirealms.craftengine.core.item.CustomItem
 import net.momirealms.craftengine.core.util.Key
 import org.bukkit.inventory.ItemStack
+import org.shotrush.atom.content.AnimalProduct
+import org.shotrush.atom.content.AnimalType
 import kotlin.reflect.KProperty
 
 object Items {
     val SharpenedFlint by item("atom:sharpened_flint")
+
+    fun getAnimalProduct(type: AnimalType, product: AnimalProduct): CustomItem<ItemStack> {
+        return CraftEngineItems.byId(Key.of("atom", "animal_${product.id}_${type.id}"))!!
+    }
 }
 
 fun item(key: Key) = CEItem(key)

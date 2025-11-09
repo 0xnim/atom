@@ -1,0 +1,21 @@
+items:
+  atom:flint_knife:
+    material: wooden_sword
+    data:
+      item-name: <!i><white><l10n:item.flint_knife.name>
+      lore:
+        - <!i><gray><l10n:item.flint_knife.lore_1>
+        - <!i><gray><l10n:item.flint_knife.lore_2>
+        - ""
+        - <!i><white><image:atom:badge_tool> <image:atom:badge_age_foraging>
+      remove-components:
+        - attribute_modifiers
+      components:
+        minecraft:consumable: {
+          consume_seconds: 30000,
+          animation: "brush"
+        }
+    model:
+      template: default:model/simplified_generated
+      arguments:
+        path: minecraft:item/flint_knife
