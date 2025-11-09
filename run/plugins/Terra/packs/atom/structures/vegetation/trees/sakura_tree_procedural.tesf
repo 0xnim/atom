@@ -140,3 +140,40 @@ num beeNestRoll = randomInt(30); // 1 in 30 chance
 if (beeNestRoll == 0) {
     structure(0, sideBranchMinHeight-1, 0, "bee_nest", "NONE");
 }
+
+// --- Random sticks around base ---
+// Config: max sticks and rarity control (higher = rarer)
+num maxSticks = 4;
+num attempts = 40;           // how many placement tries to find up to maxSticks
+num baseRadius = 8; // search radius around trunk at ground level
+num rareScale = 5;           // higher number = rarer overall spawns
+
+num placed = 0;
+for (num t = 0; t < attempts && placed <= maxSticks; t = t + 1) {
+    // Sample a candidate position with distance bias toward trunk.
+    // Use "rejection sampling": pick within square, reject outside circle sometimes.
+    num x = randomInt(baseRadius * 2 + 1) - baseRadius; // [-R, R]
+    num z = randomInt(baseRadius * 2 + 1) - baseRadius;
+
+    // Skip the trunk center
+    if (x == 0 && z == 0) continue;
+
+    // Compute squared distance and bias probability:
+    // Closer to center => higher chance. Farther => lower chance.
+    num d2 = x * x + z * z;
+    num r2 = baseRadius * baseRadius;
+    if (d2 > r2) continue;
+
+    // Distance bias: probNear ranges from ~1 near center to small near edge
+    // Using a smooth falloff curve (quadratic)
+    num probNearScaled = (r2 - d2) / r2;          // 1.0 at center, ~0 at edge
+    num probPermille = floor(probNearScaled * 1000); // 0..1000
+
+    // Add overall rarity gate
+    // Effective chance ~ probNearScaled / rareScale
+    if (randomInt(rareScale * 1000) >= probPermille) continue;
+
+    if (structure(x, 0, z, "ground_stick", "NONE")) {
+        placed = placed + 1;
+    }
+}
