@@ -15,36 +15,42 @@ images:
     font: minecraft:badges
     file: minecraft:font/badges/tool/tool.png
     char: '\ub001'
+  atom:badge_weapon:
+    height: 9
+    ascent: 8
+    font: minecraft:badges
+    file: minecraft:font/badges/weapon/stone.png
+    char: '\ub002'
   atom:badge_food:
     height: 9
     ascent: 8
     font: minecraft:badges
     file: minecraft:font/badges/food/food_b.png
-    char: '\ub002'
+    char: '\ub003'
   atom:badge_food_rare:
     height: 9
     ascent: 8
     font: minecraft:badges
     file: minecraft:font/badges/food/rare_food_b.png
-    char: '\ub003'
+    char: '\ub004'
   atom:badge_food_epic:
     height: 9
     ascent: 8
     font: minecraft:badges
     file: minecraft:font/badges/food/epic_food_b.png
-    char: '\ub004'
+    char: '\ub005'
   atom:badge_natural:
     height: 9
     ascent: 8
     font: minecraft:badges
     file: minecraft:font/badges/natural/natural_b.png
-    char: '\ub005'
+    char: '\ub006'
   atom:badge_material:
     height: 9
     ascent: 8
     font: minecraft:badges
     file: minecraft:font/badges/material/iron.png
-    char: '\ub006'
+    char: '\ub007'
   atom:badge_age_foraging:
     height: 9
     ascent: 8
