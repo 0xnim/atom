@@ -231,7 +231,7 @@ object KnappingRecipes {
         }
         register("saw_blade") {
             rows(
-                "## ",
+                "##  ",
                 " ###",
                 "  ##",
                 "   #",
