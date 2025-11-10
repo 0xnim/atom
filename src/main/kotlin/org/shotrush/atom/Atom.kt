@@ -12,6 +12,7 @@ import org.shotrush.atom.content.mobs.herd.HerdManager
 import org.shotrush.atom.content.systems.ItemHeatSystem
 import org.shotrush.atom.content.systems.PlayerTemperatureSystem
 import org.shotrush.atom.content.systems.ThirstSystem
+import org.shotrush.atom.content.workstation.Workstations
 import org.shotrush.atom.core.age.AgeManager
 import org.shotrush.atom.core.api.AtomAPI
 import org.shotrush.atom.core.api.player.PlayerDataAPI
@@ -51,6 +52,8 @@ class Atom : JavaPlugin() {
         AtomAPI.registerItems()
         AtomAPI.registerBlocks()
         AtomAPI.registerSystems()
+
+        Workstations.init()
 
         setupCommands()
         logger.info("Atom plugin has been enabled!")

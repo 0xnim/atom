@@ -50,7 +50,7 @@ dependencies {
     compileOnly("net.dmulloy2:ProtocolLib:5.4.0")
     compileOnly("net.momirealms:craft-engine-core:0.0.65")
     compileOnly("net.momirealms:craft-engine-bukkit:0.0.65")
-//    implementation("dev.triumphteam:triumph-gui-paper:4.0.0-SNAPSHOT")
+    compileOnly("net.momirealms:craft-engine-nms-helper:1.0.127")
     implementation("dev.triumphteam:triumph-gui-paper-kotlin:4.0.0-SNAPSHOT")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("com.github.shynixn.mccoroutine:mccoroutine-folia-api:2.22.0")
