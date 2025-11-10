@@ -9,6 +9,8 @@ categories:
       - '#atom:foraging'
       - '#atom:copper'
       - '#atom:bronze'
+      - '#atom:tools'
+      - '#atom:tool_heads'
       - '#atom:animal_product'
   atom:foraging:
     name: <!i><white><lang:category.foraging.name></white>
@@ -35,6 +37,7 @@ categories:
     icon: minecraft:copper_ingot
     list:
       - '#atom:molds'
+      - '#atom:tool_heads'
   atom:bronze:
     name: <!i><white><lang:category.bronze.name></white>
     hidden: true
