@@ -46,25 +46,6 @@ val rotateNeg90: Transform = { p ->
     Pattern(out.map { String(it) })
 }
 
-typealias MultiTransform = (Pattern) -> List<Pattern>
-
-val variants: MultiTransform = { p ->
-    val set = linkedSetOf<Pattern>()
-
-    fun addUnique(x: Pattern) {
-        set.add(x)
-    }
-
-    val vx = invertX(p)
-    val vy = invertY(p)
-    val r90 = rotate90(p)
-    val r270 = rotateNeg90(p)
-    val r180 = rotate90(r90)
-
-    listOf(vx, vy, r90, r180, r270, invertX(r90), invertY(r90)).forEach(::addUnique)
-    set.toList()
-}
-
 // Builder DSL: allows registering < 5x5 shapes
 class PatternSetBuilder(
     private val filledChars: Set<Char> = setOf('#'),
@@ -92,11 +73,6 @@ class PatternSetBuilder(
     fun transform(transform: Transform) {
         val prev = last ?: error("No previous pattern to transform")
         pattern(transform(prev))
-    }
-
-    fun transform(transform: MultiTransform) {
-        val prev = last ?: error("No previous pattern to transform")
-        transform(prev).forEach(::pattern)
     }
 
     fun build(): List<Pattern> = patterns.toList()
@@ -251,7 +227,7 @@ object KnappingRecipes {
                 "##",
                 "##",
             )
-            transform(variants)
+            transform(invertX)
         }
         register("saw_blade") {
             rows(
@@ -260,7 +236,7 @@ object KnappingRecipes {
                 "  ##",
                 "   #",
             )
-            transform(variants)
+            transform(invertX)
         }
     }
 }
