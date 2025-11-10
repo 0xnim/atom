@@ -1,0 +1,41 @@
+items:
+  atom:leather_bed:
+    material: nether_brick
+    data:
+      item-name: <!i><lang:item.leather_bed.name>
+      lore:
+        - <!i><gray><lang:item.leather_bed.lore_1>
+        - <!i><gray><lang:item.leather_bed.lore_2>
+        - ""
+        - <!i><white><image:atom:badge_workstation> <image:atom:badge_age_foraging>
+    model:
+      type: minecraft:model
+      path: minecraft:block/leather_bed
+    behavior:
+      type: block_item
+      block:
+        loot:
+          template: default:loot_table/self
+        settings:
+          template:
+            - default:sound/wood
+            - default:pickaxe_power/level_1
+          overrides:
+            hardness: 2.0
+            resistance: 3.0
+            replaceable: false
+            is-redstone-conductor: false
+            is-suffocating: false
+            instrument: bass
+            map-color: 10
+            tags:
+              - minecraft:mineable/axe
+        state:
+          auto-state: cactus
+          model:
+            path: minecraft:block/leather_bed
+lang:
+  en:
+    item.leather_bed.name: Leather Drying Bed
+    item.leather_bed.lore_1: "Place leather to process and cure"
+    item.leather_bed.lore_2: "Use sharpened flint or knife to scrape"

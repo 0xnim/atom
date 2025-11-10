@@ -1,6 +1,6 @@
 items:
   atom:sharpened_flint:
-    material: brush
+    material: flint
     data:
       item-name: <!i><white><lang:item.sharpened_flint.name>
       lore:

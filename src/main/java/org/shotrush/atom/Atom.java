@@ -16,6 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.shotrush.atom.core.workstations.WorkstationManager;
 
 public final class Atom extends JavaPlugin {
 
@@ -72,6 +73,11 @@ public final class Atom extends JavaPlugin {
     public void onDisable() {
         
         saveAllPlayerData();
+        
+        
+        if (WorkstationManager.getInstance() != null) {
+            WorkstationManager.getInstance().saveWorkstations();
+        }
         
         
         org.shotrush.atom.core.api.AtomAPI.shutdown();

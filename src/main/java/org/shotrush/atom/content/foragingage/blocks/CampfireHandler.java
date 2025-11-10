@@ -4,11 +4,12 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.Atom;
-import org.shotrush.atom.core.items.CustomItem;
 import org.shotrush.atom.core.util.ActionBarManager;
 import org.shotrush.atom.core.workstations.WorkstationHandler;
 import org.shotrush.atom.core.api.annotation.RegisterSystem;
@@ -37,9 +38,8 @@ public class CampfireHandler extends WorkstationHandler<CampfireHandler.Lighting
     }
     
     @Override
-    protected boolean isValidTool(ItemStack item) {
-        CustomItem pebble = Atom.getInstance().getItemRegistry().getItem("pebble");
-        return pebble != null && pebble.isCustomItem(item);
+    public boolean isValidTool(ItemStack item) {
+        return org.shotrush.atom.UtilKt.matches(item, "atom:pebble");
     }
     
     @Override
@@ -64,6 +64,46 @@ public class CampfireHandler extends WorkstationHandler<CampfireHandler.Lighting
     @Override
     protected String getStatusMessage() {
         return "§7Striking flint... Creating sparks";
+    }
+    
+    @Override
+    public org.joml.AxisAngle4f getItemRotation() {
+        return new org.joml.AxisAngle4f(0, 0, 0, 1);
+    }
+    
+    @Override
+    public org.joml.Vector3f getItemScale() {
+        return new org.joml.Vector3f(1, 1, 1);
+    }
+    
+    @Override
+    public boolean handleInteraction(PlayerInteractEvent event, Block block, Player player, ItemStack hand, org.shotrush.atom.core.workstations.WorkstationData data) {
+        return false; 
+    }
+    
+    @Override
+    public boolean canPlaceItem(ItemStack item) {
+        return false;
+    }
+    
+    @Override
+    public org.joml.Vector3f getPlacementPosition() {
+        return new org.joml.Vector3f(0, 0, 0);
+    }
+    
+    @Override
+    public int getMaxItems() {
+        return 0;
+    }
+    
+    @Override
+    public String getFullMessage() {
+        return "";
+    }
+    
+    @Override
+    public String getEmptyMessage() {
+        return "";
     }
     
     

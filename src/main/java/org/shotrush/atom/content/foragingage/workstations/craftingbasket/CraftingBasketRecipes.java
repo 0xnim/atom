@@ -82,10 +82,12 @@ public class CraftingBasketRecipes {
     }
     
     private void registerCraftingBasketBukkitRecipe() {
-        ItemStack craftingBasketItem = Atom.getInstance().getBlockManager().createBlockItem("crafting_basket");
-        if (craftingBasketItem != null) {
+        net.momirealms.craftengine.core.item.CustomItem<ItemStack> customItem = 
+            net.momirealms.craftengine.bukkit.api.CraftEngineItems.byId(net.momirealms.craftengine.core.util.Key.of("atom:crafting_basket"));
+        if (customItem != null) {
+            ItemStack item = customItem.buildItemStack();
             BukkitRecipeBuilder.shapeless("crafting_basket_recipe")
-                .result(craftingBasketItem)
+                .result(item)
                 .ingredient(Material.LEAF_LITTER, 3)
                 .ingredient(Material.VINE)
                 .register();
@@ -93,10 +95,12 @@ public class CraftingBasketRecipes {
     }
     
     private void registerKnappingStationBukkitRecipe() {
-        ItemStack knappingStationItem = Atom.getInstance().getBlockManager().createBlockItem("knapping_station");
-        if (knappingStationItem != null) {
+        net.momirealms.craftengine.core.item.CustomItem<ItemStack> customItem = 
+            net.momirealms.craftengine.bukkit.api.CraftEngineItems.byId(net.momirealms.craftengine.core.util.Key.of("atom:knapping_station"));
+        if (customItem != null) {
+            ItemStack item = customItem.buildItemStack();
             BukkitRecipeBuilder.shapeless("knapping_station_recipe")
-                .result(knappingStationItem)
+                .result(item)
                 .ingredient(Material.HAY_BLOCK)
                 .ingredient("uncured_leather")
                 .register();

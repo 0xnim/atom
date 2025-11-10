@@ -2,12 +2,12 @@ package org.shotrush.atom.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
-import org.bukkit.Location;
-import org.bukkit.block.Block;
+import net.momirealms.craftengine.bukkit.api.CraftEngineItems;
+import net.momirealms.craftengine.core.item.CustomItem;
+import net.momirealms.craftengine.core.util.Key;
 import org.bukkit.entity.Player;
-import org.shotrush.atom.Atom;
+import org.bukkit.inventory.ItemStack;
 import org.shotrush.atom.commands.annotation.AutoRegister;
-import org.shotrush.atom.content.foragingage.workstations.leatherbed.LeatherBedHandler;
 
 @AutoRegister(priority = 34)
 @CommandAlias("leatherbed|leatherrack")
@@ -17,27 +17,11 @@ public class LeatherBedCommand extends BaseCommand {
     @Default
     @CommandPermission("atom.leatherbed")
     public void onLeatherBed(Player player) {
-        Atom.getInstance().getBlockManager().giveBlockItem(player, "leather_bed");
-    }
-    
-    @Subcommand("finishcuring|cure")
-    @CommandPermission("atom.leatherbed.admin")
-    @Description("Instantly finish curing leather on the nearest leather bed")
-    public void onFinishCuring(Player player) {
-        Block targetBlock = player.getTargetBlockExact(5);
-        
-        if (targetBlock == null) {
-            player.sendMessage("§cNo block in range! Look at a leather bed.");
-            return;
-        }
-        
-        Location blockLoc = targetBlock.getLocation();
-        boolean finished = LeatherBedHandler.finishCuringNearby(blockLoc);
-        
-        if (finished) {
-            player.sendMessage("§aLeather curing completed instantly!");
-        } else {
-            player.sendMessage("§cNo curing leather found nearby. Make sure there's scraped leather on the bed.");
+        CustomItem<ItemStack> customItem = CraftEngineItems.byId(Key.of("atom:leather_bed"));
+        if (customItem != null) {
+            ItemStack item = customItem.buildItemStack();
+            player.getInventory().addItem(item);
+            player.sendMessage("§aYou received a Leather Drying Bed!");
         }
     }
 }

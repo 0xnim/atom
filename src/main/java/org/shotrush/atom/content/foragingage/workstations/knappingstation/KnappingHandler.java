@@ -1,19 +1,28 @@
 package org.shotrush.atom.content.foragingage.workstations.knappingstation;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import net.momirealms.craftengine.bukkit.api.CraftEngineItems;
+import net.momirealms.craftengine.core.item.CustomItem;
+import net.momirealms.craftengine.core.util.Key;
 import org.shotrush.atom.Atom;
 import org.shotrush.atom.core.api.item.ItemQualityAPI;
-import org.shotrush.atom.core.items.CustomItem;
 import org.shotrush.atom.core.items.ItemQuality;
 import org.shotrush.atom.core.util.ActionBarManager;
+import org.shotrush.atom.core.workstations.WorkstationData;
 import org.shotrush.atom.core.workstations.WorkstationHandler;
 import org.shotrush.atom.core.api.annotation.RegisterSystem;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
+import org.joml.Quaternionf;
 
 @RegisterSystem(
     id = "knapping_handler",
@@ -28,17 +37,88 @@ public class KnappingHandler extends WorkstationHandler<KnappingHandler.Knapping
     public KnappingHandler(Plugin plugin) {
         super();
         instance = this;
+        WorkstationData.registerHandler("knapping_station", this);
     }
     
     @Override
-    protected boolean isValidTool(ItemStack item) {
-        CustomItem pebble = Atom.getInstance().getItemRegistry().getItem("pebble");
-        CustomItem pressureFlaker = Atom.getInstance().getItemRegistry().getItem("pressure_flaker");
+    public AxisAngle4f getItemRotation() {
         
-        boolean isPebble = pebble != null && pebble.isCustomItem(item);
-        boolean isPressureFlaker = pressureFlaker != null && pressureFlaker.isCustomItem(item);
+        float randomYaw = (float) (Math.random() * Math.PI * 2);
+        Quaternionf q1 = new Quaternionf().rotateY(randomYaw);
+        Quaternionf q2 = new Quaternionf().rotateX((float) Math.toRadians(90));
+        Quaternionf combined = q1.mul(q2);
+        return new AxisAngle4f().set(combined);
+    }
+    
+    @Override
+    public Vector3f getItemScale() {
+        return new Vector3f(1.0f, 1.0f, 1.0f);
+    }
+    
+    @Override
+    public boolean handleInteraction(PlayerInteractEvent event, Block block, Player player, ItemStack hand, WorkstationData data) {
         
-        return isPebble || isPressureFlaker;
+        if (org.shotrush.atom.UtilKt.matches(hand, "atom:pebble") || 
+            org.shotrush.atom.UtilKt.matches(hand, "atom:pressure_flaker")) {
+            if (data.getPlacedItems().isEmpty()) {
+                ActionBarManager.send(player, getEmptyMessage());
+                event.setCancelled(true);
+                return true;
+            }
+            if (!isKnapping(player)) {
+                Location dropLoc = block.getLocation().clone().add(0.5, 0.5, 0.5);
+                startKnapping(player, dropLoc, data::removeLastItem);
+            }
+            return true; 
+        }
+        
+        
+        if (canPlaceItem(hand)) {
+            if (data.getPlacedItems().size() >= getMaxItems()) {
+                ActionBarManager.send(player, getFullMessage());
+                return false;
+            }
+            event.setCancelled(true);
+            if (data.placeItem(hand, getPlacementPosition(), 0)) {
+                hand.setAmount(hand.getAmount() - 1);
+                player.swingMainHand();
+            }
+            return true;
+        }
+        
+        return false;
+    }
+    
+    @Override
+    public boolean canPlaceItem(ItemStack item) {
+        return item.getType() == Material.FLINT || 
+               org.shotrush.atom.UtilKt.matches(item, "atom:sharpened_flint");
+    }
+    
+    @Override
+    public Vector3f getPlacementPosition() {
+        return new Vector3f(-0.2f, 0.5f, 0.2f);
+    }
+    
+    @Override
+    public int getMaxItems() {
+        return 1;
+    }
+    
+    @Override
+    public String getFullMessage() {
+        return "§cKnapping station is full!";
+    }
+    
+    @Override
+    public String getEmptyMessage() {
+        return "§cPlace flint first!";
+    }
+    
+    @Override
+    public boolean isValidTool(ItemStack item) {
+        return org.shotrush.atom.UtilKt.matches(item, "atom:pebble") || 
+               org.shotrush.atom.UtilKt.matches(item, "atom:pressure_flaker");
     }
     
     @Override
@@ -122,24 +202,36 @@ public class KnappingHandler extends WorkstationHandler<KnappingHandler.Knapping
             ActionBarManager.send(player, "§cThe flint broke!");
             ActionBarManager.clearStatus(player);
             player.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1.0f, 1.0f);
-            onComplete.run();
         } else {
             ActionBarManager.send(player, "§aSuccessfully sharpened the flint!");
             ActionBarManager.clearStatus(player);
             player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0f, 1.5f);
-            onComplete.run();
             
-            ItemStack sharpenedFlint = Atom.getInstance().getItemRegistry().createItem("sharpened_flint");
-            if (sharpenedFlint != null) {
-                double temperature = org.shotrush.atom.content.systems.PlayerTemperatureSystem
-                    .getInstance().getPlayerTemperature(player);
+            player.sendMessage("§eDEBUG: Creating sharpened_flint via CraftEngine...");
+            CustomItem<ItemStack> customItem = CraftEngineItems.byId(Key.of("atom:sharpened_flint"));
+            player.sendMessage("§eDEBUG: CustomItem: " + (customItem != null ? "SUCCESS" : "NULL"));
+            
+            if (customItem != null) {
+                ItemStack sharpenedFlint = customItem.buildItemStack();
+                player.sendMessage("§eDEBUG: Built ItemStack: " + (sharpenedFlint != null ? "SUCCESS" : "NULL"));
                 
-                ItemQuality quality = ItemQuality.fromTemperature(temperature);
-                ItemQualityAPI.setQuality(sharpenedFlint, quality);
-                
-                player.getWorld().dropItemNaturally(dropLocation, sharpenedFlint);
+                if (sharpenedFlint != null) {
+                    double temperature = org.shotrush.atom.content.systems.PlayerTemperatureSystem
+                        .getInstance().getPlayerTemperature(player);
+                    
+                    ItemQuality quality = ItemQuality.fromTemperature(temperature);
+                    ItemQualityAPI.setQuality(sharpenedFlint, quality);
+                    
+                    player.sendMessage("§eDEBUG: Dropping at " + dropLocation.getBlockX() + "," + dropLocation.getBlockY() + "," + dropLocation.getBlockZ());
+                    player.getWorld().dropItemNaturally(dropLocation, sharpenedFlint);
+                    player.sendMessage("§eDEBUG: Drop called!");
+                }
+            } else {
+                player.sendMessage("§cDEBUG: Failed to get sharpened_flint from CraftEngine!");
             }
         }
+
+        onComplete.run();
         
         org.shotrush.atom.core.api.player.PlayerDataAPI.incrementInt(player, "knapping.count", 0);
     }
@@ -159,12 +251,10 @@ public class KnappingHandler extends WorkstationHandler<KnappingHandler.Knapping
             ActionBarManager.send(player, "§cThe flint shattered during pressure flaking!");
             ActionBarManager.clearStatus(player);
             player.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1.0f, 0.8f);
-            onComplete.run();
         } else {
             ActionBarManager.send(player, "§aSuccessfully created high quality sharpened flint!");
             ActionBarManager.clearStatus(player);
             player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0f, 1.8f);
-            onComplete.run();
             
             ItemStack sharpenedFlint = Atom.getInstance().getItemRegistry().createItem("sharpened_flint");
             if (sharpenedFlint != null) {
@@ -177,6 +267,9 @@ public class KnappingHandler extends WorkstationHandler<KnappingHandler.Knapping
                 player.getWorld().dropItemNaturally(dropLocation, sharpenedFlint);
             }
         }
+        
+        
+        onComplete.run();
         
         org.shotrush.atom.core.api.player.PlayerDataAPI.incrementInt(player, "pressure_flaking.count", 0);
     }

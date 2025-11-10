@@ -29,13 +29,13 @@ import java.util.*;
 import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.core.api.annotation.RegisterSystem;
 
-//@RegisterSystem(
-//    id = "animal_behavior",
-//    priority = 4,
-//    toggleable = true,
-//    provides = {"herd_manager"},
-//    description = "Advanced animal AI with herding behavior"
-//)
+
+
+
+
+
+
+
 public class AnimalBehaviorNew implements Listener {
     
     private final Atom plugin;
@@ -100,10 +100,10 @@ public class AnimalBehaviorNew implements Listener {
             Objects.requireNonNull(animal.getAttribute(Attribute.ATTACK_DAMAGE)).setBaseValue(2.0);
         }
         
-//        plugin.getLogger().info(">>> Animal spawn detected: " + animal.getType() + " (Reason: " + event.getSpawnReason() + ")");
+
         
         if (AnimalDomestication.isFullyDomesticated(animal)) {
-//            plugin.getLogger().info("Fully domesticated - skipping");
+
             return;
         }
         
@@ -361,10 +361,10 @@ public class AnimalBehaviorNew implements Listener {
                 continue;
             }
             
-//            plugin.getLogger().info(">>> Entity loaded from chunk: " + animal.getType() + " (UUID: " + animal.getUniqueId() + ")");
+
             
             if (AnimalDomestication.isFullyDomesticated(animal)) {
-//                plugin.getLogger().info("Fully domesticated - skipping");
+
                 continue;
             }
             
@@ -376,9 +376,9 @@ public class AnimalBehaviorNew implements Listener {
         double domesticationFactor = AnimalDomestication.getDomesticationFactor(animal);
         SpeciesBehavior behavior = SpeciesBehavior.get(animal.getType());
         
-//        DebugManager.log(String.format("Initializing %s#%d (domestication: %.1f%%)",
-//            animal.getType().name(), animal.getEntityId(), domesticationFactor * 100),
-//            DebugCategory.GOALS, DebugLevel.MINIMAL);
+
+
+
         
         if (!animal.hasMetadata("stats_enhanced")) {
             enhanceAnimalStats(animal, domesticationFactor, behavior);
@@ -400,11 +400,11 @@ public class AnimalBehaviorNew implements Listener {
             animal.setMetadata("aggressive", new FixedMetadataValue(plugin, isAggressive));
         }
         
-//        plugin.getLogger().info(">>> Initializing: Aggressive=" + isAggressive + ", Role=" + role);
+
         
-//        DebugManager.logSocial(mob, "Herd Assignment",
-//            String.format("Role: %s, Herd size: %d, Aggressive: %s",
-//                role.name(), herd.size(), isAggressive));
+
+
+
         
         double maxStamina = herdManager.getPersistence().getMaxStamina(animal, 100 + (Math.random() * 100));
         double stamina = herdManager.getPersistence().getStamina(animal, maxStamina);

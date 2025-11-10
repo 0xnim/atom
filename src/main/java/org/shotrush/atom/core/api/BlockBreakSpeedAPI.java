@@ -2,6 +2,7 @@ package org.shotrush.atom.core.api;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.momirealms.craftengine.bukkit.api.CraftEngineBlocks;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -137,8 +138,10 @@ public class BlockBreakSpeedAPI implements Listener {
     private void onBlockDamage(BlockDamageEvent event) {
         Player player = event.getPlayer();
         Block block = event.getBlock();
-        
-        
+        clearSpeedModifier(player);
+        if (CraftEngineBlocks.getCustomBlockState(block) != null) {
+            return;
+        }
         applySpeedModifier(player, block.getType());
     }
     
@@ -184,8 +187,7 @@ public class BlockBreakSpeedAPI implements Listener {
         if (attribute == null) return;
         
         attribute.getModifiers().stream()
-            .filter(mod -> mod.getKey() != null && 
-                          mod.getKey().getKey().equals(MODIFIER_KEY))
+            .filter(mod -> mod.getKey().getKey().equals(MODIFIER_KEY))
             .forEach(attribute::removeModifier);
     }
 }

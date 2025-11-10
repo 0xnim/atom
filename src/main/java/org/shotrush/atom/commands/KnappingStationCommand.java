@@ -2,8 +2,11 @@ package org.shotrush.atom.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
+import net.momirealms.craftengine.bukkit.api.CraftEngineItems;
+import net.momirealms.craftengine.core.item.CustomItem;
+import net.momirealms.craftengine.core.util.Key;
 import org.bukkit.entity.Player;
-import org.shotrush.atom.Atom;
+import org.bukkit.inventory.ItemStack;
 import org.shotrush.atom.commands.annotation.AutoRegister;
 
 @AutoRegister(priority = 32)
@@ -14,6 +17,11 @@ public class KnappingStationCommand extends BaseCommand {
     @Default
     @CommandPermission("atom.knapping")
     public void onKnapping(Player player) {
-        Atom.getInstance().getBlockManager().giveBlockItem(player, "knapping_station");
+        CustomItem<ItemStack> customItem = CraftEngineItems.byId(Key.of("atom:knapping_station"));
+        if (customItem != null) {
+            ItemStack item = customItem.buildItemStack();
+            player.getInventory().addItem(item);
+            player.sendMessage("§aYou received a Knapping Station!");
+        }
     }
 }

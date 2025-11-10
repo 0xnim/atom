@@ -2,12 +2,17 @@ package org.shotrush.atom.core.workstations;
 
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.shotrush.atom.Atom;
 import org.shotrush.atom.core.util.ActionBarManager;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
+import org.bukkit.Material;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +30,22 @@ public abstract class WorkstationHandler<T extends WorkstationHandler.WorkProgre
     }
     
     
-    protected abstract boolean isValidTool(ItemStack item);
+    public abstract boolean isValidTool(ItemStack item);
+    
+    
+    public final boolean handleWrenchInteraction(Player player, ItemStack hand, boolean sneaking, WorkstationData data, Block block) {
+        if (!org.shotrush.atom.UtilKt.matches(hand, "atom:wrench")) return false;
+        
+        if (sneaking) {
+            ItemStack removed = data.removeLastItem();
+            if (removed != null) {
+                player.getInventory().addItem(removed);
+            }
+            return true;
+        }
+        
+        return false; 
+    }
     
     
     protected abstract Sound getStrokeSound();
@@ -35,6 +55,30 @@ public abstract class WorkstationHandler<T extends WorkstationHandler.WorkProgre
     
     
     protected abstract String getStatusMessage();
+
+    
+    public abstract AxisAngle4f getItemRotation();
+    
+    
+    public abstract Vector3f getItemScale();
+    
+    
+    public abstract boolean handleInteraction(PlayerInteractEvent event, Block block, Player player, ItemStack hand, WorkstationData data);
+    
+    
+    public abstract boolean canPlaceItem(ItemStack item);
+    
+    
+    public abstract Vector3f getPlacementPosition();
+    
+    
+    public abstract int getMaxItems();
+    
+    
+    public abstract String getFullMessage();
+    
+    
+    public abstract String getEmptyMessage();
     
     @EventHandler
     public void onPlayerItemHeld(org.bukkit.event.player.PlayerItemHeldEvent event) {
@@ -188,7 +232,7 @@ public abstract class WorkstationHandler<T extends WorkstationHandler.WorkProgre
             this.startTime = startTime;
             this.requiredStrokes = requiredStrokes;
             this.lastStrokeTime = startTime;
-            this.location = location;
+            this.location = location != null ? location.clone() : null;
         }
     }
 }
