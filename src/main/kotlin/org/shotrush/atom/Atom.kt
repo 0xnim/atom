@@ -2,10 +2,14 @@ package org.shotrush.atom
 
 import co.aikar.commands.PaperCommandManager
 import com.github.shynixn.mccoroutine.folia.SuspendingJavaPlugin
+import dev.jorel.commandapi.CommandAPI
+import dev.jorel.commandapi.CommandAPIBukkitConfig
+import dev.jorel.commandapi.CommandAPIPaperConfig
 import lombok.Getter
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.plugin.java.JavaPlugin
+import org.shotrush.atom.commands.MoldCommand
 import org.shotrush.atom.content.mobs.ai.debug.MobAIDebugCommand
 import org.shotrush.atom.content.mobs.ai.debug.VisualDebugger
 import org.shotrush.atom.content.mobs.commands.HerdCommand
@@ -36,8 +40,14 @@ class Atom : SuspendingJavaPlugin() {
     var ageManager: AgeManager? = null
         private set
 
+    override fun onLoad() {
+        super.onLoad()
+        CommandAPI.onLoad(CommandAPIPaperConfig(this))
+    }
 
     override fun onEnable() {
+        super.onEnable()
+        CommandAPI.onEnable()
         instance = this
 
 
@@ -77,9 +87,12 @@ class Atom : SuspendingJavaPlugin() {
             val visualDebugger = VisualDebugger(this)
             commandManager.registerCommand(MobAIDebugCommand(visualDebugger, herdManager))
         }
+
+        MoldCommand.register()
     }
 
     override fun onDisable() {
+        CommandAPI.onDisable()
         saveAllPlayerData()
 
 

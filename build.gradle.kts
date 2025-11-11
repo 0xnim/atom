@@ -55,6 +55,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("com.github.shynixn.mccoroutine:mccoroutine-folia-api:2.22.0")
     implementation("com.github.shynixn.mccoroutine:mccoroutine-folia-core:2.22.0")
+    implementation("dev.jorel:commandapi-paper-shade:11.0.0")
+    implementation("dev.jorel:commandapi-kotlin-paper:11.0.0")
 }
 
 tasks.withType(xyz.jpenilla.runtask.task.AbstractRun::class) {
