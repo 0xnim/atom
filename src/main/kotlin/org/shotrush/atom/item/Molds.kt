@@ -32,7 +32,7 @@ object Molds {
         val stack = item.buildItemStack()
         val lore = stack.lore() ?: mutableListOf()
         val loreCopy = lore.toMutableList()
-        // replace lore at index 0
+        
         loreCopy[0] = Component.text("Filled with: ").style {
             it.decoration(TextDecoration.ITALIC, false).color(
                 NamedTextColor.GRAY

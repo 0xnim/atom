@@ -8,10 +8,10 @@ import org.shotrush.atom.item.Molds
 
 private const val N = 5
 
-// Column-major index helper: idx = r + c*N
+
 private fun idxColMajor(r: Int, c: Int): Int = r + c * N
 
-// Variable-sized pattern
+
 data class Pattern(val rows: List<String>) {
     val height: Int = rows.size
     val width: Int = rows.maxOfOrNull { it.length } ?: 0
@@ -27,7 +27,7 @@ data class Pattern(val rows: List<String>) {
     operator fun get(r: Int): String = rows[r]
 }
 
-// Transforms updated for variable size
+
 typealias Transform = (Pattern) -> Pattern
 
 val invertX: Transform = { p -> Pattern(p.rows.map(String::reversed)) }
@@ -49,14 +49,14 @@ val rotateNeg90: Transform = { p ->
     Pattern(out.map { String(it) })
 }
 
-// Builder DSL: allows registering < 5x5 shapes
+
 class PatternSetBuilder(
     private val filledChars: Set<Char> = setOf('#'),
 ) {
     private val patterns = mutableListOf<Pattern>()
     private var last: Pattern? = null
 
-    // rows can be any k x m, where 1 <= k,m <= 5
+    
     fun rows(vararg r: String) {
         require(r.isNotEmpty()) { "Provide at least one row" }
         val w = r.first().length
@@ -159,10 +159,10 @@ object KnappingRecipes {
     fun getResult(gridColumnMajor: List<Boolean>, variant: MoldType): ItemStack? {
         for (recipe in recipes.values) {
             for (pattern in recipe.patterns) {
-                // If patterns are 5x5 expanded, you can use strict match; otherwise use matchesPatternAnywhere
+                
                 val ok = if (pattern.height == N && pattern.width == N) {
                     matchesAt(gridColumnMajor, pattern, 0, 0, setOf('#')) &&
-                            outsideRegionEmpty(gridColumnMajor, 0, 0, N, N) // trivial
+                            outsideRegionEmpty(gridColumnMajor, 0, 0, N, N) 
                 } else {
                     matchesPatternAnywhere(gridColumnMajor, pattern, setOf('#'))
                 }

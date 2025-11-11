@@ -13,6 +13,8 @@ items:
     behavior:
       type: block_item
       block:
+        behaviors:
+          - type: atom:crafting_basket
         loot:
           template: default:loot_table/self
         settings:
@@ -30,7 +32,15 @@ items:
             tags:
               - minecraft:mineable/axe
         state:
-          auto-state: cactus
+          auto-state: lower_tripwire
+          collision:
+            type: aabb
+            min-x: 0.0
+            min-y: 0.0
+            min-z: 0.0
+            max-x: 1.0
+            max-y: 0.3
+            max-z: 1.0
           model:
             path: minecraft:block/crafting_basket
 lang:

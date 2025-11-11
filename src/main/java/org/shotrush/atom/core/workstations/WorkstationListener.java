@@ -19,12 +19,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.core.api.annotation.RegisterSystem;
 
-//@RegisterSystem(
-//    id = "workstation_listener",
-//    priority = 6,
-//    toggleable = true,
-//    description = "Generic listener for CraftEngine workstation blocks"
-//)
+
+
+
+
+
+
 public class WorkstationListener implements Listener {
     private static final java.util.Set<String> WORKSTATION_TYPES = java.util.Set.of(
         "knapping_station", "leather_bed", "crafting_basket"
@@ -122,8 +122,8 @@ public class WorkstationListener implements Listener {
             player.sendMessage("§cWorkstationManager is null!");
             return;
         }
-        // TODO: Please fix the fricking bug where this shit doesn't drop anything, also
-        // TODO: Exempt ALL CraftEngine Blocks from the BlockBreakSpeed API cause they have a fuckass mismatch.
+        
+        
         player.sendMessage("§eDEBUG: getOrCreate at " + block.getX() + "," + block.getY() + "," + block.getZ());
         WorkstationData data = manager.getOrCreate(block, type);
         player.sendMessage("§aWorkstation data: " + (data != null ? "found" : "null") + ", items: " + (data != null ? data.getPlacedItems().size() : 0));
@@ -137,7 +137,7 @@ public class WorkstationListener implements Listener {
             event.setCancelled(true);
             return;
         }
-        //e
+        
 
         if (handler != null && handler.isValidTool(hand)) {
             handler.handleInteraction(event, block, player, hand, data);

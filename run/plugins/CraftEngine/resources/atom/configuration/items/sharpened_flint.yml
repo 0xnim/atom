@@ -3,6 +3,11 @@ items:
     material: flint
     data:
       item-name: <!i><white><lang:item.sharpened_flint.name>
+      components:
+        minecraft:consumable: {
+          consume_seconds: 10000,
+          animation: "brush"
+        }
       lore:
         - ""
         - <!i><white><image:atom:badge_age_foraging>

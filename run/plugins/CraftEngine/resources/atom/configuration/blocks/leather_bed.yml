@@ -14,6 +14,8 @@ items:
     behavior:
       type: block_item
       block:
+        behaviors:
+          - type: atom:leather_bed
         loot:
           template: default:loot_table/self
         settings:

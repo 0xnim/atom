@@ -79,6 +79,8 @@ class Atom : SuspendingJavaPlugin() {
 
         AtomAPI.registerCommands(commandManager)
 
+        
+        commandManager.registerCommand(org.shotrush.atom.content.workstation.commands.WorkstationCommands())
 
         val herdManager = AtomAPI.Systems.getService("herd_manager", HerdManager::class.java)
         if (herdManager != null) {
