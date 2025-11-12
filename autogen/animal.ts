@@ -28,6 +28,7 @@ type ItemType =
     | "cooked_meat"
     | "burnt_meat"
     | "raw_leather"
+    | "leather"
     | "cured_leather"
     | "bone";
 
@@ -61,9 +62,7 @@ const animalDisplay: Record<AnimalId, string> = {
     camel: "Camel",
 };
 
-const meatNameOverrides: Partial<
-    Record<AnimalId, { raw?: string; cooked?: string }>
-> = {
+const meatNameOverrides: Record<string, string> = {
     cow: "Beef",
     pig: "Pork",
     sheep: "Mutton",
@@ -72,7 +71,7 @@ const meatNameOverrides: Partial<
 };
 
 function itemKey(id: AnimalId, type: ItemType) {
-    if (type.includes("leather")) return `atom:animal_leather_${type.split("_")[0]}_${id}`;
+    if (type.includes("leather") && type !== "leather") return `atom:animal_leather_${type.split("_")[0]}_${id}`;
     if (type.includes("meat")) return `atom:animal_meat_${type.split("_")[0]}_${id}`;
     return `atom:animal_${type}_${id}`;
 }
@@ -89,6 +88,8 @@ function getTexturePathForType(type: ItemType) {
             return "minecraft:item/meat/burnt";
         case "raw_leather":
             return "minecraft:item/leather_meat";
+        case "leather":
+            return "minecraft:item/leather";
         case "cured_leather":
             return "minecraft:item/leather_cured";
         case "bone":
@@ -146,6 +147,8 @@ function makeLabel(id: AnimalId, type: ItemType): string {
             const b = meatNameOverrides[id] ?? `${a} Meat`;
             return `Burnt ${b}`;
         }
+        case "leather":
+            return `${a} Leather`;
         case "raw_leather":
             return `Raw ${a} Leather`;
         case "cured_leather":
@@ -163,6 +166,7 @@ function generateDoc() {
         "undercooked_meat",
         "cooked_meat",
         "burnt_meat",
+        "leather",
         "raw_leather",
         "cured_leather",
         "bone",
