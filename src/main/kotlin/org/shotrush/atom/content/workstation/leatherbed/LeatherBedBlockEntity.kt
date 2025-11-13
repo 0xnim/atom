@@ -10,7 +10,9 @@ import net.momirealms.craftengine.bukkit.api.CraftEngineItems
 import net.momirealms.craftengine.bukkit.item.BukkitItemManager
 import net.momirealms.craftengine.core.block.ImmutableBlockState
 import net.momirealms.craftengine.core.block.entity.BlockEntity
+import net.momirealms.craftengine.core.block.properties.Property
 import net.momirealms.craftengine.core.entity.player.InteractionResult
+import net.momirealms.craftengine.core.util.HorizontalDirection
 import net.momirealms.craftengine.core.util.Key
 import net.momirealms.craftengine.core.world.BlockPos
 import net.momirealms.craftengine.core.world.ChunkPos
@@ -46,6 +48,8 @@ class LeatherBedBlockEntity(
     pos: BlockPos,
     blockState: ImmutableBlockState,
 ) : BlockEntity(Workstations.LEATHER_BED_ENTITY_TYPE, pos, blockState) {
+    val rotation: HorizontalDirection
+        get() = blockState().get(blockState().properties.first() as Property<HorizontalDirection>)
     var storedItem: ItemStack = ItemStack.empty()
         private set(value) {
             field = value
@@ -90,6 +94,17 @@ class LeatherBedBlockEntity(
             pos.y().toDouble(),
             pos.z().toDouble()
         )
+
+    val dropLocation: Location
+        get() {
+            val rot = rotation
+            return Location(
+                world.world.platformWorld() as World,
+                pos.x().toDouble() + rot.stepX(),
+                pos.y().toDouble() + 0.5f,
+                pos.z().toDouble() + rot.stepZ()
+            )
+        }
 
     fun markDirty() {
         world?.getChunkAtIfLoaded(ChunkPos(pos))?.setDirty(true);
@@ -149,7 +164,7 @@ class LeatherBedBlockEntity(
     }
 
     private fun finishScraping(player: Player, tool: ItemStack) {
-        val center = location.add(0.5, 0.5, 0.5)
+        val center = dropLocation
 
         val storedProduct = Items.getAnimalProductFromItem(storedItem)
 
@@ -225,7 +240,7 @@ class LeatherBedBlockEntity(
 
     fun tryEmptyItems(player: Player, item: ItemStack): InteractionResult {
         if (storedItem.isEmpty) return InteractionResult.FAIL
-        location.world.dropItemNaturally(location, storedItem)
+        location.world.dropItemNaturally(dropLocation, storedItem)
         storedItem = ItemStack.empty()
         return InteractionResult.SUCCESS
     }

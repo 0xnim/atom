@@ -43,7 +43,7 @@ class LeatherBedBlockDynamicRenderer(val entity: LeatherBedBlockEntity) : Dynami
     }
 
     fun getDataValues(): List<Any> {
-        val rotation = entity.blockState().get(entity.blockState().properties.first() as Property<HorizontalDirection>)
+        val rotation = entity.rotation
         val idx = when (rotation) {
             HorizontalDirection.NORTH -> 0
             HorizontalDirection.EAST -> 1
