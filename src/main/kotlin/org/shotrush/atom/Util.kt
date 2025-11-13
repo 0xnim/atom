@@ -35,7 +35,7 @@ fun Block.matches(namespace: String, path: String) = matches(Key.of(namespace, p
 
 fun CompoundTag.getItemStack(key: String): ItemStack = getCompound(key)?.let { tag ->
     CoreReflections.`instance$ItemStack$CODEC`.parse(MRegistryOps.NBT, tag).resultOrPartial { err ->
-        Atom.instance?.logger?.severe("Tried to load invalid item: '$tag'. $err")
+        Atom.instance.logger?.severe("Tried to load invalid item: '$tag'. $err")
     }.map { result -> FastNMS.INSTANCE.`method$CraftItemStack$asCraftMirror`(result) }.getOrElse { ItemStack.empty() }
 } ?: ItemStack.empty()
 

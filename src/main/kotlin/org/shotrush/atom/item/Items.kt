@@ -25,7 +25,8 @@ object Items {
     fun getAnimalFromProduct(product: ItemStack): AnimalType {
         val ns = product.getNamespacedKey()
         val (_, key) = ns.split(":")
-        return AnimalType.byId(key) ?: throw IllegalStateException("Animal $key not found!")
+        val animal = key.split("_").last()
+        return AnimalType.byId(animal) ?: throw IllegalStateException("Animal $animal not found!")
     }
 }
 

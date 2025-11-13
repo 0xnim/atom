@@ -1,11 +1,12 @@
 package org.shotrush.atom.content
 
 enum class AnimalProduct(val id: String) {
-    RawMeat("raw_meat"),
-    CookedMeat("cooked_meat"),
-    BurntMeat("burnt_meat"),
-    RawLeather("raw_leather"),
+    RawMeat("meat_raw"),
+    UndercookedMeat("meat_undercooked"),
+    CookedMeat("meat_cooked"),
+    BurntMeat("meat_burnt"),
+    RawLeather("leather_raw"),
     Leather("leather"),
-    CuredLeather("cured_leather"),
+    CuredLeather("leather_cured"),
     Bone("bone"),
 }
