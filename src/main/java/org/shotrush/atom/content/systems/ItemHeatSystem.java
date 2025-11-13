@@ -22,13 +22,13 @@ import java.util.Map;
 import java.util.UUID;
 import org.shotrush.atom.core.api.annotation.RegisterSystem;
 
-@RegisterSystem(
-    id = "item_heat_system",
-    priority = 3,
-    dependencies = {"action_bar_manager"},
-    toggleable = true,
-    description = "Manages item temperature and heat mechanics"
-)
+//@RegisterSystem(
+//    id = "item_heat_system",
+//    priority = 3,
+//    dependencies = {"action_bar_manager"},
+//    toggleable = true,
+//    description = "Manages item temperature and heat mechanics"
+//)
 public class ItemHeatSystem implements Listener {
     @Getter
     public static ItemHeatSystem instance;

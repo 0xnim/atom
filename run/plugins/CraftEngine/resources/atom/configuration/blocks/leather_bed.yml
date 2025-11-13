@@ -32,10 +32,40 @@ items:
             map-color: 10
             tags:
               - minecraft:mineable/axe
-        state:
-          auto-state: cactus
-          model:
-            path: minecraft:block/leather_bed
+        states:
+          properties:
+            facing:
+              type: 4-direction
+              default: north
+          appearances:
+            east:
+              auto-state: non_tintable_leaves
+              model:
+                path: minecraft:block/leather_bed
+                y: 90
+            north:
+              auto-state: non_tintable_leaves
+              model:
+                path: minecraft:block/leather_bed
+            south:
+              auto-state: non_tintable_leaves
+              model:
+                path: minecraft:block/leather_bed
+                y: 180
+            west:
+              auto-state: non_tintable_leaves
+              model:
+                path: minecraft:block/leather_bed
+                y: 270
+          variants:
+            facing=east:
+              appearance: east
+            facing=north:
+              appearance: north
+            facing=south:
+              appearance: south
+            facing=west:
+              appearance: west
 lang:
   en:
     item.leather_bed.name: Leather Drying Bed
