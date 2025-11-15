@@ -31,8 +31,7 @@ class ClayCauldronDynamicRenderer(val entity: ClayCauldronBlockEntity) : AtomBlo
         scale(Vector3f(1f))
 
         translation { Vector3f(0f, ((entity.fluidStored.toFloat() / entity.MAX_FLUID.toFloat()) / 2f) - 0.3f, 0f) }
-
         displayedItem { entity.fluidAsItem }
-        autoVisibleFromItem()
+        visible { entity.fluid != null && entity.fluidStored > 0 }
     }
 })
