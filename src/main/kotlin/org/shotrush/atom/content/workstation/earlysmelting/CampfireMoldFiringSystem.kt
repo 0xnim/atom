@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap
 class CampfireMoldFiringSystem(private val plugin: Plugin) : Listener {
 
     companion object {
-        const val FIRING_TIME_MS = 10 * 60 * 1000L // 10 minutes
+        const val FIRING_TIME_MS = 5 * 60 * 1000L // 5 minutes
         const val CHECK_INTERVAL_TICKS = 40L // Check every 2 seconds
         val activeFiring = ConcurrentHashMap<Location, FiringJob>()
 
@@ -77,16 +77,16 @@ class CampfireMoldFiringSystem(private val plugin: Plugin) : Listener {
         if (block.type != Material.CAMPFIRE && block.type != Material.SOUL_CAMPFIRE) return
 
         // Check if there's a straw block with clay mold below
-        val strawBlock = block.location.clone().add(0.0, -1.0, 0.0).block
-        val frame = GroundItemUtils.findGroundItemAbove(strawBlock)
+        val belowBlock = block.location.clone().add(0.0, -1.0, 0.0)
+        val frame = GroundItemUtils.findClosestGroundItem(belowBlock)
         val item = frame?.let { GroundItemUtils.isObstructed(it, customKey = Key.of("atom:straw")) }
-        if (item != null && Molds.isEmptyMold(item) && Molds.getMoldType(item) == MoldType.Clay) {
+        if (item != null && Molds.isMold(item) && Molds.getMoldType(item) == MoldType.Clay) {
             // Wait a tick to ensure block data is set
             Atom.instance.launch {
                 delay(50L)
                 val data = block.blockData
                 if (data is Lightable && data.isLit) {
-                    startFiring(strawBlock.location, frame)
+                    startFiring(belowBlock, frame)
                 }
             }
         }
@@ -104,18 +104,18 @@ class CampfireMoldFiringSystem(private val plugin: Plugin) : Listener {
             val data = block.blockData
             if (data !is Lightable) return@launch
 
-            val strawBlock = block.location.clone().add(0.0, -1.0, 0.0).block
-            val frame = GroundItemUtils.findGroundItemAbove(strawBlock) ?: return@launch
+            val blockBelow = block.location.clone().add(0.0, -1.0, 0.0)
+            val frame = GroundItemUtils.findClosestGroundItem(blockBelow) ?: return@launch
             val item = GroundItemUtils.isObstructed(frame, customKey = Key.of("atom:straw"))
-            if (item != null && Molds.isEmptyMold(item) && Molds.getMoldType(item) == MoldType.Clay) {
+            if (item != null && Molds.isMold(item) && Molds.getMoldType(item) == MoldType.Clay) {
                 if (data.isLit) {
                     // Campfire was lit
-                    if (!activeFiring.containsKey(strawBlock.location)) {
-                        startFiring(strawBlock.location, frame)
+                    if (!activeFiring.containsKey(blockBelow)) {
+                        startFiring(blockBelow, frame)
                     }
                 } else {
                     // Campfire was extinguished
-                    cancelFiring(strawBlock.location)
+                    cancelFiring(blockBelow)
                 }
             }
         }
@@ -140,7 +140,7 @@ class CampfireMoldFiringSystem(private val plugin: Plugin) : Listener {
                     // Check if this location should still be firing
                     if (!activeFiring.containsKey(strawBlockLocation)) {
                         if (shouldBeFiring(strawBlockLocation)) {
-                            val frame = GroundItemUtils.findGroundItemAbove(strawBlockLocation.block)
+                            val frame = GroundItemUtils.findClosestGroundItem(strawBlockLocation)
                             if (frame != null) {
                                 val remaining = FIRING_TIME_MS - (System.currentTimeMillis() - data.curingStartTime!!)
                                 if (remaining > 0) {
@@ -149,6 +149,7 @@ class CampfireMoldFiringSystem(private val plugin: Plugin) : Listener {
                             }
                         } else {
                             // Setup no longer valid, remove data
+                            Atom.instance.logger.info("  Setup no longer valid at ($pos), removing data")
                             WorkstationDataManager.removeWorkstationData(pos)
                         }
                     }
@@ -167,9 +168,9 @@ class CampfireMoldFiringSystem(private val plugin: Plugin) : Listener {
         if (data !is Lightable || !data.isLit) return false
 
         // Check for straw block and clay mold
-        val frame = GroundItemUtils.findGroundItemAbove(strawBlock) ?: return false
+        val frame = GroundItemUtils.findClosestGroundItem(strawBlockLocation) ?: return false
         val item = GroundItemUtils.isObstructed(frame, customKey = Key.of("atom:straw")) ?: return false
-        if (!Molds.isEmptyMold(item) || Molds.getMoldType(item) != MoldType.Clay) return false
+        if (!Molds.isMold(item) || Molds.getMoldType(item) != MoldType.Clay) return false
 
         return true
     }
@@ -182,9 +183,9 @@ class CampfireMoldFiringSystem(private val plugin: Plugin) : Listener {
         val startTime = System.currentTimeMillis()
 
         // Debug logging
-        Atom.instance?.logger?.info("=== STARTING MOLD FIRING ===")
-        Atom.instance?.logger?.info("  Straw block: ${strawBlockLocation.blockX}, ${strawBlockLocation.blockY}, ${strawBlockLocation.blockZ}")
-        Atom.instance?.logger?.info("  Frame location: ${frame.location.x}, ${frame.location.y}, ${frame.location.z}")
+        Atom.instance.logger.info("=== STARTING MOLD FIRING ===")
+        Atom.instance.logger.info("  Straw block: ${strawBlockLocation.blockX}, ${strawBlockLocation.blockY}, ${strawBlockLocation.blockZ}")
+        Atom.instance.logger.info("  Frame location: ${frame.location.x}, ${frame.location.y}, ${frame.location.z}")
 
         // Save to campfire workstation data
         val campfireLocation = strawBlockLocation.clone().add(0.0, 1.0, 0.0)
@@ -197,10 +198,11 @@ class CampfireMoldFiringSystem(private val plugin: Plugin) : Listener {
         data.curingStartTime = startTime
         WorkstationDataManager.saveData()
 
-        Atom.instance?.logger?.info("  Saved data at: $pos")
+        Atom.instance.logger.info("  Saved data at: $pos")
 
         val job = atom.launch(atom.regionDispatcher(strawBlockLocation)) {
             delay(FIRING_TIME_MS)
+            Atom.instance.logger.info("  Completed firing at: ${strawBlockLocation.blockX}, ${strawBlockLocation.blockY}, ${strawBlockLocation.blockZ}")
 
             completeFiring(strawBlockLocation, frame)
             activeFiring.remove(strawBlockLocation)
@@ -241,7 +243,7 @@ class CampfireMoldFiringSystem(private val plugin: Plugin) : Listener {
         }
 
         activeFiring[strawBlockLocation] = FiringJob(job, originalStartTime, frame.location)
-        Atom.instance?.logger?.info("  ✓ Resumed firing at ($pos) - ${remaining/1000}s remaining")
+        Atom.instance.logger.info("  ✓ Resumed firing at ($pos) - ${remaining/1000}s remaining")
     }
 
     private fun cancelFiring(strawBlockLocation: Location) {
@@ -256,12 +258,12 @@ class CampfireMoldFiringSystem(private val plugin: Plugin) : Listener {
         )
         WorkstationDataManager.removeWorkstationData(pos)
 
-        Atom.instance?.logger?.info("  Cancelled firing at: $pos")
+        Atom.instance.logger.info("  Cancelled firing at: $pos")
     }
 
     private fun completeFiring(strawBlockLocation: Location, frame: ItemFrame) {
         val item = GroundItemUtils.getGroundItem(frame) ?: return
-        if (!Molds.isEmptyMold(item)) return
+        if (!Molds.isMold(item)) return
 
         val shape = Molds.getMoldShape(item)
         val firedMold = Molds.getMold(shape, MoldType.Fired).buildItemStack()
@@ -280,16 +282,16 @@ class CampfireMoldFiringSystem(private val plugin: Plugin) : Listener {
             0.02
         )
 
-        Atom.instance?.logger?.info("  ✓ Completed firing at: ${strawBlockLocation.blockX}, ${strawBlockLocation.blockY}, ${strawBlockLocation.blockZ}")
+        Atom.instance.logger.info("  ✓ Completed firing at: ${strawBlockLocation.blockX}, ${strawBlockLocation.blockY}, ${strawBlockLocation.blockZ}")
     }
 
     private fun resumeFiringProcesses() {
-        Atom.instance?.logger?.info("=== Resuming mold firing processes ===")
+        Atom.instance.logger.info("=== Resuming mold firing processes ===")
         var resumed = 0
         var expired = 0
 
         val allData = WorkstationDataManager.getAllWorkstations()
-        Atom.instance?.logger?.info("  Total workstations: ${allData.size}")
+        Atom.instance.logger.info("  Total workstations: ${allData.size}")
 
         allData.forEach { (_, data) ->
             if (data.type == "campfire" && data.curingStartTime != null) {
@@ -309,16 +311,16 @@ class CampfireMoldFiringSystem(private val plugin: Plugin) : Listener {
                 // Check if chunk is loaded before accessing blocks
                 val chunk = strawBlockLocation.chunk
                 if (!chunk.isLoaded) {
-                    Atom.instance?.logger?.info("  ✗ Chunk not loaded at ($pos), skipping")
+                    Atom.instance.logger.info("  ✗ Chunk not loaded at ($pos), skipping")
                     return@forEach
                 }
 
-                Atom.instance?.logger?.info("  Checking pos: ${pos.x()}, ${pos.y()}, ${pos.z()}")
+                Atom.instance.logger.info("  Checking pos: ${pos.x()}, ${pos.y()}, ${pos.z()}")
 
-                val frame = GroundItemUtils.findGroundItemAbove(strawBlockLocation.block)
+                val frame = GroundItemUtils.findClosestGroundItem(strawBlockLocation)
 
                 if (frame != null && shouldBeFiring(strawBlockLocation)) {
-                    Atom.instance?.logger?.info("  Found ground item - Frame at: ${frame.location.x}, ${frame.location.y}, ${frame.location.z}")
+                    Atom.instance.logger.info("  Found ground item - Frame at: ${frame.location.x}, ${frame.location.y}, ${frame.location.z}")
 
                     if (remaining > 0) {
                         resumeFiring(strawBlockLocation, frame, startTime)
@@ -327,18 +329,18 @@ class CampfireMoldFiringSystem(private val plugin: Plugin) : Listener {
                         completeFiring(strawBlockLocation, frame)
                         WorkstationDataManager.removeWorkstationData(pos)
                         expired++
-                        Atom.instance?.logger?.info("  ✗ Completed expired firing at ($pos)")
+                        Atom.instance.logger.info("  ✗ Completed expired firing at ($pos)")
                     }
                 } else {
-                    Atom.instance?.logger?.info("  ✗ Setup no longer valid at ($pos), removing data")
+                    Atom.instance.logger.info("  ✗ Setup no longer valid at ($pos), removing data")
                     WorkstationDataManager.removeWorkstationData(pos)
                 }
             }
         }
 
-        Atom.instance?.logger?.info("=== Mold Firing Resume Summary ===")
-        Atom.instance?.logger?.info("  Resumed: $resumed processes")
-        Atom.instance?.logger?.info("  Expired: $expired molds")
+        Atom.instance.logger.info("=== Mold Firing Resume Summary ===")
+        Atom.instance.logger.info("  Resumed: $resumed processes")
+        Atom.instance.logger.info("  Expired: $expired molds")
     }
 
     fun shutdown() {
