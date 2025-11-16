@@ -3,7 +3,6 @@ package org.shotrush.atom.listener
 import com.github.shynixn.mccoroutine.folia.entityDispatcher
 import com.github.shynixn.mccoroutine.folia.registerSuspendingEvents
 import kotlinx.coroutines.delay
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.title.Title
 import org.bukkit.NamespacedKey
@@ -22,6 +21,7 @@ import plutoproject.adventurekt.text.style.textRed
 import plutoproject.adventurekt.text.text
 import plutoproject.adventurekt.text.with
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 object PlayerDataTrackingListener : Listener {
     fun register(atom: Atom) {
@@ -54,14 +54,6 @@ object PlayerDataTrackingListener : Listener {
                 text("Welcome to ") with textGray
                 text("CivLabs") with textRed
             })
-            player.sendMessage("")
-            player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>We are currently testing the <white><image:atom:badge_age_foraging> <gray>and the</gray> <image:atom:badge_age_copper>"))
-            player.sendMessage("")
-            delay(1000)
-            player.showTitle(Title.title(
-                MiniMessage.miniMessage().deserialize("<gray>Welcome to the"),
-                MiniMessage.miniMessage().deserialize("<white><image:atom:badge_age_foraging>")
-            ))
         } else {
             val lastSeen = pdc.get(LAST_SEEN_KEY, PersistentDataType.LONG) ?: now
             val elapsed = (now - lastSeen).milliseconds
@@ -84,15 +76,21 @@ object PlayerDataTrackingListener : Listener {
                     }
                 ) with textGold
             })
-            player.sendMessage("")
-            player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>We are currently testing the <white><image:atom:badge_age_foraging> <gray>and the</gray> <image:atom:badge_age_copper>"))
-            player.sendMessage("")
-            delay(1000)
-            player.showTitle(Title.title(
-                MiniMessage.miniMessage().deserialize("<gray>Welcome to the"),
-                MiniMessage.miniMessage().deserialize("<white><image:atom:badge_age_foraging>")
-            ))
         }
+        player.sendMessage("")
+        player.sendMessage(
+            MiniMessage.miniMessage()
+                .deserialize("<gray>We are currently testing the <white><image:atom:badge_age_foraging> <gray>and the</gray> <image:atom:badge_age_copper>")
+        )
+        player.sendMessage("")
+        delay(1500)
+        player.showTitle(
+            Title.title(
+                MiniMessage.miniMessage().deserialize("<gray>Welcome to the"),
+                MiniMessage.miniMessage().deserialize("<white><image:atom:badge_age_foraging>"),
+                (1.5 * 20).toInt(), 8 * 20, (1.5 * 20).toInt()
+            ),
+        )
     }
 
     @EventHandler
