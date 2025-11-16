@@ -103,6 +103,7 @@ function itemBlock(id: AnimalId, type: ItemType) {
     const baseMaterial = type.includes("leather") ? "leather" : type === "bone" ? "bone" : "beef";
     const itemNameKeySuffix = type; // e.g., raw_meat
     const texturePath = getTexturePathForType(type);
+    const tag = type
 
     return {
         [itemKey(id, type)]: {
@@ -115,6 +116,9 @@ function itemBlock(id: AnimalId, type: ItemType) {
                         ? "<!i><white><image:atom:badge_material> <image:atom:badge_natural> <image:atom:badge_age_foraging>"
                         : "<!i><white><image:atom:badge_food> <image:atom:badge_natural> <image:atom:badge_age_foraging>",
                 ],
+                settings: {
+                    tags: [`atom:${type}`]
+                },
                 "remove-components": ["attribute_modifiers"],
             },
             model: {
