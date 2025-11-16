@@ -230,23 +230,23 @@ object KnappingRecipes {
 //                "#####",
 //            )
 //        }
-//        register(MoldShape.Knife) {
-//            rows(
-//                " #",
-//                "##",
-//                "##",
-//                "##",
-//            )
-//            transform(invertX)
-//        }
-//        register(MoldShape.Saw) {
-//            rows(
-//                "##  ",
-//                " ###",
-//                "  ##",
-//                "   #",
-//            )
-//            transform(invertX)
-//        }
+        register(MoldShape.Knife) {
+            rows(
+                " #",
+                "##",
+                "##",
+                "##",
+            )
+            transform(invertX)
+        }
+        register(MoldShape.Saw) {
+            rows(
+                "##  ",
+                " ###",
+                "  ##",
+                "   #",
+            )
+            transform(invertX)
+        }
     }
 }
