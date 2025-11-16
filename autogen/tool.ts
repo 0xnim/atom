@@ -309,15 +309,13 @@ function buildToolRecipe(tool: ToolType, material: Material) {
     }
     if(material == "stone") {
         return {
-            type: "shaped",
-            pattern: ["H", "V", "S"],
+            type: "shapeless",
             ingredients: {H: headKey(material, tool), V: "minecraft:vine", S: "minecraft:stick"},
             result: {id: result, count: 1},
         }
     } else {
         return {
-            type: "shaped",
-            pattern: ["H", "S"],
+            type: "shapeless",
             ingredients: {H: headKey(material, tool), S: "minecraft:stick"},
             result: {id: result, count: 1},
         }
