@@ -2,17 +2,23 @@ items:
   atom:pebble:
     material: nether_brick
     data:
-      item-name: <!i><lang:item.pebble.name>
-      lore:
-        - <!i><gray><lang:item.pebble.lore_1>
-        - <!i><gray><lang:item.pebble.lore_2>
-        - ""
-        - <!i><white><image:atom:badge_tool> <image:atom:badge_natural> <image:atom:badge_age_foraging>
+      item-name: <!i><l10n:item.pebble.name>
       components:
         minecraft:consumable: {
           consume_seconds: 10000,
           animation: "brush"
         }
+    client-bound-data:
+      lore:
+        - <!i><gray><l10n:item.pebble.lore_1>
+        - ""
+        - <!i><dark_gray><l10n:item.pebble.lore_2>
+        - <!i><dark_gray><l10n:item.pebble.lore_3>
+        - ""
+        - <!i><dark_gray><l10n:item.pebble.lore_4>
+        - <!i><dark_gray><l10n:item.pebble.lore_5>
+        - ""
+        - <!i><white><image:atom:badge_tool> <image:atom:badge_natural> <image:atom:badge_age_foraging>
     model:
       template: default:model/simplified_generated
       arguments:
@@ -32,10 +38,6 @@ blocks:
         direction: down
         support-types:
           - full
-      - type: stackable_block
-        property: pebble
-        sounds:
-          stack: minecraft:block.stone.fall
     loot:
       pools:
         - rolls: 1
@@ -166,8 +168,11 @@ recipes:
     result:
       id: minecraft:cobblestone
       count: 1
-lang:
+translations:
   en:
     item.pebble.name: Pebble
     item.pebble.lore_1: "A small, shiny pebble."
-    item.pebble.lore_2: "Can be used for knapping"
+    item.pebble.lore_2: "Use at a <gray>knapping station</gray>"
+    item.pebble.lore_3: " to craft <gray>stone tool heads</gray>."
+    item.pebble.lore_4: "Strike against a <gray>stone block</gray>"
+    item.pebble.lore_5: " to sharpen edges."

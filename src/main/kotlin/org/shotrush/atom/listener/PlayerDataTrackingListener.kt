@@ -2,7 +2,10 @@ package org.shotrush.atom.listener
 
 import com.github.shynixn.mccoroutine.folia.entityDispatcher
 import com.github.shynixn.mccoroutine.folia.registerSuspendingEvents
-import net.kyori.adventure.text.format.NamedTextColor
+import kotlinx.coroutines.delay
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
+import net.kyori.adventure.title.Title
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -13,7 +16,6 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.persistence.PersistentDataType
 import org.shotrush.atom.Atom
 import plutoproject.adventurekt.component
-import plutoproject.adventurekt.text.color
 import plutoproject.adventurekt.text.style.textGold
 import plutoproject.adventurekt.text.style.textGray
 import plutoproject.adventurekt.text.style.textRed
@@ -39,7 +41,7 @@ object PlayerDataTrackingListener : Listener {
     val TOTAL_PLAYTIME = NamespacedKey("atom", "playtime")
 
     @EventHandler
-    fun onPlayerJoin(event: PlayerJoinEvent) {
+    suspend fun onPlayerJoin(event: PlayerJoinEvent) {
         val player = event.player
         val pdc = player.persistentDataContainer
         val now = System.currentTimeMillis()
@@ -52,6 +54,14 @@ object PlayerDataTrackingListener : Listener {
                 text("Welcome to ") with textGray
                 text("CivLabs") with textRed
             })
+            player.sendMessage("")
+            player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>We are currently testing the <white><image:atom:badge_age_foraging> <gray>and the</gray> <image:atom:badge_age_copper>"))
+            player.sendMessage("")
+            delay(1000)
+            player.showTitle(Title.title(
+                MiniMessage.miniMessage().deserialize("<gray>Welcome to the"),
+                MiniMessage.miniMessage().deserialize("<white><image:atom:badge_age_foraging>")
+            ))
         } else {
             val lastSeen = pdc.get(LAST_SEEN_KEY, PersistentDataType.LONG) ?: now
             val elapsed = (now - lastSeen).milliseconds
@@ -74,6 +84,14 @@ object PlayerDataTrackingListener : Listener {
                     }
                 ) with textGold
             })
+            player.sendMessage("")
+            player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>We are currently testing the <white><image:atom:badge_age_foraging> <gray>and the</gray> <image:atom:badge_age_copper>"))
+            player.sendMessage("")
+            delay(1000)
+            player.showTitle(Title.title(
+                MiniMessage.miniMessage().deserialize("<gray>Welcome to the"),
+                MiniMessage.miniMessage().deserialize("<white><image:atom:badge_age_foraging>")
+            ))
         }
     }
 
