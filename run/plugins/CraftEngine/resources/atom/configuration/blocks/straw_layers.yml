@@ -2,10 +2,10 @@ items:
   atom:straw:
     material: wheat
     data:
-      item-name: <!i><white><lang:item.straw.name>
+      item-name: <!i><white><l10n:item.straw.name>
       lore:
-        - <!i><gray><lang:item.straw.lore_1>
-        - <!i><gray><lang:item.straw.lore_2>
+        - <!i><gray><l10n:item.straw.lore_1>
+        - <!i><gray><l10n:item.straw.lore_2>
         - ""
         - <!i><white><image:atom:badge_material> <image:atom:badge_age_foraging>
     model:

@@ -2,10 +2,10 @@ items:
   atom:leather_bed:
     material: nether_brick
     data:
-      item-name: <!i><lang:item.leather_bed.name>
+      item-name: <!i><l10n:item.leather_bed.name>
       lore:
-        - <!i><gray><lang:item.leather_bed.lore_1>
-        - <!i><gray><lang:item.leather_bed.lore_2>
+        - <!i><gray><l10n:item.leather_bed.lore_1>
+        - <!i><gray><l10n:item.leather_bed.lore_2>
         - ""
         - <!i><white><image:atom:badge_workstation> <image:atom:badge_age_foraging>
     model:
@@ -66,7 +66,7 @@ items:
               appearance: south
             facing=west:
               appearance: west
-lang:
+translations:
   en:
     item.leather_bed.name: Leather Drying Bed
     item.leather_bed.lore_1: "Place leather to process and cure"
