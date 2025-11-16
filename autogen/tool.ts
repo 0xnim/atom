@@ -121,15 +121,15 @@ const FIRED_OR_WAX_BASE_MATERIAL = "brick";
 
 // L10n builders
 function l10nTool(material: Material, type: ToolType) {
-    return `<!i><white><lang:item.tool.${material}.${type}.name>`;
+    return `<!i><white><l10n:item.tool.${material}.${type}.name>`;
 }
 
 function l10nToolHead(material: Material, type: ToolType) {
-    return `<!i><white><lang:item.tool_head.${material}.${type}.name>`;
+    return `<!i><white><l10n:item.tool_head.${material}.${type}.name>`;
 }
 
 function l10nMold(variant: MoldVariant, id: MoldId) {
-    return `<!i><white><lang:item.mold.${variant}.${id}.name>`;
+    return `<!i><white><l10n:item.mold.${variant}.${id}.name>`;
 }
 
 // Lore helpers
@@ -163,9 +163,11 @@ function buildItemEntry(
     return {
         [key]: {
             material: baseMaterial,
+            'client-bound-data': {
+                lore,
+            },
             data: {
                 "item-name": displayName,
-                lore,
                 ...(removeComponents ? {"remove-components": removeComponents} : {}),
             },
             model: typeof model === "string" ? simplifiedGeneratedModel(model) : model,
@@ -181,9 +183,9 @@ function buildCategory(
 ) {
     return {
         [`atom:${key}`]: {
-            name: `<!i><white><lang:category.${key}.name></white>`,
+            name: `<!i><white><l10n:category.${key}.name></white>`,
             hidden,
-            lore: [`<!i><gray><lang:category.${key}.lore>`],
+            lore: [`<!i><gray><l10n:category.${key}.lore>`],
             icon,
             list,
         },
@@ -195,7 +197,7 @@ function buildCategory(
 function buildToolHead(material: Material, type: ToolType) {
     const key = headKey(material, type);
     const lore = [
-        "<!i><gray><lang:item.tool_head.common.lore>",
+        "<!i><gray><l10n:item.tool_head.common.lore>",
         "",
         `<!i><white>${BADGE_MATERIAL} ${badgeAgeForMaterial(material)}`,
     ];
@@ -211,7 +213,7 @@ function buildToolHead(material: Material, type: ToolType) {
 function buildFullTool(material: Material, type: ToolType) {
     const key = toolKey(material, type);
     const lore = [
-        "<!i><gray><lang:item.tool.common.lore>",
+        "<!i><gray><l10n:item.tool.common.lore>",
         "",
         `<!i><white>${BADGE_TOOL} ${badgeAgeForMaterial(material)}`,
     ];
@@ -230,10 +232,10 @@ function buildMold(def: Mold, variant: MoldVariant) {
         variant === "clay" ? CLAY_BASE_MATERIAL : FIRED_OR_WAX_BASE_MATERIAL;
 
     const lore: (string | null)[] = [
-        "<!i><gray><lang:item.mold.common.lore>",
-        variant === "clay" ? "<!i><red><lang:item.mold.unfired.lore>" : null,
+        "<!i><gray><l10n:item.mold.common.lore>",
+        variant === "clay" ? "<!i><red><l10n:item.mold.unfired.lore>" : null,
         "",
-        `<!i><dark_gray><lang:item.mold.${def.id}.lore>`,
+        `<!i><dark_gray><l10n:item.mold.${def.id}.lore>`,
         "",
         // Keep original badges: clay uses material+age; fired/wax use utility+age
         variant === "clay"
@@ -288,7 +290,7 @@ function buildFilledMold(def: Mold, variant: "fired" | "wax") {
     const lore: (string | null)[] = [
         "<!i><gray>Filled with: <gold>MATERIAL_HERE</gold>",
         "",
-        `<!i><dark_gray><lang:item.mold.${def.id}.lore>`,
+        `<!i><dark_gray><l10n:item.mold.${def.id}.lore>`,
         "",
         `<!i><white>${badge("utility")} ${ageBadge("copper")}`,
     ];
@@ -304,10 +306,10 @@ function buildFilledMold(def: Mold, variant: "fired" | "wax") {
 
 function buildToolRecipe(tool: ToolType, material: Material) {
     let result = `atom:${material}_${tool}`
-    if(!shouldGenerateFullTool(material, tool)) {
+    if (!shouldGenerateFullTool(material, tool)) {
         result = `minecraft:${material}_${tool}`
     }
-    if(material == "stone") {
+    if (material == "stone") {
         return {
             type: "shapeless",
             ingredients: {H: headKey(material, tool), V: "minecraft:vine", S: "minecraft:stick"},
@@ -366,7 +368,7 @@ function generateMolds() {
         en[`item.mold.${def.id}.lore`] = `Used to make ${connecting} ${def.display}`;
     }
 
-    return {items, categories, lang: {en}};
+    return {items, categories, translations: {en}};
 }
 
 function generateTools() {
@@ -438,7 +440,7 @@ function generateTools() {
         }
     }
 
-    return {items, categories, lang: {en}, recipes};
+    return {items, categories, translations: {en}, recipes};
 }
 
 // ---------------------- Orchestrate + Write ----------------------
