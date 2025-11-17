@@ -16,6 +16,7 @@ class StrawFuelFeature(
 ) : CampfireRegistry.Listener {
 
     private val strawJobs = mutableMapOf<Location, Job>()
+    private val strawCount = mutableMapOf<Location, Int>() // Track actual straw count
     private val atom get() = Atom.instance
 
     fun tryAddStrawFuel(registry: CampfireRegistry, loc: Location): Long? {
@@ -36,6 +37,9 @@ class StrawFuelFeature(
         campfire.setCookTime(slot, 0)
         campfire.setCookTimeTotal(slot, Int.MAX_VALUE)
         campfire.update(true)
+        
+        // Track straw count
+        strawCount[loc] = (strawCount[loc] ?: 0) + 1
 
         // 4) Schedule progressive visual burn using your scheduler (no coroutines)
         scheduleBurnVisual(loc, slot)
@@ -53,6 +57,8 @@ class StrawFuelFeature(
                 if (current != -1) {
                     campfire.setItem(current, ItemStack(Material.AIR))
                     campfire.update(true)
+                    // Decrement straw count when it burns away
+                    strawCount[loc] = ((strawCount[loc] ?: 1) - 1).coerceAtLeast(0)
                 }
                 current = nextFilledSlot(campfire)
                 if (current == -1) break
@@ -72,10 +78,23 @@ class StrawFuelFeature(
             cf.update(true)
         }
         strawJobs.remove(state.location)?.cancel()
+        strawCount.remove(state.location)
     }
 
     override fun onCampfireBroken(state: CampfireRegistry.CampfireState) {
         strawJobs.remove(state.location)?.cancel()
+        
+        // Drop actual straw items
+        val count = strawCount.remove(state.location) ?: 0
+        if (count > 0) {
+            val strawItem = net.momirealms.craftengine.bukkit.api.CraftEngineItems.byId(
+                net.momirealms.craftengine.core.util.Key.of("atom", "straw")
+            )?.buildItemStack()?.apply { amount = count }
+            
+            if (strawItem != null) {
+                state.location.world.dropItemNaturally(state.location, strawItem)
+            }
+        }
     }
 
     private fun nextEmptySlot(cf: Campfire): Int {

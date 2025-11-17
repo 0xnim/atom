@@ -17,6 +17,7 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.Plugin
 import org.shotrush.atom.Atom
 import org.shotrush.atom.content.workstation.campfire.features.BurnoutFeature
@@ -46,11 +47,14 @@ class CampfireSystem(private val plugin: Plugin) : Listener {
         registry.addListener(burnout)
         registry.addListener(straw)
         registry.addListener(mold)
-
-        // small delayed resume so server is ready
+    }
+    
+    @EventHandler
+    fun onWorldLoad(event: org.bukkit.event.world.WorldLoadEvent) {
+        // Resume campfires for this world after it's fully loaded
         Atom.instance.launch {
-            delay(1000L)
-            registry.resumeFromDisk()
+            delay(100L) // Small delay to ensure world is fully ready
+            registry.resumeFromDisk(event.world)
         }
     }
 
@@ -115,10 +119,20 @@ class CampfireSystem(private val plugin: Plugin) : Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     fun onBreak(event: BlockBreakEvent) {
         val b = event.block
         if (b.type != Material.CAMPFIRE && b.type != Material.SOUL_CAMPFIRE) return
+        
+        // Clear campfire inventory to prevent vanilla wheat drops
+        val campfire = b.state as? org.bukkit.block.Campfire
+        if (campfire != null) {
+            for (i in 0 until campfire.size) {
+                campfire.setItem(i, ItemStack(Material.AIR))
+            }
+            campfire.update(true)
+        }
+        
         registry.brokenAt(b.location)
     }
 

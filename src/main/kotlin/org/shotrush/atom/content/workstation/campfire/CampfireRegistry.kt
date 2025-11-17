@@ -127,21 +127,21 @@ class CampfireRegistry(private val plugin: Plugin) {
         return endTime
     }
 
-    fun resumeFromDisk() {
-        atom.logger.info("=== Resuming campfires ===")
+    fun resumeFromDisk(targetWorld: org.bukkit.World) {
+        atom.logger.info("=== Resuming campfires for world ${targetWorld.name} ===")
         var resumed = 0
         var expired = 0
 
         WorkstationDataManager.getAllWorkstations().forEach { (_, data) ->
             if (data.type == WS_TYPE && data.curingStartTime != null) {
-                val world = plugin.server.getWorld("world") ?: return@forEach
                 val loc = Location(
-                    world,
+                    targetWorld,
                     data.position.x().toDouble(),
                     data.position.y().toDouble(),
                     data.position.z().toDouble()
                 )
                 val block = loc.block
+                
                 if (block.type != Material.CAMPFIRE && block.type != Material.SOUL_CAMPFIRE) {
                     clearKey(data.position); return@forEach
                 }
