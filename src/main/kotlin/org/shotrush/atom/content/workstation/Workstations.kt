@@ -1,6 +1,5 @@
 package org.shotrush.atom.content.workstation
 
-import net.momirealms.craftengine.bukkit.api.CraftEngineBlocks
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviors
 import net.momirealms.craftengine.core.block.entity.BlockEntity
@@ -8,19 +7,15 @@ import net.momirealms.craftengine.core.block.entity.BlockEntityType
 import net.momirealms.craftengine.core.block.entity.BlockEntityTypes
 import net.momirealms.craftengine.core.util.Key
 import org.shotrush.atom.content.workstation.clay_cauldron.ClayCauldronBlockBehavior
-import org.shotrush.atom.content.workstation.clay_cauldron.ClayCauldronBlockEntity
-import org.shotrush.atom.content.workstation.knapping.KnappingBlockBehavior
-import org.shotrush.atom.content.workstation.knapping.KnappingStationBehavior
-import org.shotrush.atom.content.workstation.leatherbed.LeatherBedBlockBehavior
 import org.shotrush.atom.content.workstation.craftingbasket.CraftingBasketBlockBehavior
-import org.shotrush.atom.content.workstation.knapping.KnappingStationEntity
-import org.shotrush.atom.content.workstation.leatherbed.LeatherBedBlockEntity
+import org.shotrush.atom.content.workstation.knapping.KnappingBlockBehavior
+import org.shotrush.atom.content.workstation.leatherbed.LeatherBedBlockBehavior
 
 data class WorkstationDef(val key: Key, val type: BlockEntityType<BlockEntity>) {}
 
 object Workstations {
     val KNAPPING_STATION_KEY = Key.of("atom:knapping_station")
-    val KNAPPING_STATION_BEHAVIOR = BlockBehaviors.register(KNAPPING_STATION_KEY, KnappingStationBehavior.Companion.Factory)
+    val KNAPPING_STATION_BEHAVIOR = BlockBehaviors.register(KNAPPING_STATION_KEY, KnappingBlockBehavior.Factory)
     val KNAPPING_STATION_ENTITY_TYPE = BlockEntityTypes.register<BlockEntity>(KNAPPING_STATION_KEY)
 
     val LEATHER_BED = register("atom:leather_bed", LeatherBedBlockBehavior.Factory)
