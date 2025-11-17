@@ -1,5 +1,5 @@
 // scripts/generators/wood_recipes.ts
-import {asYamlDoc, atom, mc, type AnyRecipe} from "../lib/itemkit";
+import {asYamlDoc, atom, mc, type AnyRecipe, ShapelessRecipe} from "../lib/itemkit";
 import {OUT} from "../lib/paths";
 import type {Generator} from "./types";
 
@@ -10,6 +10,9 @@ const WOOD_TYPES = [
     "jungle",
     "acacia",
     "dark_oak",
+    "cherry",
+    "pale_oak",
+    "mangrove",
 ] as const;
 type WoodType = (typeof WOOD_TYPES)[number];
 
@@ -71,7 +74,18 @@ function buildShaped<I extends string>(pattern: string[], ingredients: Record<I,
             id: output,
             count: amount,
         },
-    } as const;
+    };
+}
+
+function buildShapeless(ingredients: string[], output: string, amount: number = 1): ShapelessRecipe {
+    return {
+        type: "shapeless",
+        ingredients: ingredients,
+        result: {
+            id: output,
+            count: amount,
+        },
+    };
 }
 
 function buildSawRecipe(input: string, output: string, pattern: string[] = ["S", "I"], amount: number = 2): AnyRecipe {
@@ -86,7 +100,7 @@ function buildSawRecipe(input: string, output: string, pattern: string[] = ["S",
             id: output,
             count: amount,
         },
-    } as const;
+    };
 }
 
 
@@ -121,6 +135,7 @@ function generateWoodRecipes() {
         }, `minecraft:${wood}_fence_gate`, 2);
         recipes[`atom:${wood}_door`] = buildShaped(["PP", "PP", "PP"], {P: slabId(wood)}, `minecraft:${wood}_door`, 3);
         recipes[`atom:${wood}_trapdoor`] = buildShaped(["PPP", "PPP"], {P: slabId(wood)}, `minecraft:${wood}_trapdoor`, 3);
+        recipes[`atom:${wood}_button`] = buildShapeless([planksId(wood)], `minecraft:${wood}_button`)
     }
     return {recipes};
 }

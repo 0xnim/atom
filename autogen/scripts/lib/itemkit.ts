@@ -143,7 +143,7 @@ export type ShapedRecipe = {
 };
 export type ShapelessRecipe = {
     type: "shapeless";
-    ingredients: RecipeIngredientMap;
+    ingredients: RecipeIngredientMap | string[];
     result: { id: string; count: number };
 };
 export type CampfireRecipe = {

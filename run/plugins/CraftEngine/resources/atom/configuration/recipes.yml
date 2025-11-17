@@ -43,3 +43,15 @@ recipes:
     result:
       id: minecraft:composter
       count: 1
+  atom:bookshelf:
+    type: shaped
+    pattern:
+      - 'SSS'
+      - 'BBB'
+      - 'SSS'
+    ingredients:
+      S: "#minecraft:wooden_slabs"
+      B: "atom:book_stack"
+    result:
+      id: minecraft:bookshelf
+      count: 2
