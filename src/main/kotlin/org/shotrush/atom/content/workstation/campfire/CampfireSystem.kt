@@ -43,7 +43,7 @@ class CampfireSystem(private val plugin: Plugin) : Listener {
     private val universalFuel = UniversalFuelFeature()
 
     // Prevent duplicate fuel additions within 100ms
-    private val recentFuelAdditions = mutableMapOf<String, Long>()
+    private val recentFuelAdditions = java.util.concurrent.ConcurrentHashMap<String, Long>()
 
     init {
         plugin.server.pluginManager.registerEvents(this, plugin)
@@ -52,7 +52,7 @@ class CampfireSystem(private val plugin: Plugin) : Listener {
         registry.addListener(mold)
     }
     
-    private val resumedWorlds = mutableSetOf<String>()
+    private val resumedWorlds = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
     
     @EventHandler
     fun onWorldLoad(event: org.bukkit.event.world.WorldLoadEvent) {
@@ -130,9 +130,7 @@ class CampfireSystem(private val plugin: Plugin) : Listener {
             return
         }
 
-        // Lighting with pebble when unlit
-        if (item.matches("atom:pebble") && !data.isLit) {
-            // simulate multiple strikes with progress
+        if (item.matches("atom:firestarter") && !data.isLit) {
             val strikesNeeded = 10 + Random.nextInt(6)
             startStrikeTask(player, block.location, strikesNeeded) {
                 registry.lightAt(block.location)
@@ -141,7 +139,6 @@ class CampfireSystem(private val plugin: Plugin) : Listener {
             return
         }
 
-        // Manual extinguish if player toggles and it becomes unlit
         Atom.instance.launch(Atom.instance.regionDispatcher(block.location)) {
             delay(50L)
             val updated = block.location.block.blockData as? Lightable ?: return@launch
@@ -160,19 +157,24 @@ class CampfireSystem(private val plugin: Plugin) : Listener {
         
     }
 
-    // Periodic task to process fuel queues
     init {
         // Process fuel queues every 2 seconds to consume fuel items as time passes
-        plugin.server.scheduler.runTaskTimer(plugin, { _ ->
-            registry.getAllStates().forEach { state ->
-                if (state.lit) {
-                    universalFuel.processFuelQueue(state.location, registry)
+        plugin.launch {
+            delay(100.ticks)
+            while (true) {
+                registry.getAllStates().forEach { state ->
+                    if (state.lit) {
+                        plugin.launch(plugin.regionDispatcher(state.location)) {
+                             universalFuel.processFuelQueue(state.location, registry)
+                        }
+                    }
                 }
+                val now = System.currentTimeMillis()
+                recentFuelAdditions.entries.removeIf { now - it.value > 1000L }
+                
+                delay(100.ticks)
             }
-            // Clean up old fuel addition timestamps (older than 1 second)
-            val now = System.currentTimeMillis()
-            recentFuelAdditions.entries.removeIf { now - it.value > 1000L }
-        }, 100L, 100L) // Start after 2 seconds, repeat every 2 seconds
+        }
     }
 
     private fun startStrikeTask(
