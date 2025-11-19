@@ -1,0 +1,32 @@
+items:
+  atom:firestarter:
+    material: stick
+    client-bound-data:
+      lore:
+        - ""
+        - <!i><dark_gray><l10n:item.firestarter.lore_1>
+        - <!i><dark_gray><l10n:item.firestarter.lore_2>
+        - ""
+        - <!i><white><image:atom:badge_tool> <image:atom:badge_age_foraging>
+    data:
+      item-name: <!i><white><l10n:item.firestarter.name>
+      components:
+        minecraft:consumable: {
+          consume_seconds: 10000,
+          animation: "bow"
+        }
+      remove-components:
+        - attribute_modifiers
+    model:
+      template: default:model/simplified_generated
+      arguments:
+        path: minecraft:item/firestarter
+recipes:
+  atom:firestarter:
+    type: shapeless
+    ingredients:
+      H: minecraft:stick
+      V: minecraft:stick
+    result:
+      id: atom:firestarter
+      count: 1
