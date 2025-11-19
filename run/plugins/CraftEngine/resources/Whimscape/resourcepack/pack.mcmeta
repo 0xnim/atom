@@ -1,0 +1,51 @@
+{
+  "pack": {
+    "pack_format": 18,
+    "supported_formats": [18, 64],
+    "description": "§6A crisp pixel art look \n§8|§7 1.20.2-1.21.7_r1"
+  },
+  "overlays": {
+    "entries": [
+      {
+        "directory": "format_18-19",
+        "formats": [18, 19]
+      },
+      {
+        "directory": "format_18-27",
+        "formats": [18, 27]
+      },
+      {
+        "directory": "format_18-32",
+        "formats": [18, 32]
+      },
+      {
+        "directory": "format_18-34",
+        "formats": [18, 34]
+      },
+      {
+        "directory": "format_18-42",
+        "formats": [18, 42]
+      },
+      {
+        "directory": "format_18-43",
+        "formats": [18, 43]
+      },
+      {
+        "directory": "format_18-46",
+        "formats": [18, 46]
+      },
+      {
+        "directory": "format_32-46",
+        "formats": [32, 46]
+      },
+      {
+        "directory": "format_34",
+        "formats": 34
+      },
+      {
+        "directory": "format_46",
+        "formats": 46
+      }
+    ]
+  }
+}
