@@ -106,6 +106,7 @@ class GroundItemDisplayHandler(private val plugin: Plugin) : Listener {
         val item = event.entity
         if (item.itemStack.type == Material.AIR) return
         pendingItems.add(item.uniqueId)
+        val startTime = System.currentTimeMillis()
 
         val job = Atom.instance.launch(Atom.instance.entityDispatcher(item)) {
             while (pendingItems.contains(item.uniqueId)) {
@@ -114,6 +115,10 @@ class GroundItemDisplayHandler(private val plugin: Plugin) : Listener {
                 if (!item.isValid || item.isDead) {
                     cleanupPendingItem(item.uniqueId)
                     break
+                }
+
+                if (System.currentTimeMillis() - startTime < 3000) {
+                    continue
                 }
 
                 val velocity = item.velocity
