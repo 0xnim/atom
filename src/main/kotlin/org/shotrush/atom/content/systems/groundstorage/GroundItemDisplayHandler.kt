@@ -84,7 +84,7 @@ class GroundItemDisplayHandler(private val plugin: Plugin) : Listener {
                     val id = display.uniqueId
                     val firstSeen = nearbyTracker.getOrPut(id) { currentTimestamp }
 
-                    if (currentTimestamp - firstSeen > 250) { // .25s
+                    if (currentTimestamp - firstSeen > 500) { // .5s
                         if (display.isValid) {
                             pickupGroundItem(player, display)
                         }
