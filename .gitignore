@@ -128,5 +128,7 @@ runs/
 !/run/plugins/Terra/packs/atom/**
 !/run/plugins/CraftEngine
 !/run/plugins/CraftEngine/resources
+!/run/plugins/CraftEngine/resources/Whimscape
+!/run/plugins/CraftEngine/resources/Whimscape/**
 !/run/plugins/CraftEngine/resources/atom
 !/run/plugins/CraftEngine/resources/atom/**
