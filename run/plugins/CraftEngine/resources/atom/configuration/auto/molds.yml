@@ -1,4 +1,56 @@
 items:
+  atom:clay_mold_hoe_head:
+    material: clay_ball
+    model:
+      template: default:model/simplified_generated
+      arguments:
+        path: minecraft:item/ceramic/unfired_hoe_head
+    client-bound-data:
+      lore:
+        - <!i><gray><l10n:item.mold.common.lore>
+        - <!i><red><l10n:item.mold.unfired.lore>
+        - ""
+        - <!i><dark_gray><l10n:item.mold.hoe_head.lore>
+        - ""
+        - <!i><white><image:atom:badge_material> <image:atom:badge_age_copper>
+    data:
+      item-name: <!i><white><l10n:item.mold.clay.hoe_head.name>
+      components:
+        max-stack-size: 1
+  atom:fired_mold_hoe_head:
+    material: brick
+    model:
+      template: default:model/simplified_generated
+      arguments:
+        path: minecraft:item/ceramic/fired/hoe_head_empty
+    client-bound-data:
+      lore:
+        - <!i><gray><l10n:item.mold.common.lore>
+        - ""
+        - <!i><dark_gray><l10n:item.mold.hoe_head.lore>
+        - ""
+        - <!i><white><image:atom:badge_utility> <image:atom:badge_age_copper>
+    data:
+      item-name: <!i><white><l10n:item.mold.fired.hoe_head.name>
+      components:
+        max-stack-size: 1
+  atom:wax_mold_hoe_head:
+    material: brick
+    model:
+      template: default:model/simplified_generated
+      arguments:
+        path: minecraft:item/ceramic/wax_hoe_head
+    client-bound-data:
+      lore:
+        - <!i><gray><l10n:item.mold.common.lore>
+        - ""
+        - <!i><dark_gray><l10n:item.mold.hoe_head.lore>
+        - ""
+        - <!i><white><image:atom:badge_utility> <image:atom:badge_age_copper>
+    data:
+      item-name: <!i><white><l10n:item.mold.wax.hoe_head.name>
+      components:
+        max-stack-size: 1
   atom:clay_mold_axe_head:
     material: clay_ball
     model:
@@ -413,6 +465,58 @@ items:
         - <!i><white><image:atom:badge_utility> <image:atom:badge_age_copper>
     data:
       item-name: <!i><white><l10n:item.mold.wax.sword_blade.name>
+      components:
+        max-stack-size: 1
+  atom:filled_fired_mold_hoe_head:
+    material: brick
+    model:
+      type: minecraft:model
+      path: minecraft:item/custom/gen/tool/filled_fired_hoe_head
+      generation:
+        parent: minecraft:item/handheld
+        textures:
+          layer0: minecraft:item/ceramic/fired/hoe_head_empty
+          layer1: minecraft:item/ceramic/fired/hoe_head_overlay
+      tints:
+        - type: minecraft:constant
+          value: 255,255,255
+        - type: minecraft:dye
+          default: 255,255,255
+    client-bound-data:
+      lore:
+        - "<!i><gray>Filled with: <gold>MATERIAL_HERE</gold>"
+        - ""
+        - <!i><dark_gray><l10n:item.mold.hoe_head.lore>
+        - ""
+        - <!i><white><image:atom:badge_utility> <image:atom:badge_age_copper>
+    data:
+      item-name: <!i><white><l10n:item.mold.fired.hoe_head.name>
+      components:
+        max-stack-size: 1
+  atom:filled_wax_mold_hoe_head:
+    material: brick
+    model:
+      type: minecraft:model
+      path: minecraft:item/custom/gen/tool/filled_wax_hoe_head
+      generation:
+        parent: minecraft:item/handheld
+        textures:
+          layer0: minecraft:item/ceramic/wax_hoe_head
+          layer1: minecraft:item/ceramic/fired/hoe_head_overlay
+      tints:
+        - type: minecraft:constant
+          value: 255,255,255
+        - type: minecraft:dye
+          default: 255,255,255
+    client-bound-data:
+      lore:
+        - "<!i><gray>Filled with: <gold>MATERIAL_HERE</gold>"
+        - ""
+        - <!i><dark_gray><l10n:item.mold.hoe_head.lore>
+        - ""
+        - <!i><white><image:atom:badge_utility> <image:atom:badge_age_copper>
+    data:
+      item-name: <!i><white><l10n:item.mold.wax.hoe_head.name>
       components:
         max-stack-size: 1
   atom:filled_fired_mold_axe_head:
@@ -831,110 +935,6 @@ items:
       item-name: <!i><white><l10n:item.mold.wax.sword_blade.name>
       components:
         max-stack-size: 1
-  atom:clay_mold_hoe_head:
-    material: clay_ball
-    model:
-      template: default:model/simplified_generated
-      arguments:
-        path: minecraft:item/ceramic/unfired_hoe_head
-    client-bound-data:
-      lore:
-        - <!i><gray><l10n:item.mold.common.lore>
-        - <!i><red><l10n:item.mold.unfired.lore>
-        - ""
-        - <!i><dark_gray><l10n:item.mold.hoe_head.lore>
-        - ""
-        - <!i><white><image:atom:badge_material> <image:atom:badge_age_copper>
-    data:
-      item-name: <!i><white><l10n:item.mold.clay.hoe_head.name>
-      components:
-        max-stack-size: 1
-  atom:fired_mold_hoe_head:
-    material: brick
-    model:
-      template: default:model/simplified_generated
-      arguments:
-        path: minecraft:item/ceramic/fired/hoe_head_empty
-    client-bound-data:
-      lore:
-        - <!i><gray><l10n:item.mold.common.lore>
-        - ""
-        - <!i><dark_gray><l10n:item.mold.hoe_head.lore>
-        - ""
-        - <!i><white><image:atom:badge_utility> <image:atom:badge_age_copper>
-    data:
-      item-name: <!i><white><l10n:item.mold.fired.hoe_head.name>
-      components:
-        max-stack-size: 1
-  atom:wax_mold_hoe_head:
-    material: brick
-    model:
-      template: default:model/simplified_generated
-      arguments:
-        path: minecraft:item/ceramic/wax_hoe_head
-    client-bound-data:
-      lore:
-        - <!i><gray><l10n:item.mold.common.lore>
-        - ""
-        - <!i><dark_gray><l10n:item.mold.hoe_head.lore>
-        - ""
-        - <!i><white><image:atom:badge_utility> <image:atom:badge_age_copper>
-    data:
-      item-name: <!i><white><l10n:item.mold.wax.hoe_head.name>
-      components:
-        max-stack-size: 1
-  atom:filled_fired_mold_hoe_head:
-    material: brick
-    model:
-      type: minecraft:model
-      path: minecraft:item/custom/gen/tool/filled_fired_hoe_head
-      generation:
-        parent: minecraft:item/handheld
-        textures:
-          layer0: minecraft:item/ceramic/fired/hoe_head_empty
-          layer1: minecraft:item/ceramic/fired/hoe_head_overlay
-      tints:
-        - type: minecraft:constant
-          value: 255,255,255
-        - type: minecraft:dye
-          default: 255,255,255
-    client-bound-data:
-      lore:
-        - "<!i><gray>Filled with: <gold>MATERIAL_HERE</gold>"
-        - ""
-        - <!i><dark_gray><l10n:item.mold.hoe_head.lore>
-        - ""
-        - <!i><white><image:atom:badge_utility> <image:atom:badge_age_copper>
-    data:
-      item-name: <!i><white><l10n:item.mold.fired.hoe_head.name>
-      components:
-        max-stack-size: 1
-  atom:filled_wax_mold_hoe_head:
-    material: brick
-    model:
-      type: minecraft:model
-      path: minecraft:item/custom/gen/tool/filled_wax_hoe_head
-      generation:
-        parent: minecraft:item/handheld
-        textures:
-          layer0: minecraft:item/ceramic/wax_hoe_head
-          layer1: minecraft:item/ceramic/fired/hoe_head_overlay
-      tints:
-        - type: minecraft:constant
-          value: 255,255,255
-        - type: minecraft:dye
-          default: 255,255,255
-    client-bound-data:
-      lore:
-        - "<!i><gray>Filled with: <gold>MATERIAL_HERE</gold>"
-        - ""
-        - <!i><dark_gray><l10n:item.mold.hoe_head.lore>
-        - ""
-        - <!i><white><image:atom:badge_utility> <image:atom:badge_age_copper>
-    data:
-      item-name: <!i><white><l10n:item.mold.wax.hoe_head.name>
-      components:
-        max-stack-size: 1
 categories:
   atom:molds:
     name: <!i><white><l10n:category.molds.name></white>
@@ -943,6 +943,9 @@ categories:
       - <!i><gray><l10n:category.molds.lore>
     icon: atom:clay_mold_shovel_head
     list:
+      - atom:clay_mold_hoe_head
+      - atom:fired_mold_hoe_head
+      - atom:wax_mold_hoe_head
       - atom:clay_mold_axe_head
       - atom:fired_mold_axe_head
       - atom:wax_mold_axe_head
@@ -967,6 +970,8 @@ categories:
       - atom:clay_mold_sword_blade
       - atom:fired_mold_sword_blade
       - atom:wax_mold_sword_blade
+      - atom:filled_fired_mold_hoe_head
+      - atom:filled_wax_mold_hoe_head
       - atom:filled_fired_mold_axe_head
       - atom:filled_wax_mold_axe_head
       - atom:filled_fired_mold_hammer_head
@@ -983,11 +988,6 @@ categories:
       - atom:filled_wax_mold_shovel_head
       - atom:filled_fired_mold_sword_blade
       - atom:filled_wax_mold_sword_blade
-      - atom:clay_mold_hoe_head
-      - atom:fired_mold_hoe_head
-      - atom:wax_mold_hoe_head
-      - atom:filled_fired_mold_hoe_head
-      - atom:filled_wax_mold_hoe_head
     priority: 51
 translations:
   en:
@@ -995,6 +995,10 @@ translations:
     category.molds.lore: Reusable molds for shaping tools and parts
     item.mold.common.lore: A mold used in crafting tools and weapons
     item.mold.unfired.lore: Fire this in a kiln to create a mold
+    item.mold.wax.hoe_head.name: Wax Hoe Head Mold
+    item.mold.clay.hoe_head.name: Clay Hoe Head Mold
+    item.mold.fired.hoe_head.name: Fired Hoe Head Mold
+    item.mold.hoe_head.lore: Used to make a Hoe Head
     item.mold.wax.axe_head.name: Wax Axe Head Mold
     item.mold.clay.axe_head.name: Clay Axe Head Mold
     item.mold.fired.axe_head.name: Fired Axe Head Mold
@@ -1027,7 +1031,3 @@ translations:
     item.mold.clay.sword_blade.name: Clay Sword Blade Mold
     item.mold.fired.sword_blade.name: Fired Sword Blade Mold
     item.mold.sword_blade.lore: Used to make a Sword Blade
-    item.mold.wax.hoe_head.name: Wax Hoe Head Mold
-    item.mold.clay.hoe_head.name: Clay Hoe Head Mold
-    item.mold.fired.hoe_head.name: Fired Hoe Head Mold
-    item.mold.hoe_head.lore: Used to make a Hoe Head

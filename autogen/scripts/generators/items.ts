@@ -45,6 +45,7 @@ const ageByMaterial: Record<Material, string> = {
 // Molds
 type MoldDef = { id: string; display: string };
 const MOLDS = [
+    { id: "hoe_head", display: "Hoe Head" },
     { id: "axe_head", display: "Axe Head" },
     { id: "hammer_head", display: "Hammer Head" },
     { id: "ingot", display: "Ingot" },
