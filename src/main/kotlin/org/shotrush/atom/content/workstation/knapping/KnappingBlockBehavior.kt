@@ -130,8 +130,8 @@ class KnappingBlockBehavior(block: CustomBlock) : AbstractBlockBehavior(block), 
                 remember(clicksState)
                 render { container ->
                     for (r in 1..5) {
-                        for (c in 1..5) {
-                            val slot = (r - 1) + (c - 1) * 5
+                        for (c in 2..6) {
+                            val slot = (r - 1) + (c - 2) * 5
                             val clicked = clicks.getOrNull(slot) ?: false
                             val material = if (!clicked) itemA else itemB
                             container[r, c] = ItemBuilder.from(material)
@@ -253,8 +253,8 @@ class KnappingBlockBehavior(block: CustomBlock) : AbstractBlockBehavior(block), 
                     // Render 5x5 area from centered mask
                     val mask = patternToCenteredGrid5x5(entry.patterns[patternIndex])
                     for (r in 1..5) {
-                        for (c in 1..5) {
-                            val slot = (r - 1) + (c - 1) * 5
+                        for (c in 2..6) {
+                            val slot = (r - 1) + (c - 2) * 5
                             val filled = mask.getOrNull(slot) ?: false
                             val material = if (!filled) itemA else itemB
                             container[r, c] = ItemBuilder.from(material)
