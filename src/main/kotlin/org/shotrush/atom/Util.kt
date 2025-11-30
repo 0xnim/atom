@@ -10,8 +10,12 @@ import net.momirealms.craftengine.bukkit.plugin.reflection.minecraft.MRegistryOp
 import net.momirealms.craftengine.core.item.CustomItem
 import net.momirealms.craftengine.core.plugin.CraftEngine
 import net.momirealms.craftengine.core.util.Key
+import net.momirealms.craftengine.core.world.BlockPos
+import net.momirealms.craftengine.core.world.CEWorld
 import net.momirealms.craftengine.libraries.nbt.CompoundTag
 import net.momirealms.craftengine.libraries.nbt.Tag
+import org.bukkit.Location
+import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import org.shotrush.atom.item.isItem
@@ -79,3 +83,8 @@ val Duration.inWholeTicks: Long
 
 fun format(string: String) = MiniMessage.miniMessage().deserialize(string)
 fun format(vararg strings: String) = strings.map { format(it) }
+
+
+fun BlockPos.toBukkitLocation(ceWorld: CEWorld?): Location {
+    return Location(ceWorld?.world?.platformWorld() as? World, x().toDouble(), y().toDouble(), z().toDouble())
+}

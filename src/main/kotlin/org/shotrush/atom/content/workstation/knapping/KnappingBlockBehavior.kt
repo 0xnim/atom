@@ -17,15 +17,11 @@ import net.momirealms.craftengine.bukkit.plugin.BukkitCraftEngine
 import net.momirealms.craftengine.core.block.BlockBehavior
 import net.momirealms.craftengine.core.block.CustomBlock
 import net.momirealms.craftengine.core.block.ImmutableBlockState
-import net.momirealms.craftengine.core.block.behavior.AbstractBlockBehavior
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory
-import net.momirealms.craftengine.core.block.behavior.EntityBlockBehavior
 import net.momirealms.craftengine.core.block.entity.BlockEntity
-import net.momirealms.craftengine.core.block.entity.BlockEntityType
 import net.momirealms.craftengine.core.entity.player.InteractionResult
 import net.momirealms.craftengine.core.item.ItemBuildContext
 import net.momirealms.craftengine.core.item.context.UseOnContext
-import net.momirealms.craftengine.core.plugin.CraftEngine
 import net.momirealms.craftengine.core.plugin.context.ContextHolder
 import net.momirealms.craftengine.core.plugin.gui.GuiParameters
 import net.momirealms.craftengine.core.world.BlockPos
@@ -35,6 +31,8 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.shotrush.atom.Atom
+import org.shotrush.atom.content.base.AtomBlock
+import org.shotrush.atom.content.base.BlockEntityFactory
 import org.shotrush.atom.content.workstation.Workstations
 import org.shotrush.atom.format
 import org.shotrush.atom.getNamespacedKey
@@ -47,22 +45,19 @@ private const val N = 5
 
 private fun idxColMajor(r: Int, c: Int): Int = r + c * N
 
-class KnappingBlockBehavior(block: CustomBlock) : AbstractBlockBehavior(block), EntityBlockBehavior {
+class KnappingBlockBehavior(block: CustomBlock) : AtomBlock<KnappingBlockBehavior.KnappingBlockEntity>(
+    block,
+    BlockEntityFactory(
+        Workstations.KNAPPING_STATION_ENTITY_TYPE,
+        ::KnappingBlockEntity
+    )
+) {
     object Factory : BlockBehaviorFactory {
         override fun create(
             block: CustomBlock,
             arguments: Map<String?, Any?>,
         ): BlockBehavior = KnappingBlockBehavior(block)
     }
-
-    override fun <T : BlockEntity> blockEntityType(state: ImmutableBlockState): BlockEntityType<T> =
-        EntityBlockBehavior.blockEntityTypeHelper(Workstations.KNAPPING_STATION_ENTITY_TYPE)
-
-    override fun createBlockEntity(
-        pos: BlockPos,
-        state: ImmutableBlockState,
-    ): BlockEntity = KnappingBlockEntity(pos, state)
-
     // ---------- Utilities for recipe rendering ----------
 
     private data class RecipeEntry(

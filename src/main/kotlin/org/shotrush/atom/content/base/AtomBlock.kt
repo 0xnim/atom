@@ -1,32 +1,57 @@
+@file:Suppress("UnstableApiUsage")
+
 package org.shotrush.atom.content.base
 
+import com.github.shynixn.mccoroutine.folia.launch
+import com.github.shynixn.mccoroutine.folia.regionDispatcher
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import net.momirealms.craftengine.core.block.CustomBlock
 import net.momirealms.craftengine.core.block.ImmutableBlockState
 import net.momirealms.craftengine.core.block.behavior.AbstractBlockBehavior
 import net.momirealms.craftengine.core.block.behavior.EntityBlockBehavior
 import net.momirealms.craftengine.core.block.entity.BlockEntity
 import net.momirealms.craftengine.core.block.entity.BlockEntityType
+import net.momirealms.craftengine.core.block.entity.tick.BlockEntityTicker
 import net.momirealms.craftengine.core.entity.player.InteractionResult
 import net.momirealms.craftengine.core.item.context.UseOnContext
 import net.momirealms.craftengine.core.world.BlockPos
-import net.momirealms.craftengine.libraries.nbt.CompoundTag
-import org.bukkit.Bukkit
-import org.bukkit.Location
-import org.bukkit.entity.Display
-import org.bukkit.entity.Interaction
-import org.bukkit.entity.ItemDisplay
+import net.momirealms.craftengine.core.world.CEWorld
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
-import org.joml.Vector3f
-import java.util.UUID
+import org.shotrush.atom.Atom
+import org.shotrush.atom.toBukkitLocation
 
-abstract class AtomBlock(
-    block: CustomBlock
+data class BlockEntityFactory<BE : BlockEntity>(
+    val type: BlockEntityType<BlockEntity>,
+    val factory: (pos: BlockPos, state: ImmutableBlockState) -> BE,
+    val ticker: (suspend (BE) -> Unit)? = null,
+)
+
+abstract class AtomBlock<BE : BlockEntity>(
+    block: CustomBlock,
+    private val factory: BlockEntityFactory<BE>,
 ) : AbstractBlockBehavior(block), EntityBlockBehavior {
-    abstract override fun <T : BlockEntity> blockEntityType(state: ImmutableBlockState): BlockEntityType<T>
+    final override fun <T : BlockEntity> blockEntityType(state: ImmutableBlockState): BlockEntityType<T> =
+        EntityBlockBehavior.blockEntityTypeHelper(factory.type)
 
+    final override fun createBlockEntity(pos: BlockPos, state: ImmutableBlockState): BlockEntity =
+        factory.factory.invoke(pos, state)
 
-    abstract override fun createBlockEntity(pos: BlockPos, state: ImmutableBlockState): BlockEntity
+    final override fun <T : BlockEntity> createSyncBlockEntityTicker(
+        level: CEWorld?,
+        state: ImmutableBlockState?,
+        blockEntityType: BlockEntityType<T>,
+    ): BlockEntityTicker<T>? {
+        val ticker = factory.ticker
+        if (ticker != null) {
+            return BlockEntityTicker { world, pos, state, be ->
+                Atom.instance.launch(Atom.instance.regionDispatcher(pos.toBukkitLocation(world))) {
+                    ticker(be as BE)
+                }
+            }
+        }
+        return null
+    }
 
     override fun useOnBlock(context: UseOnContext, state: ImmutableBlockState): InteractionResult {
         val player = context.player?.platformPlayer() as? Player ?: return InteractionResult.PASS

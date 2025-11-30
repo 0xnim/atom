@@ -16,11 +16,17 @@ import org.bukkit.inventory.MenuType
 import org.shotrush.atom.Atom
 import org.shotrush.atom.content.workstation.Workstations
 import org.shotrush.atom.content.base.AtomBlock
+import org.shotrush.atom.content.base.BlockEntityFactory
 
 
 class CraftingBasketBlockBehavior(
     block: CustomBlock,
-) : AtomBlock(block) {
+) : AtomBlock<CraftingBasketBlockEntity>(
+    block, BlockEntityFactory(
+        Workstations.CRAFTING_BASKET_ENTITY_TYPE,
+        ::CraftingBasketBlockEntity
+    )
+) {
 
     companion object {
         object Factory : BlockBehaviorFactory {
@@ -30,15 +36,6 @@ class CraftingBasketBlockBehavior(
             ): BlockBehavior = CraftingBasketBlockBehavior(block)
         }
     }
-
-    override fun <T : BlockEntity> blockEntityType(state: ImmutableBlockState): BlockEntityType<T> =
-        @Suppress("UNCHECKED_CAST")
-        Workstations.CRAFTING_BASKET_ENTITY_TYPE as BlockEntityType<T>
-
-    override fun createBlockEntity(
-        pos: BlockPos,
-        state: ImmutableBlockState,
-    ): BlockEntity = CraftingBasketBlockEntity(pos, state)
 
     override fun useOnBlock(
         context: UseOnContext,

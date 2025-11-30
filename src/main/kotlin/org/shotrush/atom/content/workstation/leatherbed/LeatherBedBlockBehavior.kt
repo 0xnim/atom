@@ -18,12 +18,19 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.shotrush.atom.Atom
 import org.shotrush.atom.content.base.AtomBlock
+import org.shotrush.atom.content.base.BlockEntityFactory
 import org.shotrush.atom.content.workstation.Workstations
 import org.shotrush.atom.core.util.ActionBarManager
 import org.shotrush.atom.matches
 
 
-class LeatherBedBlockBehavior(block: CustomBlock) : AtomBlock(block) {
+class LeatherBedBlockBehavior(block: CustomBlock) : AtomBlock<LeatherBedBlockEntity>(
+    block, BlockEntityFactory(
+        Workstations.LEATHER_BED.type,
+        ::LeatherBedBlockEntity,
+        LeatherBedBlockEntity::tick
+    )
+) {
 
     companion object {
         fun isScrapingTool(item: ItemStack): Boolean {
@@ -37,15 +44,6 @@ class LeatherBedBlockBehavior(block: CustomBlock) : AtomBlock(block) {
             arguments: Map<String?, Any?>,
         ): BlockBehavior = LeatherBedBlockBehavior(block)
     }
-
-    override fun <T : BlockEntity> blockEntityType(state: ImmutableBlockState): BlockEntityType<T> =
-        @Suppress("UNCHECKED_CAST")
-        Workstations.LEATHER_BED.type as BlockEntityType<T>
-
-    override fun createBlockEntity(
-        pos: BlockPos,
-        state: ImmutableBlockState,
-    ): BlockEntity = LeatherBedBlockEntity(pos, state)
 
     fun getFullMessage(): String = "<red>Leather bed is full!</red>"
 
@@ -78,16 +76,6 @@ class LeatherBedBlockBehavior(block: CustomBlock) : AtomBlock(block) {
             } else {
                 blockEntity.tryPlaceItem(player, item)
             }
-        }
-    }
-
-    override fun <T : BlockEntity?> createSyncBlockEntityTicker(
-        level: CEWorld,
-        state: ImmutableBlockState,
-        blockEntityType: BlockEntityType<T>,
-    ): BlockEntityTicker<T> {
-        return EntityBlockBehavior.createTickerHelper { _, _, _, be: LeatherBedBlockEntity ->
-            Atom.instance.launch(Atom.instance.regionDispatcher(be.location)) { be.tick() }
         }
     }
 }
