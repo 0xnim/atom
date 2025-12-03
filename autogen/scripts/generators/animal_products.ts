@@ -39,32 +39,32 @@ type ItemType =
     | "leather"
     | "leather_cured"
     | "bone"
-    | "organ"
+    | "intestine"
     | "heart"
     | "liver"
     | "kidney"
-    | "lungs"
+    | "lung"
     | "fat";
 
 // Animals that have each organ type
 const organsForAnimal: Record<AnimalId, ItemType[]> = {
-    cow: ["organ", "heart", "liver", "kidney", "lungs", "fat"],
-    pig: ["organ", "heart", "liver", "kidney", "lungs", "fat"],
-    sheep: ["organ", "heart", "liver", "kidney", "lungs"],
-    chicken: ["organ", "heart", "liver"],
-    rabbit: ["organ"],
-    horse: ["organ", "heart", "liver", "kidney", "lungs"],
-    donkey: ["organ", "heart", "liver", "kidney", "lungs"],
-    mule: ["organ", "heart", "liver", "kidney", "lungs"],
-    llama: ["organ", "heart", "liver", "kidney", "lungs"],
-    goat: ["organ", "heart", "liver", "kidney", "lungs"],
-    cat: ["organ"],
-    wolf: ["organ"],
-    fox: ["organ"],
-    panda: ["organ", "lungs"],
-    polar_bear: ["organ", "heart", "liver", "lungs"],
-    ocelot: ["organ"],
-    camel: ["organ", "heart", "liver", "kidney", "lungs", "fat"],
+    cow: ["intestine", "heart", "liver", "kidney", "lung", "fat"],
+    pig: ["intestine", "heart", "liver", "kidney", "lung", "fat"],
+    sheep: ["intestine", "heart", "liver", "kidney", "lung"],
+    chicken: ["intestine", "heart", "liver"],
+    rabbit: ["intestine"],
+    horse: ["intestine", "heart", "liver", "kidney", "lung"],
+    donkey: ["intestine", "heart", "liver", "kidney", "lung"],
+    mule: ["intestine", "heart", "liver", "kidney", "lung"],
+    llama: ["intestine", "heart", "liver", "kidney", "lung"],
+    goat: ["intestine", "heart", "liver", "kidney", "lung"],
+    cat: ["intestine"],
+    wolf: ["intestine"],
+    fox: ["intestine"],
+    panda: ["intestine", "lung"],
+    polar_bear: ["intestine", "heart", "liver", "lung"],
+    ocelot: ["intestine"],
+    camel: ["intestine", "heart", "liver", "kidney", "lung", "fat"],
 };
 
 const CATEGORY_KEY = "atom:animal_product";
@@ -134,16 +134,16 @@ function textureForType(type: ItemType) {
             return "minecraft:item/leather_cured";
         case "bone":
             return "minecraft:item/meat/bone";
-        case "organ":
-            return "minecraft:item/organ/organ";
+        case "intestine":
+            return "minecraft:item/organ/intestine";
         case "heart":
             return "minecraft:item/organ/heart";
         case "liver":
             return "minecraft:item/organ/liver";
         case "kidney":
             return "minecraft:item/organ/kidney";
-        case "lungs":
-            return "minecraft:item/organ/lungs";
+        case "lung":
+            return "minecraft:item/organ/lung";
         case "fat":
             return "minecraft:item/organ/fat";
         default:
@@ -159,11 +159,11 @@ function baseMaterialForType(type: ItemType): string {
             return "leather";
         case "bone":
             return "bone";
-        case "organ":
+        case "intestine":
         case "heart":
         case "liver":
         case "kidney":
-        case "lungs":
+        case "lung":
             return "porkchop";
         case "fat":
             return "honeycomb";
@@ -199,16 +199,16 @@ function makeLabel(id: AnimalId, type: ItemType): string {
             return `Cured ${a} Leather`;
         case "bone":
             return `${a} Bone`;
-        case "organ":
-            return `${a} Organs`;
+        case "intestine":
+            return `${a} Intestine`;
         case "heart":
             return `${a} Heart`;
         case "liver":
             return `${a} Liver`;
         case "kidney":
             return `${a} Kidney`;
-        case "lungs":
-            return `${a} Lungs`;
+        case "lung":
+            return `${a} Lung`;
         case "fat":
             return `${a} Fat`;
     }
@@ -309,11 +309,11 @@ function generateDoc() {
     // All item types including organs
     const allItemTypes: ItemType[] = [
         ...baseItemTypes,
-        "organ",
+        "intestine",
         "heart",
         "liver",
         "kidney",
-        "lungs",
+        "lung",
         "fat",
     ];
     
