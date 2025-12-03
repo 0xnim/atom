@@ -1754,7 +1754,7 @@ animals:
         external: true
       meat_1:
         display_name: "Meat"
-        tool: knife
+        tool: none
         item: "atom:meat_raw_chicken"
         min_amount: 1
         max_amount: 2
@@ -1786,7 +1786,7 @@ animals:
         display_material: CHICKEN
       meat_2:
         display_name: "Meat"
-        tool: knife
+        tool: none
         item: "atom:meat_raw_chicken"
         min_amount: 1
         max_amount: 2
@@ -1804,7 +1804,7 @@ animals:
       # Row 2: Bones
       bone_1:
         display_name: "Bones"
-        tool: knife
+        tool: none
         item: "atom:bone_chicken"
         min_amount: 1
         max_amount: 2
@@ -1812,7 +1812,7 @@ animals:
         display_material: BONE
       bone_2:
         display_name: "Bones"
-        tool: knife
+        tool: none
         item: "atom:bone_chicken"
         min_amount: 1
         max_amount: 2
@@ -1823,11 +1823,12 @@ animals:
     display_name: "Rabbit"
     decomposition_ticks: 24000
     gui_rows: 2
+    requires_butchering: false
     parts:
       # Row 1: Hide, meat, organs
       hide_1:
         display_name: "Hide"
-        tool: axe
+        tool: none
         item: "minecraft:rabbit_hide"
         min_amount: 1
         max_amount: 1
@@ -1835,7 +1836,7 @@ animals:
         display_material: RABBIT_HIDE
       meat_1:
         display_name: "Meat"
-        tool: knife
+        tool: none
         item: "atom:meat_raw_rabbit"
         min_amount: 1
         max_amount: 2
@@ -1843,7 +1844,7 @@ animals:
         display_material: RABBIT
       meat_2:
         display_name: "Meat"
-        tool: knife
+        tool: none
         item: "atom:meat_raw_rabbit"
         min_amount: 1
         max_amount: 2
@@ -1859,7 +1860,7 @@ animals:
         display_material: RABBIT
       meat_3:
         display_name: "Meat"
-        tool: knife
+        tool: none
         item: "atom:meat_raw_rabbit"
         min_amount: 1
         max_amount: 2
@@ -1867,7 +1868,7 @@ animals:
         display_material: RABBIT
       meat_4:
         display_name: "Meat"
-        tool: knife
+        tool: none
         item: "atom:meat_raw_rabbit"
         min_amount: 1
         max_amount: 2
@@ -1875,7 +1876,7 @@ animals:
         display_material: RABBIT
       hide_2:
         display_name: "Hide"
-        tool: axe
+        tool: none
         item: "minecraft:rabbit_hide"
         min_amount: 1
         max_amount: 1
@@ -1884,7 +1885,7 @@ animals:
       # Row 2: Bones
       bone_1:
         display_name: "Bones"
-        tool: knife
+        tool: none
         item: "atom:bone_rabbit"
         min_amount: 1
         max_amount: 2
@@ -1892,7 +1893,7 @@ animals:
         display_material: BONE
       bone_2:
         display_name: "Bones"
-        tool: knife
+        tool: none
         item: "atom:bone_rabbit"
         min_amount: 1
         max_amount: 2
