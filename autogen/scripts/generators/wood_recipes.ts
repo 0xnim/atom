@@ -93,7 +93,7 @@ function buildSawRecipe(input: string, output: string, pattern: string[] = ["S",
         type: "shaped",
         pattern: pattern,
         ingredients: {
-            S: "#" + atom("tool_saw"),
+            S: "#minecraft:saws",
             I: input,
         },
         result: {
