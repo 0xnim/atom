@@ -15,6 +15,7 @@ import org.shotrush.atom.Atom
 import org.shotrush.atom.content.AnimalType
 import org.shotrush.atom.content.base.AtomBlockEntity
 import org.shotrush.atom.core.util.ActionBarManager
+import java.util.Collections
 import java.util.concurrent.ThreadLocalRandom
 
 class CarcassBlockEntity(
@@ -30,7 +31,7 @@ class CarcassBlockEntity(
         private set
     var opened: Boolean = false
         private set
-    val parts: MutableList<CarcassPartState> = mutableListOf()
+    val parts: MutableList<CarcassPartState> = Collections.synchronizedList(mutableListOf())
 
     private var initialized = false
 
