@@ -104,6 +104,36 @@ const meatNameOverrides: Record<string, string> = {
     rabbit: "Rabbit",
 };
 
+// Base nutrition values per animal (for cooked meat)
+// Larger animals give more food
+const animalNutrition: Record<AnimalId, { nutrition: number; saturation: number }> = {
+    cow: { nutrition: 8, saturation: 12.8 },
+    pig: { nutrition: 8, saturation: 12.8 },
+    horse: { nutrition: 7, saturation: 9.8 },
+    donkey: { nutrition: 6, saturation: 8.4 },
+    mule: { nutrition: 6, saturation: 8.4 },
+    camel: { nutrition: 7, saturation: 9.8 },
+    llama: { nutrition: 5, saturation: 7.0 },
+    polar_bear: { nutrition: 7, saturation: 9.8 },
+    panda: { nutrition: 5, saturation: 7.0 },
+    sheep: { nutrition: 6, saturation: 9.6 },
+    goat: { nutrition: 6, saturation: 9.6 },
+    wolf: { nutrition: 4, saturation: 5.6 },
+    fox: { nutrition: 3, saturation: 4.2 },
+    ocelot: { nutrition: 3, saturation: 4.2 },
+    cat: { nutrition: 2, saturation: 2.8 },
+    chicken: { nutrition: 6, saturation: 7.2 },
+    rabbit: { nutrition: 5, saturation: 6.0 },
+};
+
+// Cooking state multipliers (applied to base nutrition)
+const cookingMultipliers: Record<string, { nutritionMult: number; saturationMult: number }> = {
+    meat_raw: { nutritionMult: 0.25, saturationMult: 0.15 },
+    meat_undercooked: { nutritionMult: 0.5, saturationMult: 0.4 },
+    meat_cooked: { nutritionMult: 1.0, saturationMult: 1.0 },
+    meat_burnt: { nutritionMult: 0.3, saturationMult: 0.2 },
+};
+
 const recipeTransitions = [
     { from: "meat_raw", to: "meat_undercooked", category: "food" },
     { from: "meat_undercooked", to: "meat_cooked", category: "food" },
@@ -214,6 +244,23 @@ function makeLabel(id: AnimalId, type: ItemType): string {
     }
 }
 
+function getFoodComponent(id: AnimalId, type: ItemType): Record<string, unknown> | null {
+    const multiplier = cookingMultipliers[type];
+    if (!multiplier) return null;
+    
+    const base = animalNutrition[id];
+    const nutrition = Math.max(1, Math.round(base.nutrition * multiplier.nutritionMult));
+    const saturation = Math.round(base.saturation * multiplier.saturationMult * 10) / 10;
+    
+    return {
+        "minecraft:food": {
+            nutrition,
+            saturation,
+            can_always_eat: false,
+        },
+    };
+}
+
 function itemBlock(id: AnimalId, type: ItemType) {
     const baseMaterial = baseMaterialForType(type);
     const texturePath = textureForType(type);
@@ -222,6 +269,11 @@ function itemBlock(id: AnimalId, type: ItemType) {
     const loreBadge = isFood
         ? "<!i><white><image:atom:badge_food> <image:atom:badge_natural> <image:atom:badge_age_foraging>"
         : "<!i><white><image:atom:badge_material> <image:atom:badge_natural> <image:atom:badge_age_foraging>";
+
+    const foodComponent = getFoodComponent(id, type);
+    const additionalData = foodComponent 
+        ? { components: foodComponent }
+        : {};
 
     return buildItemEntry(
         itemKey(id, type),
@@ -232,6 +284,7 @@ function itemBlock(id: AnimalId, type: ItemType) {
         {
             removeComponents: ["attribute_modifiers"],
             tags: [`atom:${type}`],
+            additionalData,
         },
     );
 }

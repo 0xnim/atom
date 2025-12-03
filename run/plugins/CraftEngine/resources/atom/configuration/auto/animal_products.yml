@@ -16,6 +16,11 @@ items:
       item-name: <!i><white><lang:item.meat_raw.cow.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 1.9
+          can_always_eat: false
   atom:meat_undercooked_cow:
     material: beef
     model:
@@ -33,6 +38,11 @@ items:
       item-name: <!i><white><lang:item.meat_undercooked.cow.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 4
+          saturation: 5.1
+          can_always_eat: false
   atom:meat_cooked_cow:
     material: beef
     model:
@@ -50,6 +60,11 @@ items:
       item-name: <!i><white><lang:item.meat_cooked.cow.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 8
+          saturation: 12.8
+          can_always_eat: false
   atom:meat_burnt_cow:
     material: beef
     model:
@@ -67,6 +82,11 @@ items:
       item-name: <!i><white><lang:item.meat_burnt.cow.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 2.6
+          can_always_eat: false
   atom:leather_cow:
     material: leather
     model:
@@ -254,6 +274,11 @@ items:
       item-name: <!i><white><lang:item.meat_raw.pig.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 1.9
+          can_always_eat: false
   atom:meat_undercooked_pig:
     material: beef
     model:
@@ -271,6 +296,11 @@ items:
       item-name: <!i><white><lang:item.meat_undercooked.pig.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 4
+          saturation: 5.1
+          can_always_eat: false
   atom:meat_cooked_pig:
     material: beef
     model:
@@ -288,6 +318,11 @@ items:
       item-name: <!i><white><lang:item.meat_cooked.pig.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 8
+          saturation: 12.8
+          can_always_eat: false
   atom:meat_burnt_pig:
     material: beef
     model:
@@ -305,6 +340,11 @@ items:
       item-name: <!i><white><lang:item.meat_burnt.pig.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 2.6
+          can_always_eat: false
   atom:leather_pig:
     material: leather
     model:
@@ -492,6 +532,11 @@ items:
       item-name: <!i><white><lang:item.meat_raw.sheep.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 1.4
+          can_always_eat: false
   atom:meat_undercooked_sheep:
     material: beef
     model:
@@ -509,6 +554,11 @@ items:
       item-name: <!i><white><lang:item.meat_undercooked.sheep.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 3
+          saturation: 3.8
+          can_always_eat: false
   atom:meat_cooked_sheep:
     material: beef
     model:
@@ -526,6 +576,11 @@ items:
       item-name: <!i><white><lang:item.meat_cooked.sheep.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 6
+          saturation: 9.6
+          can_always_eat: false
   atom:meat_burnt_sheep:
     material: beef
     model:
@@ -543,6 +598,11 @@ items:
       item-name: <!i><white><lang:item.meat_burnt.sheep.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 1.9
+          can_always_eat: false
   atom:leather_sheep:
     material: leather
     model:
@@ -713,6 +773,11 @@ items:
       item-name: <!i><white><lang:item.meat_raw.chicken.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 1.1
+          can_always_eat: false
   atom:meat_undercooked_chicken:
     material: beef
     model:
@@ -730,6 +795,11 @@ items:
       item-name: <!i><white><lang:item.meat_undercooked.chicken.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 3
+          saturation: 2.9
+          can_always_eat: false
   atom:meat_cooked_chicken:
     material: beef
     model:
@@ -747,6 +817,11 @@ items:
       item-name: <!i><white><lang:item.meat_cooked.chicken.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 6
+          saturation: 7.2
+          can_always_eat: false
   atom:meat_burnt_chicken:
     material: beef
     model:
@@ -764,6 +839,11 @@ items:
       item-name: <!i><white><lang:item.meat_burnt.chicken.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 1.4
+          can_always_eat: false
   atom:leather_chicken:
     material: leather
     model:
@@ -900,6 +980,11 @@ items:
       item-name: <!i><white><lang:item.meat_raw.rabbit.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 1
+          saturation: 0.9
+          can_always_eat: false
   atom:meat_undercooked_rabbit:
     material: beef
     model:
@@ -917,6 +1002,11 @@ items:
       item-name: <!i><white><lang:item.meat_undercooked.rabbit.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 3
+          saturation: 2.4
+          can_always_eat: false
   atom:meat_cooked_rabbit:
     material: beef
     model:
@@ -934,6 +1024,11 @@ items:
       item-name: <!i><white><lang:item.meat_cooked.rabbit.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 5
+          saturation: 6
+          can_always_eat: false
   atom:meat_burnt_rabbit:
     material: beef
     model:
@@ -951,6 +1046,11 @@ items:
       item-name: <!i><white><lang:item.meat_burnt.rabbit.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 1.2
+          can_always_eat: false
   atom:leather_rabbit:
     material: leather
     model:
@@ -1053,6 +1153,11 @@ items:
       item-name: <!i><white><lang:item.meat_raw.horse.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 1.5
+          can_always_eat: false
   atom:meat_undercooked_horse:
     material: beef
     model:
@@ -1070,6 +1175,11 @@ items:
       item-name: <!i><white><lang:item.meat_undercooked.horse.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 4
+          saturation: 3.9
+          can_always_eat: false
   atom:meat_cooked_horse:
     material: beef
     model:
@@ -1087,6 +1197,11 @@ items:
       item-name: <!i><white><lang:item.meat_cooked.horse.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 7
+          saturation: 9.8
+          can_always_eat: false
   atom:meat_burnt_horse:
     material: beef
     model:
@@ -1104,6 +1219,11 @@ items:
       item-name: <!i><white><lang:item.meat_burnt.horse.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 2
+          can_always_eat: false
   atom:leather_horse:
     material: leather
     model:
@@ -1274,6 +1394,11 @@ items:
       item-name: <!i><white><lang:item.meat_raw.donkey.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 1.3
+          can_always_eat: false
   atom:meat_undercooked_donkey:
     material: beef
     model:
@@ -1291,6 +1416,11 @@ items:
       item-name: <!i><white><lang:item.meat_undercooked.donkey.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 3
+          saturation: 3.4
+          can_always_eat: false
   atom:meat_cooked_donkey:
     material: beef
     model:
@@ -1308,6 +1438,11 @@ items:
       item-name: <!i><white><lang:item.meat_cooked.donkey.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 6
+          saturation: 8.4
+          can_always_eat: false
   atom:meat_burnt_donkey:
     material: beef
     model:
@@ -1325,6 +1460,11 @@ items:
       item-name: <!i><white><lang:item.meat_burnt.donkey.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 1.7
+          can_always_eat: false
   atom:leather_donkey:
     material: leather
     model:
@@ -1495,6 +1635,11 @@ items:
       item-name: <!i><white><lang:item.meat_raw.mule.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 1.3
+          can_always_eat: false
   atom:meat_undercooked_mule:
     material: beef
     model:
@@ -1512,6 +1657,11 @@ items:
       item-name: <!i><white><lang:item.meat_undercooked.mule.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 3
+          saturation: 3.4
+          can_always_eat: false
   atom:meat_cooked_mule:
     material: beef
     model:
@@ -1529,6 +1679,11 @@ items:
       item-name: <!i><white><lang:item.meat_cooked.mule.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 6
+          saturation: 8.4
+          can_always_eat: false
   atom:meat_burnt_mule:
     material: beef
     model:
@@ -1546,6 +1701,11 @@ items:
       item-name: <!i><white><lang:item.meat_burnt.mule.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 1.7
+          can_always_eat: false
   atom:leather_mule:
     material: leather
     model:
@@ -1716,6 +1876,11 @@ items:
       item-name: <!i><white><lang:item.meat_raw.llama.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 1
+          saturation: 1.1
+          can_always_eat: false
   atom:meat_undercooked_llama:
     material: beef
     model:
@@ -1733,6 +1898,11 @@ items:
       item-name: <!i><white><lang:item.meat_undercooked.llama.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 3
+          saturation: 2.8
+          can_always_eat: false
   atom:meat_cooked_llama:
     material: beef
     model:
@@ -1750,6 +1920,11 @@ items:
       item-name: <!i><white><lang:item.meat_cooked.llama.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 5
+          saturation: 7
+          can_always_eat: false
   atom:meat_burnt_llama:
     material: beef
     model:
@@ -1767,6 +1942,11 @@ items:
       item-name: <!i><white><lang:item.meat_burnt.llama.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 1.4
+          can_always_eat: false
   atom:leather_llama:
     material: leather
     model:
@@ -1937,6 +2117,11 @@ items:
       item-name: <!i><white><lang:item.meat_raw.goat.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 1.4
+          can_always_eat: false
   atom:meat_undercooked_goat:
     material: beef
     model:
@@ -1954,6 +2139,11 @@ items:
       item-name: <!i><white><lang:item.meat_undercooked.goat.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 3
+          saturation: 3.8
+          can_always_eat: false
   atom:meat_cooked_goat:
     material: beef
     model:
@@ -1971,6 +2161,11 @@ items:
       item-name: <!i><white><lang:item.meat_cooked.goat.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 6
+          saturation: 9.6
+          can_always_eat: false
   atom:meat_burnt_goat:
     material: beef
     model:
@@ -1988,6 +2183,11 @@ items:
       item-name: <!i><white><lang:item.meat_burnt.goat.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 1.9
+          can_always_eat: false
   atom:leather_goat:
     material: leather
     model:
@@ -2158,6 +2358,11 @@ items:
       item-name: <!i><white><lang:item.meat_raw.cat.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 1
+          saturation: 0.4
+          can_always_eat: false
   atom:meat_undercooked_cat:
     material: beef
     model:
@@ -2175,6 +2380,11 @@ items:
       item-name: <!i><white><lang:item.meat_undercooked.cat.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 1
+          saturation: 1.1
+          can_always_eat: false
   atom:meat_cooked_cat:
     material: beef
     model:
@@ -2192,6 +2402,11 @@ items:
       item-name: <!i><white><lang:item.meat_cooked.cat.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 2.8
+          can_always_eat: false
   atom:meat_burnt_cat:
     material: beef
     model:
@@ -2209,6 +2424,11 @@ items:
       item-name: <!i><white><lang:item.meat_burnt.cat.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 1
+          saturation: 0.6
+          can_always_eat: false
   atom:leather_cat:
     material: leather
     model:
@@ -2311,6 +2531,11 @@ items:
       item-name: <!i><white><lang:item.meat_raw.wolf.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 1
+          saturation: 0.8
+          can_always_eat: false
   atom:meat_undercooked_wolf:
     material: beef
     model:
@@ -2328,6 +2553,11 @@ items:
       item-name: <!i><white><lang:item.meat_undercooked.wolf.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 2.2
+          can_always_eat: false
   atom:meat_cooked_wolf:
     material: beef
     model:
@@ -2345,6 +2575,11 @@ items:
       item-name: <!i><white><lang:item.meat_cooked.wolf.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 4
+          saturation: 5.6
+          can_always_eat: false
   atom:meat_burnt_wolf:
     material: beef
     model:
@@ -2362,6 +2597,11 @@ items:
       item-name: <!i><white><lang:item.meat_burnt.wolf.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 1
+          saturation: 1.1
+          can_always_eat: false
   atom:leather_wolf:
     material: leather
     model:
@@ -2464,6 +2704,11 @@ items:
       item-name: <!i><white><lang:item.meat_raw.fox.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 1
+          saturation: 0.6
+          can_always_eat: false
   atom:meat_undercooked_fox:
     material: beef
     model:
@@ -2481,6 +2726,11 @@ items:
       item-name: <!i><white><lang:item.meat_undercooked.fox.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 1.7
+          can_always_eat: false
   atom:meat_cooked_fox:
     material: beef
     model:
@@ -2498,6 +2748,11 @@ items:
       item-name: <!i><white><lang:item.meat_cooked.fox.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 3
+          saturation: 4.2
+          can_always_eat: false
   atom:meat_burnt_fox:
     material: beef
     model:
@@ -2515,6 +2770,11 @@ items:
       item-name: <!i><white><lang:item.meat_burnt.fox.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 1
+          saturation: 0.8
+          can_always_eat: false
   atom:leather_fox:
     material: leather
     model:
@@ -2617,6 +2877,11 @@ items:
       item-name: <!i><white><lang:item.meat_raw.panda.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 1
+          saturation: 1.1
+          can_always_eat: false
   atom:meat_undercooked_panda:
     material: beef
     model:
@@ -2634,6 +2899,11 @@ items:
       item-name: <!i><white><lang:item.meat_undercooked.panda.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 3
+          saturation: 2.8
+          can_always_eat: false
   atom:meat_cooked_panda:
     material: beef
     model:
@@ -2651,6 +2921,11 @@ items:
       item-name: <!i><white><lang:item.meat_cooked.panda.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 5
+          saturation: 7
+          can_always_eat: false
   atom:meat_burnt_panda:
     material: beef
     model:
@@ -2668,6 +2943,11 @@ items:
       item-name: <!i><white><lang:item.meat_burnt.panda.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 1.4
+          can_always_eat: false
   atom:leather_panda:
     material: leather
     model:
@@ -2787,6 +3067,11 @@ items:
       item-name: <!i><white><lang:item.meat_raw.polar_bear.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 1.5
+          can_always_eat: false
   atom:meat_undercooked_polar_bear:
     material: beef
     model:
@@ -2804,6 +3089,11 @@ items:
       item-name: <!i><white><lang:item.meat_undercooked.polar_bear.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 4
+          saturation: 3.9
+          can_always_eat: false
   atom:meat_cooked_polar_bear:
     material: beef
     model:
@@ -2821,6 +3111,11 @@ items:
       item-name: <!i><white><lang:item.meat_cooked.polar_bear.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 7
+          saturation: 9.8
+          can_always_eat: false
   atom:meat_burnt_polar_bear:
     material: beef
     model:
@@ -2838,6 +3133,11 @@ items:
       item-name: <!i><white><lang:item.meat_burnt.polar_bear.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 2
+          can_always_eat: false
   atom:leather_polar_bear:
     material: leather
     model:
@@ -2991,6 +3291,11 @@ items:
       item-name: <!i><white><lang:item.meat_raw.ocelot.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 1
+          saturation: 0.6
+          can_always_eat: false
   atom:meat_undercooked_ocelot:
     material: beef
     model:
@@ -3008,6 +3313,11 @@ items:
       item-name: <!i><white><lang:item.meat_undercooked.ocelot.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 1.7
+          can_always_eat: false
   atom:meat_cooked_ocelot:
     material: beef
     model:
@@ -3025,6 +3335,11 @@ items:
       item-name: <!i><white><lang:item.meat_cooked.ocelot.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 3
+          saturation: 4.2
+          can_always_eat: false
   atom:meat_burnt_ocelot:
     material: beef
     model:
@@ -3042,6 +3357,11 @@ items:
       item-name: <!i><white><lang:item.meat_burnt.ocelot.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 1
+          saturation: 0.8
+          can_always_eat: false
   atom:leather_ocelot:
     material: leather
     model:
@@ -3144,6 +3464,11 @@ items:
       item-name: <!i><white><lang:item.meat_raw.camel.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 1.5
+          can_always_eat: false
   atom:meat_undercooked_camel:
     material: beef
     model:
@@ -3161,6 +3486,11 @@ items:
       item-name: <!i><white><lang:item.meat_undercooked.camel.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 4
+          saturation: 3.9
+          can_always_eat: false
   atom:meat_cooked_camel:
     material: beef
     model:
@@ -3178,6 +3508,11 @@ items:
       item-name: <!i><white><lang:item.meat_cooked.camel.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 7
+          saturation: 9.8
+          can_always_eat: false
   atom:meat_burnt_camel:
     material: beef
     model:
@@ -3195,6 +3530,11 @@ items:
       item-name: <!i><white><lang:item.meat_burnt.camel.name>
       remove-components:
         - attribute_modifiers
+      components:
+        minecraft:food:
+          nutrition: 2
+          saturation: 2
+          can_always_eat: false
   atom:leather_camel:
     material: leather
     model:
