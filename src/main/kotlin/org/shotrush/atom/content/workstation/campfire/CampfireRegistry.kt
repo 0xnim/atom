@@ -24,6 +24,7 @@ class CampfireRegistry(private val plugin: Plugin) {
         val location: Location,
         var lit: Boolean,
         var startTime: Long?,          // when became lit (for burnout + mold)
+        var endTime: Long? = null,     // when the campfire should burn out
         var burnoutJob: Job? = null
     )
 
@@ -74,8 +75,10 @@ class CampfireRegistry(private val plugin: Plugin) {
         }
         if (!state.lit) {
             state.lit = true
-            state.startTime = System.currentTimeMillis()
-            persistStartTime(state)
+            val now = System.currentTimeMillis()
+            state.startTime = now
+            state.endTime = now + BASE_BURN_MS
+            persistTimes(state)
             scheduleBurnout(state)
             listeners.forEach { it.onCampfireLit(state) }
             atom.logger.info("Campfire lit at ${xyz(state)} (via $fromEvent)")
@@ -109,28 +112,27 @@ class CampfireRegistry(private val plugin: Plugin) {
     fun addFuel(loc: Location, addedMs: Long): Long? {
         val fixed = fix(loc)
         val state = active[fixed] ?: return null
-        if (!state.lit || state.startTime == null) return null
+        if (!state.lit || state.endTime == null) return null
+        
         val now = System.currentTimeMillis()
-        val elapsed = now - state.startTime!!
-        val remaining = BASE_BURN_MS - elapsed
-        if (remaining <= 0) return null
+        
+        // Extend the end time by the added fuel duration
+        // If current endTime is in the past (shouldn't happen normally), start from now
+        val currentEnd = state.endTime!!.coerceAtLeast(now)
+        val newEndTime = currentEnd + addedMs
+        state.endTime = newEndTime
 
-        val newDuration = remaining + addedMs
-        val newStart = now - (BASE_BURN_MS - newDuration)
-        state.startTime = newStart
+        persistTimes(state)
 
-        persistStartTime(state)
-
-        // reschedule burnout
+        // reschedule burnout with new end time
         atom.launch(atom.regionDispatcher(state.location)) {
             cancelBurnout(state)
             scheduleBurnout(state)
         }
 
-        val endTime = newStart + BASE_BURN_MS
-        listeners.forEach { it.onFuelAdded(state, addedMs, endTime) }
-        atom.logger.info("Fuel added at ${xyz(state)}: +${addedMs / 1000}s")
-        return endTime
+        listeners.forEach { it.onFuelAdded(state, addedMs, newEndTime) }
+        atom.logger.info("Fuel added at ${xyz(state)}: +${addedMs / 1000}s, new end in ${(newEndTime - now) / 1000}s")
+        return newEndTime
     }
 
     fun resumeFromDisk(targetWorld: org.bukkit.World) {
@@ -161,9 +163,12 @@ class CampfireRegistry(private val plugin: Plugin) {
                             return@run
                         }
 
-                        val state = CampfireState(loc, lightable.isLit, data.curingStartTime)
-                        val elapsed = System.currentTimeMillis() - data.curingStartTime!!
-                        val remaining = BASE_BURN_MS - elapsed
+                        val now = System.currentTimeMillis()
+                        // Use persisted endTime if available, otherwise fall back to old calculation
+                        val endTime = data.curingEndTime ?: (data.curingStartTime!! + BASE_BURN_MS)
+                        val remaining = endTime - now
+
+                        val state = CampfireState(loc, lightable.isLit, data.curingStartTime, endTime)
 
                         if (remaining > 0 && lightable.isLit) {
                             active[fix(loc)] = state
@@ -187,9 +192,9 @@ class CampfireRegistry(private val plugin: Plugin) {
     }
 
     private fun scheduleBurnout(state: CampfireState, remainingOverride: Long? = null) {
-        val start = state.startTime ?: return
+        val endTime = state.endTime ?: return
         val now = System.currentTimeMillis()
-        val remaining = remainingOverride ?: (BASE_BURN_MS - (now - start)).coerceAtLeast(0)
+        val remaining = remainingOverride ?: (endTime - now).coerceAtLeast(0)
         if (remaining <= 0) {
             // immediate extinguish
             extinguishAt(state.location, "burnout")
@@ -228,10 +233,11 @@ class CampfireRegistry(private val plugin: Plugin) {
         }
     }
 
-    private fun persistStartTime(state: CampfireState) {
+    private fun persistTimes(state: CampfireState) {
         val pos = BlockPos(state.location.blockX, state.location.blockY, state.location.blockZ)
         val d = WorkstationDataManager.getWorkstationData(pos, WS_TYPE)
         d.curingStartTime = state.startTime
+        d.curingEndTime = state.endTime
         WorkstationDataManager.saveData()
     }
 
