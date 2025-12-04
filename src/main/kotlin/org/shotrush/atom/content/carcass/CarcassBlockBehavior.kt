@@ -8,6 +8,7 @@ import net.momirealms.craftengine.core.entity.player.InteractionResult
 import net.momirealms.craftengine.core.item.context.UseOnContext
 import org.bukkit.entity.Player
 import org.shotrush.atom.content.base.AtomBlock
+import org.shotrush.atom.core.util.ActionBarManager
 
 class CarcassBlockBehavior(block: CustomBlock) : AtomBlock<CarcassBlockEntity>(
     block,
@@ -43,7 +44,7 @@ class CarcassBlockBehavior(block: CustomBlock) : AtomBlock<CarcassBlockEntity>(
                 val hasKnife = ToolRequirement.KNIFE.isSatisfiedBy(heldItem)
                 
                 if (!hasKnife) {
-                    player.sendActionBar(net.kyori.adventure.text.Component.text("You need a knife to open this carcass", net.kyori.adventure.text.format.NamedTextColor.RED))
+                    ActionBarManager.send(player, "carcass", "<red>You need a knife to open this carcass</red>")
                     return InteractionResult.PASS
                 }
             }

@@ -5,6 +5,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.plugin.Plugin;
 import org.shotrush.atom.core.api.annotation.RegisterSystem;
 import org.shotrush.atom.core.util.ActionBarManager;
 
@@ -15,6 +16,11 @@ import org.shotrush.atom.core.util.ActionBarManager;
         description = "Handles loss of hunger in combat"
 )
 public class CombatListener implements Listener {
+    
+    public CombatListener(Plugin plugin) {
+        // Required by SystemRegistry
+    }
+    
     @EventHandler
     public void onPlayerAttack(EntityDamageByEntityEvent e) {
         if (e.getDamager() instanceof Player player) {

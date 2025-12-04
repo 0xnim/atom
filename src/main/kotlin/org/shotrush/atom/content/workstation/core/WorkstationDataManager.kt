@@ -160,9 +160,10 @@ object WorkstationDataManager {
             
             
             val curingStartTime = section.getLong("curing_start_time", 0L).takeIf { it > 0 }
+            val curingEndTime = section.getLong("curing_end_time", 0L).takeIf { it > 0 }
             val fuelQueue = section.getString("fuel_queue", "") ?: ""
             
-            workstationData[key] = WorkstationData(pos, type, placedItems, curingStartTime, fuelQueue)
+            workstationData[key] = WorkstationData(pos, type, placedItems, curingStartTime, curingEndTime, fuelQueue)
         }
         
         Atom.instance.logger.info("Loaded ${workstationData.size} workstation data entries")
@@ -216,6 +217,10 @@ object WorkstationDataManager {
                 section.set("curing_start_time", it)
             }
             
+            data.curingEndTime?.let {
+                section.set("curing_end_time", it)
+            }
+            
             if (data.fuelQueue.isNotEmpty()) {
                 section.set("fuel_queue", data.fuelQueue)
             }
@@ -266,6 +271,7 @@ object WorkstationDataManager {
         val type: String,
         val placedItems: MutableList<PlacedItem>,
         var curingStartTime: Long? = null,
+        var curingEndTime: Long? = null,
         var fuelQueue: String = ""
     )
 }

@@ -21,6 +21,7 @@ object CarcassConfigs {
     private const val DAY_TICKS = 24000L
     private const val DEFAULT_DECOMPOSITION = DAY_TICKS * 2
 
+    @Volatile
     private var configs: Map<AnimalType, CarcassAnimalConfig> = emptyMap()
 
     fun load() {

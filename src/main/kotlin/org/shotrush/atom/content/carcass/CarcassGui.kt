@@ -17,11 +17,13 @@ import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.MenuType
 import org.shotrush.atom.Atom
+import org.shotrush.atom.core.util.ActionBarManager
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 
 object CarcassGui : Listener {
     
-    private val openViews = mutableMapOf<UUID, OpenCarcassView>()
+    private val openViews = ConcurrentHashMap<UUID, OpenCarcassView>()
     
     private data class OpenCarcassView(
         val blockEntity: CarcassBlockEntity,
@@ -167,7 +169,7 @@ object CarcassGui : Listener {
             } else {
                 clickedPart.requiredTool.displayName.lowercase()
             }
-            player.sendActionBar(Component.text("Click with $toolName to harvest", NamedTextColor.RED))
+            ActionBarManager.send(player, "carcass", "<red>Click with $toolName to harvest</red>")
             return
         }
         
