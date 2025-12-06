@@ -7,6 +7,6 @@ object Commands {
     fun register(manager: PaperCommandManager) {
         manager.registerCommand(TemperatureDebugCommand())
         LivingCommands.register()
-//        MoldCommand.register()
+        MoldCommand.register()
     }
 }
