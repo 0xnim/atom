@@ -9,7 +9,7 @@ import net.momirealms.craftengine.bukkit.plugin.reflection.minecraft.CoreReflect
 import net.momirealms.craftengine.bukkit.plugin.reflection.minecraft.MRegistryOps
 import net.momirealms.craftengine.core.item.CustomItem
 import net.momirealms.craftengine.core.plugin.CraftEngine
-import net.momirealms.craftengine.core.util.Key
+import net.momirealms.craftengine.core.util.Key as CEKey
 import net.momirealms.craftengine.core.world.BlockPos
 import net.momirealms.craftengine.core.world.CEWorld
 import net.momirealms.craftengine.libraries.nbt.CompoundTag
@@ -20,6 +20,7 @@ import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.shotrush.atom.item.isItem
+import org.shotrush.atom.util.Key
 import java.util.function.Consumer
 import kotlin.jvm.optionals.getOrElse
 import kotlin.time.Duration
@@ -39,6 +40,7 @@ fun ItemStack.getNamespacedPath(): String = if (isCustomItem()) {
 
 fun ItemStack.matches(regex: Regex) = getNamespacedKey().matches(regex)
 fun ItemStack.matches(key: Key) = getNamespacedKey() == key.toString()
+fun ItemStack.matches(key: CEKey) = getNamespacedKey() == key.toString()
 fun ItemStack.matches(key: String) = getNamespacedKey() == key
 fun ItemStack.matches(namespace: String, path: String) = getNamespacedKey() == "$namespace:$path"
 fun ItemStack.matches(item: CustomItem<ItemStack>) = item.isItem(this)
@@ -50,10 +52,11 @@ fun Block.getNamespacedKey(): String = if (CraftEngineBlocks.isCustomBlock(this)
 }
 
 fun Block.matches(key: Key) =
-    (CraftEngineBlocks.getCustomBlockState(this)?.owner()?.matchesKey(key) ?: type.key.toString()) == key.toString()
-
-fun Block.matches(key: String) = matches(Key.of(key))
-fun Block.matches(namespace: String, path: String) = matches(Key.of(namespace, path))
+    CraftEngineBlocks.getCustomBlockState(this)?.owner()?.matchesKey(key.toCEKey()) ?: (type.key.toString() == key.toString())
+fun Block.matches(key: CEKey) =
+    CraftEngineBlocks.getCustomBlockState(this)?.owner()?.matchesKey(key) ?: (type.key.toString() == key.toString())
+fun Block.matches(key: String) = matches(CEKey.of(key))
+fun Block.matches(namespace: String, path: String) = matches(CEKey.of(namespace, path))
 
 fun CompoundTag.getItemStack(key: String): ItemStack {
     if (getTagType(key).toInt() != 10) return ItemStack.empty()
