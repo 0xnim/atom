@@ -5,8 +5,7 @@ import net.momirealms.craftengine.core.entity.ItemDisplayContext
 import net.momirealms.craftengine.core.util.HorizontalDirection
 import net.momirealms.craftengine.core.util.QuaternionUtils
 import org.joml.Vector3f
-import org.shotrush.atom.content.base.AtomBlockEntityRenderer
-import org.shotrush.atom.content.base.display.toVector3f
+import org.shotrush.atom.blocks.AtomBlockEntityRenderer
 
 class LeatherBedBlockDynamicRenderer(val entity: LeatherBedBlockEntity) : AtomBlockEntityRenderer({
     origin(entity.pos())

@@ -1,6 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
-package org.shotrush.atom.content.base
+package org.shotrush.atom.blocks
 
 import com.github.shynixn.mccoroutine.folia.launch
 import com.github.shynixn.mccoroutine.folia.regionDispatcher

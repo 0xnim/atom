@@ -13,7 +13,7 @@ import net.momirealms.craftengine.libraries.nbt.CompoundTag
 import org.bukkit.entity.Player
 import org.bukkit.inventory.MenuType
 import org.shotrush.atom.Atom
-import org.shotrush.atom.content.base.AtomBlock
+import org.shotrush.atom.blocks.AtomBlock
 import org.shotrush.atom.content.workstation.Workstations
 
 class CraftingBasketBlockBehavior(

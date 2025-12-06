@@ -7,7 +7,7 @@ import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory
 import net.momirealms.craftengine.core.entity.player.InteractionResult
 import net.momirealms.craftengine.core.item.context.UseOnContext
 import org.bukkit.entity.Player
-import org.shotrush.atom.content.base.AtomBlock
+import org.shotrush.atom.blocks.AtomBlock
 import org.shotrush.atom.core.util.ActionBarManager
 
 class CarcassBlockBehavior(block: CustomBlock) : AtomBlock<CarcassBlockEntity>(

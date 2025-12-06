@@ -2,11 +2,9 @@ package org.shotrush.atom.content.workstation.clay_cauldron
 
 import net.momirealms.craftengine.core.entity.Billboard
 import net.momirealms.craftengine.core.entity.ItemDisplayContext
-import net.momirealms.craftengine.core.util.HorizontalDirection
 import net.momirealms.craftengine.core.util.QuaternionUtils
-import org.bukkit.inventory.ItemStack
 import org.joml.Vector3f
-import org.shotrush.atom.content.base.AtomBlockEntityRenderer
+import org.shotrush.atom.blocks.AtomBlockEntityRenderer
 
 
 class ClayCauldronDynamicRenderer(val entity: ClayCauldronBlockEntity) : AtomBlockEntityRenderer({

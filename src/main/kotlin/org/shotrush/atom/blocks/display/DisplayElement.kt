@@ -1,4 +1,4 @@
-package org.shotrush.atom.content.base.display
+package org.shotrush.atom.blocks.display
 
 import net.momirealms.craftengine.core.entity.player.Player
 

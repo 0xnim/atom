@@ -3,6 +3,7 @@ plugins {
     id("com.gradleup.shadow") version "8.3.5"
     id("xyz.jpenilla.run-paper") version "2.3.1"
     id("org.jetbrains.kotlin.jvm") version "2.2.21"
+    kotlin("plugin.serialization") version "2.2.21"
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.19"
     kotlin("plugin.lombok") version "2.2.21"
     id("io.freefair.lombok") version "8.14.2"
@@ -39,6 +40,8 @@ dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
     implementation("org.yaml:snakeyaml:2.2")
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    implementation("net.benwoodworth.knbt:knbt:0.11.9")
 
     compileOnly("org.projectlombok:lombok:1.18.38")
     annotationProcessor("org.projectlombok:lombok:1.18.38")

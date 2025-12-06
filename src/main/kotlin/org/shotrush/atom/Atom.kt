@@ -21,12 +21,7 @@ import org.shotrush.atom.core.api.player.PlayerDataAPI
 import org.shotrush.atom.core.blocks.CustomBlockManager
 import org.shotrush.atom.core.items.CustomItemRegistry
 import org.shotrush.atom.core.storage.DataStorage
-import org.shotrush.atom.core.workstations.WorkstationManager
 import org.shotrush.atom.listener.EventListeners
-import org.shotrush.atom.listener.PlayerDataTrackingListener
-import org.shotrush.atom.listener.PlayerMiningListener
-import org.shotrush.atom.listener.RecipeUnlockHandler
-import org.shotrush.atom.listener.TestListener
 
 class Atom : SuspendingJavaPlugin() {
     var blockManager: CustomBlockManager? = null
@@ -80,11 +75,7 @@ class Atom : SuspendingJavaPlugin() {
     private fun setupCommands() {
         val commandManager = PaperCommandManager(this)
 
-
         AtomAPI.registerCommands(commandManager)
-
-
-//        commandManager.registerCommand(org.shotrush.atom.content.workstation.commands.WorkstationCommands())
 
         val herdManager = AtomAPI.Systems.getService("herd_manager", HerdManager::class.java)
         if (herdManager != null) {
@@ -100,12 +91,6 @@ class Atom : SuspendingJavaPlugin() {
     override fun onDisable() {
         CommandAPI.onDisable()
         saveAllPlayerData()
-
-
-        if (WorkstationManager.instance != null) {
-            WorkstationManager.instance.saveWorkstations()
-        }
-
 
         AtomAPI.shutdown()
 

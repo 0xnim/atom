@@ -19,7 +19,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.shotrush.atom.Atom
 import org.shotrush.atom.content.AnimalProduct
-import org.shotrush.atom.content.base.AtomBlockEntity
+import org.shotrush.atom.blocks.AtomBlockEntity
 import org.shotrush.atom.content.foraging.items.SharpenedFlint
 import org.shotrush.atom.content.workstation.Workstations
 import org.shotrush.atom.core.util.ActionBarManager

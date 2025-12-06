@@ -2,14 +2,16 @@ package org.shotrush.atom.listener
 
 import com.github.shynixn.mccoroutine.folia.entityDispatcher
 import com.github.shynixn.mccoroutine.folia.registerSuspendingEvents
-import net.momirealms.craftengine.bukkit.item.recipe.RecipeEventListener
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEvent
 import org.shotrush.atom.Atom
 import org.shotrush.atom.item.Molds
 
-object TestListener : Listener {
+/**
+ * Eventually this will move to a item behaviour in CE, but for now its this.
+ */
+object MoldListener : Listener {
     fun register(atom: Atom) {
         val eventDispatcher = mapOf(eventDef<PlayerInteractEvent> {
             atom.entityDispatcher(it.player)

@@ -1,4 +1,4 @@
-package org.shotrush.atom.content.base.display
+package org.shotrush.atom.blocks.display
 
 import com.github.shynixn.mccoroutine.folia.asyncDispatcher
 import com.github.shynixn.mccoroutine.folia.launch

@@ -12,7 +12,7 @@ import org.bukkit.World
 import org.bukkit.block.data.type.Campfire
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.shotrush.atom.content.base.AtomBlockEntity
+import org.shotrush.atom.blocks.AtomBlockEntity
 import org.shotrush.atom.content.workstation.Workstations
 import org.shotrush.atom.getItemStack
 import org.shotrush.atom.item.Material

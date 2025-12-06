@@ -6,6 +6,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.*;
 
+@Deprecated(forRemoval = true)
 public class CustomItemRegistry {
     private final Plugin plugin;
     private final Map<String, CustomItem> items = new HashMap<>();

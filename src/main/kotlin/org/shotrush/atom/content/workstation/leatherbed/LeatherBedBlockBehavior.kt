@@ -8,7 +8,7 @@ import net.momirealms.craftengine.core.entity.player.InteractionResult
 import net.momirealms.craftengine.core.item.context.UseOnContext
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.shotrush.atom.content.base.AtomBlock
+import org.shotrush.atom.blocks.AtomBlock
 import org.shotrush.atom.content.workstation.Workstations
 import org.shotrush.atom.core.util.ActionBarManager
 import org.shotrush.atom.matches

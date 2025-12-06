@@ -31,7 +31,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.shotrush.atom.Atom
-import org.shotrush.atom.content.base.AtomBlock
+import org.shotrush.atom.blocks.AtomBlock
 import org.shotrush.atom.content.workstation.Workstations
 import org.shotrush.atom.format
 import org.shotrush.atom.getNamespacedKey

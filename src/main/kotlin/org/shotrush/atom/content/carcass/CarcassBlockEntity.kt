@@ -13,7 +13,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.shotrush.atom.Atom
 import org.shotrush.atom.content.AnimalType
-import org.shotrush.atom.content.base.AtomBlockEntity
+import org.shotrush.atom.blocks.AtomBlockEntity
 import org.shotrush.atom.core.util.ActionBarManager
 import java.util.Collections
 import java.util.concurrent.ThreadLocalRandom

@@ -1,4 +1,4 @@
-package org.shotrush.atom.content.base
+package org.shotrush.atom.blocks
 
 import net.momirealms.craftengine.core.block.ImmutableBlockState
 import net.momirealms.craftengine.core.block.entity.BlockEntity
