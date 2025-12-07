@@ -8,5 +8,6 @@ object Commands {
         manager.registerCommand(TemperatureDebugCommand())
         LivingCommands.register()
         MoldCommand.register()
+        RoomCommands.register()
     }
 }

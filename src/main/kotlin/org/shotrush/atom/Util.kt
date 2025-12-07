@@ -1,6 +1,7 @@
 package org.shotrush.atom
 
 import com.mojang.serialization.DataResult
+import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.momirealms.craftengine.bukkit.api.CraftEngineBlocks
 import net.momirealms.craftengine.bukkit.api.CraftEngineItems
@@ -88,8 +89,8 @@ val Duration.inWholeTicks: Long
 fun format(string: String) = MiniMessage.miniMessage().deserialize(string)
 fun format(vararg strings: String) = strings.map { format(it) }
 
-fun Player.sendMiniMessage(message: String) = sendMessage(format(message))
-fun Player.sendMiniMessages(vararg message: String) = message.forEach { sendMiniMessage(it) }
+fun Audience.sendMiniMessage(message: String) = sendMessage(format(message))
+fun Audience.sendMiniMessages(vararg message: String) = message.forEach { sendMiniMessage(it) }
 
 fun BlockPos.toBukkitLocation(ceWorld: CEWorld?): Location {
     return Location(ceWorld?.world?.platformWorld() as? World, x().toDouble(), y().toDouble(), z().toDouble())

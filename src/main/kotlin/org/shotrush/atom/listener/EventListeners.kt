@@ -3,6 +3,7 @@ package org.shotrush.atom.listener
 import com.github.shynixn.mccoroutine.folia.registerSuspendingEvents
 import org.shotrush.atom.Atom
 import org.shotrush.atom.systems.reinforce.ReinforcementSystem
+import org.shotrush.atom.systems.room.RoomSystem
 
 object EventListeners {
     fun register(atom: Atom) {
@@ -12,6 +13,7 @@ object EventListeners {
         RecipeUnlockHandler.register(atom)
 //        PlayerChatListener.register(this)
         atom.registerAtomListener(ReinforcementSystem)
+        atom.registerAtomListener(RoomSystem)
     }
 
     fun Atom.registerAtomListener(listener: AtomListener) {

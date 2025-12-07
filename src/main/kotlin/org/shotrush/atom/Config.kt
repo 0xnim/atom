@@ -1,15 +1,14 @@
 package org.shotrush.atom
 
 import com.charleskorn.kaml.Yaml
-import kotlinx.serialization.BinaryFormat
-import kotlinx.serialization.InternalSerializationApi
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.StringFormat
+import kotlinx.serialization.*
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.serializer
 import net.benwoodworth.knbt.Nbt
+import net.benwoodworth.knbt.NbtCompression
+import net.benwoodworth.knbt.NbtVariant
 import java.nio.file.Path
 import kotlin.io.path.createParentDirectories
+import kotlin.io.path.notExists
 
 sealed interface FileFormat {
     fun <T : Any> decodeFromFile(file: Path, serializer: KSerializer<T>): T
@@ -48,12 +47,36 @@ sealed interface FileFormat {
 enum class FileType(val format: FileFormat) {
     JSON(FileFormat.StringBased(Json)),
     YAML(FileFormat.StringBased(Yaml.default)),
-    NBT(FileFormat.BinaryBased(Nbt { }))
+    NBT(FileFormat.BinaryBased(Nbt {
+        variant = NbtVariant.Java
+        compression = NbtCompression.Gzip
+    })),
+    NBT_NO_COMPRESSION(FileFormat.BinaryBased(Nbt {
+        variant = NbtVariant.Java
+        compression = NbtCompression.None
+    }))
 }
 
 inline fun <reified T> readSerializedFile(path: String, type: FileType): T =
     readSerializedFile(Atom.instance.dataPath.resolve(path), type)
 
+inline fun <reified T> readSerializedFileOrNull(str: String, type: FileType): T? {
+    val path = Atom.instance.dataPath.resolve(str)
+    if (path.notExists()) return null
+    return try {
+        readSerializedFile(path, type)
+    } catch (e: Exception) {
+        null
+    }
+}
+inline fun <reified T> readSerializedFileOrNull(path: Path, type: FileType): T? {
+    if (path.notExists()) return null
+    return try {
+        readSerializedFile(path, type)
+    } catch (e: Exception) {
+        null
+    }
+}
 @OptIn(InternalSerializationApi::class)
 inline fun <reified T : Any> readSerializedFile(path: Path, type: FileType): T =
     type.format.decodeFromFile(path, T::class.serializer())
