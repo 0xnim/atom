@@ -26,7 +26,7 @@ import kotlin.jvm.optionals.getOrElse
 import kotlin.time.Duration
 import net.momirealms.craftengine.core.util.Key as CEKey
 
-fun ItemStack.isCustomItem() = CraftEngineItems.isCustomItem(this)
+fun ItemStack.isCustomItem() = CraftEngineItems.isCustomItem(this) && CraftEngineItems.getCustomItemId(this) != null
 fun ItemStack.getNamespacedKey(): String = if (isCustomItem()) {
     CraftEngineItems.getCustomItemId(this)?.toString() ?: type.key.toString()
 } else {

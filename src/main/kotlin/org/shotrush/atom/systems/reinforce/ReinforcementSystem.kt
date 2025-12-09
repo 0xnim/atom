@@ -16,6 +16,7 @@ import org.shotrush.atom.api.ChunkKey
 import org.shotrush.atom.api.chunkKey
 import org.shotrush.atom.listener.AtomListener
 import org.shotrush.atom.listener.eventDef
+import org.shotrush.atom.sendMiniMessage
 import java.util.concurrent.ConcurrentHashMap
 
 @Serializable
@@ -82,10 +83,18 @@ object ReinforcementSystem : AtomListener {
         val currentLevel = getReinforcementLevel(block.location)
         if (requestedLevel.isHigher(currentLevel)) {
             if (currentLevel != null) {
-                block.location.world?.dropItemNaturally(block.location, currentLevel.itemRef.createStack())
+                block.location.world?.dropItemNaturally(
+                    block.location.clone().add(
+                        event.blockFace.modX.toDouble(),
+                        event.blockFace.modY.toDouble(),
+                        event.blockFace.modZ.toDouble()
+                    ), currentLevel.itemRef.createStack()
+                )
             }
             setReinforcementLevel(block.location, requestedLevel)
-            event.setUseItemInHand(Event.Result.ALLOW)
+            event.setUseItemInHand(Event.Result.DENY)
+            item.amount--
+            event.player.sendMiniMessage("<gray>Applied ${requestedLevel.displayName} reinforcement!</gray>")
         }
     }
 }
