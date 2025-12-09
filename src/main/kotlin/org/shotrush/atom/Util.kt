@@ -9,8 +9,6 @@ import net.momirealms.craftengine.bukkit.nms.FastNMS
 import net.momirealms.craftengine.bukkit.plugin.reflection.minecraft.CoreReflections
 import net.momirealms.craftengine.bukkit.plugin.reflection.minecraft.MRegistryOps
 import net.momirealms.craftengine.core.item.CustomItem
-import net.momirealms.craftengine.core.plugin.CraftEngine
-import net.momirealms.craftengine.core.util.Key as CEKey
 import net.momirealms.craftengine.core.world.BlockPos
 import net.momirealms.craftengine.core.world.CEWorld
 import net.momirealms.craftengine.libraries.nbt.CompoundTag
@@ -18,13 +16,15 @@ import net.momirealms.craftengine.libraries.nbt.Tag
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.Block
-import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.shotrush.atom.api.BlockRef
+import org.shotrush.atom.api.ItemRef
 import org.shotrush.atom.item.isItem
 import org.shotrush.atom.util.Key
-import java.util.function.Consumer
+import org.shotrush.atom.util.asAtomKey
 import kotlin.jvm.optionals.getOrElse
 import kotlin.time.Duration
+import net.momirealms.craftengine.core.util.Key as CEKey
 
 fun ItemStack.isCustomItem() = CraftEngineItems.isCustomItem(this)
 fun ItemStack.getNamespacedKey(): String = if (isCustomItem()) {
@@ -46,6 +46,9 @@ fun ItemStack.matches(key: String) = getNamespacedKey() == key
 fun ItemStack.matches(namespace: String, path: String) = getNamespacedKey() == "$namespace:$path"
 fun ItemStack.matches(item: CustomItem<ItemStack>) = item.isItem(this)
 
+fun ItemStack.asReference() = CraftEngineItems.getCustomItemId(this)?.let { ItemRef.custom(it.asAtomKey()) }
+    ?: ItemRef.MaterialRef(type)
+
 fun Block.getNamespacedKey(): String = if (CraftEngineBlocks.isCustomBlock(this)) {
     CraftEngineBlocks.getCustomBlockState(this)?.owner()?.value()?.id()?.toString() ?: type.key.toString()
 } else {
@@ -58,6 +61,10 @@ fun Block.matches(key: CEKey) =
     CraftEngineBlocks.getCustomBlockState(this)?.owner()?.matchesKey(key) ?: (type.key.toString() == key.toString())
 fun Block.matches(key: String) = matches(CEKey.of(key))
 fun Block.matches(namespace: String, path: String) = matches(CEKey.of(namespace, path))
+
+fun Block.asReference() =
+    CraftEngineBlocks.getCustomBlockState(this)?.owner()?.value()?.id()?.let { BlockRef.custom(it.asAtomKey()) }
+        ?: BlockRef.MaterialRef(this.type)
 
 fun CompoundTag.getItemStack(key: String): ItemStack {
     if (getTagType(key).toInt() != 10) return ItemStack.empty()

@@ -1,4 +1,4 @@
-package org.shotrush.atom.item
+package org.shotrush.atom.api
 
 import net.momirealms.craftengine.bukkit.api.CraftEngineItems
 import org.bukkit.Material

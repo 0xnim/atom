@@ -9,3 +9,5 @@ data class Key(val namespace: String, val key: String) {
 
     fun toCEKey(): CEKey = CEKey(namespace, key)
 }
+
+fun CEKey.asAtomKey(): Key = Key(namespace, value)
