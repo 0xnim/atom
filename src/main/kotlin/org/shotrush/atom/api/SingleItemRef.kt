@@ -7,8 +7,7 @@ import org.shotrush.atom.isCustomItem
 import org.shotrush.atom.matches
 import org.shotrush.atom.util.Key
 
-sealed class ItemRef {
-    abstract fun matches(stack: ItemStack): Boolean
+sealed class SingleItemRef : ItemFilter {
     abstract fun createStack(amount: Int = 1): ItemStack
 
     companion object {
@@ -17,7 +16,7 @@ sealed class ItemRef {
         fun custom(key: String) = custom(Key("atom", key))
     }
 
-    data class MaterialRef(val material: Material) : ItemRef() {
+    data class MaterialRef(val material: Material) : SingleItemRef() {
         override fun matches(stack: ItemStack): Boolean {
             return if (stack.isCustomItem()) false else stack.type == material
         }
@@ -27,7 +26,7 @@ sealed class ItemRef {
         }
     }
 
-    data class CEItemRef(val key: Key) : ItemRef() {
+    data class CEItemRef(val key: Key) : SingleItemRef() {
         override fun matches(stack: ItemStack): Boolean {
             return if (!stack.isCustomItem()) false else stack.matches(key)
         }
