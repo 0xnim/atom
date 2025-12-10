@@ -57,6 +57,11 @@ class RoomScanFace(
         return true
     }
 
+    private data class ChunkQueues(
+        val active: ArrayDeque<Vector3i> = ArrayDeque(),
+        val pending: ArrayDeque<Vector3i> = ArrayDeque()
+    )
+
     override suspend fun scan(): Boolean {
         val ok = try {
             runBatchedScan()
@@ -86,39 +91,31 @@ class RoomScanFace(
         // First cell must be occupiable for airflow
         if (!faceProvider.canOccupy(world, sx, sy, sz)) return@coroutineScope false
 
-        // Per-chunk buckets + pending
-        val frontierBuckets = HashMap<Long, ArrayDeque<Vector3i>>()
-        fun bucketKey(cx: Int, cz: Int) = packChunk(cx, cz)
-        fun getBucket(cx: Int, cz: Int) =
-            frontierBuckets.computeIfAbsent(bucketKey(cx, cz)) { ArrayDeque() }
+        // Per-chunk queues: active + pending
+        val frontier = HashMap<Long, ChunkQueues>()
+        fun queues(cx: Int, cz: Int) =
+            frontier.computeIfAbsent(packChunk(cx, cz)) { ChunkQueues() }
 
-        getBucket(startChunkX, startChunkZ).add(Vector3i(sx, sy, sz))
+        queues(startChunkX, startChunkZ).active.add(Vector3i(sx, sy, sz))
 
         var stepsSinceEpochCheck = 0
 
-        while (frontierBuckets.isNotEmpty()) {
-            val keys = frontierBuckets.keys.toList()
+        while (frontier.isNotEmpty()) {
+            val keys = frontier.keys.toList()
 
             for (pk in keys) {
                 val cx = (pk shr 32).toInt()
                 val cz = (pk and 0xFFFF_FFFFL).toInt()
-                val bucket = frontierBuckets[pk] ?: continue
-                if (bucket.isEmpty()) {
-                    frontierBuckets.remove(pk)
-                    continue
-                }
+                val q = frontier[pk] ?: continue
 
                 val keepBucket = withContext(Atom.instance.regionDispatcher(world, cx, cz)) {
                     rememberEpoch(cx, cz)
 
-                    val pendingKey = (pk xor 0xFFFF_FFFFL)
-                    val pending = frontierBuckets.computeIfAbsent(pendingKey) { ArrayDeque() }
-
                     var processed = 0
 
-                    // Validate pending for this chunk
-                    while (pending.isNotEmpty() && processed < nodesPerChunkHop) {
-                        val p = pending.removeFirst()
+                    // Drain and validate pending into active (bounded)
+                    while (q.pending.isNotEmpty() && processed < nodesPerChunkHop) {
+                        val p = q.pending.removeFirst()
                         val px = p.x(); val py = p.y(); val pz = p.z()
                         if (!inRangeY(py)) {
                             processed++
@@ -135,15 +132,16 @@ class RoomScanFace(
                         if (!faceProvider.canOccupy(world, px, py, pz)) {
                             ScanReservations.releaseCells(listOf(key), scanId)
                         } else if (!scannedPositions.contains(key)) {
+                            // Accept cell into scan immediately
                             scannedPositions.add(key)
                             if (volume > maxVolume) return@withContext false
-                            bucket.add(Vector3i(px, py, pz))
+                            q.active.add(Vector3i(px, py, pz))
                         }
                         processed++
                     }
 
                     // Expand within this chunk
-                    while (bucket.isNotEmpty() && processed < nodesPerChunkHop) {
+                    while (q.active.isNotEmpty() && processed < nodesPerChunkHop) {
                         if (volume > maxVolume) return@withContext false
 
                         stepsSinceEpochCheck++
@@ -152,7 +150,7 @@ class RoomScanFace(
                             if (!epochsStable()) return@withContext false
                         }
 
-                        val p = bucket.removeFirst()
+                        val p = q.active.removeFirst()
                         val px = p.x(); val py = p.y(); val pz = p.z()
 
                         // Current cell must remain occupiable
@@ -192,27 +190,31 @@ class RoomScanFace(
                             val nChunkZ = nz shr 4
 
                             if (nChunkX == cx && nChunkZ == cz) {
+                                // Accept immediately
                                 scannedPositions.add(key)
                                 if (volume > maxVolume) return@withContext false
-                                bucket.add(Vector3i(nx, ny, nz))
+                                q.active.add(Vector3i(nx, ny, nz))
                             } else {
                                 rememberEpoch(nChunkX, nChunkZ)
-                                val tgtKey = bucketKey(nChunkX, nChunkZ)
-                                val tgtPendingKey = (tgtKey xor 0xFFFF_FFFFL)
-                                val tgtPending = frontierBuckets.computeIfAbsent(tgtPendingKey) { ArrayDeque() }
-                                tgtPending.add(Vector3i(nx, ny, nz))
+                                // Accept immediately and queue into target's pending
+                                scannedPositions.add(key)
+                                if (volume > maxVolume) return@withContext false
+                                val tgt = queues(nChunkX, nChunkZ)
+                                tgt.pending.add(Vector3i(nx, ny, nz))
                             }
                         }
                         processed++
                     }
 
-                    if (pending.isEmpty()) frontierBuckets.remove(pendingKey)
-
                     true
                 }
 
                 if (!keepBucket) return@coroutineScope false
-                if (bucket.isEmpty()) frontierBuckets.remove(pk)
+                // Remove this chunk if fully drained
+                val q2 = frontier[pk]
+                if (q2 != null && q2.active.isEmpty() && q2.pending.isEmpty()) {
+                    frontier.remove(pk)
+                }
             }
         }
 
