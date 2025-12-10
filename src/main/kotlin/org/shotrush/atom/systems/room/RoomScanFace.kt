@@ -7,6 +7,7 @@ import net.minecraft.core.Direction
 import org.bukkit.World
 import org.joml.Vector3i
 import org.shotrush.atom.Atom
+import org.shotrush.atom.systems.room.face.FaceOpenProvider
 import org.shotrush.atom.util.LocationUtil
 import java.util.UUID
 import kotlin.collections.ArrayDeque

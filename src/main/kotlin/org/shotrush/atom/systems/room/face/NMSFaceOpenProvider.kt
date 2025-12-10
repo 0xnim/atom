@@ -1,4 +1,4 @@
-package org.shotrush.atom.systems.room
+package org.shotrush.atom.systems.room.face
 
 import net.minecraft.core.Direction
 import org.bukkit.Material
@@ -11,14 +11,6 @@ import org.bukkit.block.data.type.GlassPane
 import org.bukkit.block.data.type.TrapDoor
 import org.bukkit.craftbukkit.block.CraftBlock
 import org.shotrush.atom.systems.physics.engine.nms
-
-interface FaceOpenProvider {
-    fun canOccupy(world: World, x: Int, y: Int, z: Int): Boolean
-
-    fun isOpen(world: World, x: Int, y: Int, z: Int, dir: Direction): Boolean
-
-    companion object Default : FaceOpenProvider by NMSFaceOpenProvider
-}
 
 object NMSFaceOpenProvider : FaceOpenProvider {
     private fun isAirLike(mat: Material): Boolean {
@@ -34,7 +26,7 @@ object NMSFaceOpenProvider : FaceOpenProvider {
         return mat == Material.WATER || mat == Material.LAVA
     }
     private fun isPane(data: BlockData): Boolean {
-        // Covers glass pane variants; MultipleFacing is used by many “pane-like” blocks too.
+        // Covers glass pane variants; MultipleFacing is used by many "pane-like" blocks too.
         return data is GlassPane || (data is MultipleFacing && isPaneMaterial(data.material))
     }
 

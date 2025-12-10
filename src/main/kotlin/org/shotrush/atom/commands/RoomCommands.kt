@@ -14,7 +14,7 @@ import org.joml.Vector3i
 import org.shotrush.atom.Atom
 import org.shotrush.atom.sendMiniMessage
 import org.shotrush.atom.core.api.scheduler.SchedulerAPI
-import org.shotrush.atom.systems.room.FaceOpenProvider
+import org.shotrush.atom.systems.room.face.FaceOpenProvider
 import org.shotrush.atom.systems.room.RoomRegistry
 import org.shotrush.atom.systems.room.RoomScanner
 import java.util.UUID
