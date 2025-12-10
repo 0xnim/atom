@@ -12,13 +12,16 @@ sealed interface ItemFilter {
     fun matches(stack: ItemStack): Boolean
 
     companion object {
-        fun ofTag(tag: Key): ItemFilter = TagFilter(tag)
-        fun ofTag(tag: String): ItemFilter {
-            if (tag.startsWith("#")) {
-                return TagFilter(Key.of(tag.substring(1)))
-            }
-            return TagFilter(Key.of(tag))
+        fun tag(tag: Key) = TagFilter(tag)
+
+        fun tag(tag: String): TagFilter {
+            val normalized = if (tag.startsWith("#")) tag.substring(1) else tag
+            return TagFilter(Key.of(normalized))
         }
+
+        fun material(material: Material) = SingleItemRef.material(material)
+        fun keyed(key: Key) = SingleItemRef.keyed(key)
+        fun atom(key: String) = SingleItemRef.atom(key)
     }
 }
 
