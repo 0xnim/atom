@@ -1,5 +1,7 @@
 package org.shotrush.atom.systems.physics.engine
 
+import com.github.shynixn.mccoroutine.folia.regionDispatcher
+import kotlinx.coroutines.withContext
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
@@ -12,6 +14,7 @@ import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.craftbukkit.CraftWorld
 import org.bukkit.craftbukkit.block.CraftBlockState
+import org.shotrush.atom.Atom
 import net.minecraft.world.level.block.state.BlockState as NMSBlockState
 
 object PhysicsHelper {
@@ -26,7 +29,7 @@ object PhysicsHelper {
      * @param allowDiagonal  If false, returns false for diagonal axes (if you use custom directions)
      * @param allowLiquids   If false, liquids short-circuit to true if either is liquid (matching original)
      */
-    fun isBlockFaceTouchingNeighbour(
+    suspend fun isBlockFaceTouchingNeighbour(
         level: ServerLevel,
         pos: BlockPos,
         face: Direction,
@@ -34,7 +37,9 @@ object PhysicsHelper {
     ): Boolean {
         val state = level.getBlockState(pos)
         val nPos = pos.relative(face)
-        val nState = level.getBlockState(nPos)
+        val nState = withContext(Atom.instance.regionDispatcher(level.world, nPos.x shr 4, nPos.z shr 4)) {
+            level.getBlockState(nPos)
+        }
 
         if (!allowLiquids && (isLiquid(state) || isLiquid(nState))) {
             return true

@@ -7,16 +7,16 @@ import org.shotrush.atom.systems.physics.engine.PhysicsHelper
 import org.shotrush.atom.systems.physics.engine.nms
 
 interface NeighbourConnectionRule : PhysicsRule {
-    fun evaluate(world: World, block: Block, direction: Direction): Boolean
+    suspend fun evaluate(world: World, block: Block, direction: Direction): Boolean
 
     companion object Noop : NeighbourConnectionRule {
-        override fun evaluate(world: World, block: Block, direction: Direction): Boolean = false
+        override suspend fun evaluate(world: World, block: Block, direction: Direction): Boolean = false
         override fun isCacheable(): Boolean = true
     }
 }
 
 class BasicNeighbourConnectionRule(val directionTest: (Direction) -> Boolean = { true }) : NeighbourConnectionRule {
-    override fun evaluate(
+    override suspend fun evaluate(
         world: World,
         block: Block,
         direction: Direction,
