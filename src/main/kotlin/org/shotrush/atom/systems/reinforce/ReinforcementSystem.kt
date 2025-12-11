@@ -112,9 +112,9 @@ object ReinforcementSystem : AtomListener {
     private val outlineManager: OutlineManager = OutlineManager(
         SnapshotCollector(VoxelShapeProvider.Default),
         VoxelOutlineBuilder(),
-        ParticleOutlineRenderer3D(step = 0.25),
-        yBandHeight = 6,
-        defaultHalfSize = 8,
+        ParticleOutlineRenderer3D(defaultStep = 0.5),
+        defaultYBandHeight = 6,
+        defaultHalfSize = 12,
         scope = pluginScope
     )
 
@@ -142,6 +142,17 @@ object ReinforcementSystem : AtomListener {
     fun startRendering(player: UUID, job: Job) {
         renderingJobs[player] = job
     }
+
+    // Outline per-player settings API
+    fun setOutlineSettings(player: UUID, settings: PlayerOutlineSettings) {
+        outlineManager.setSettings(player, settings)
+    }
+
+    fun updateOutlineSettings(player: UUID, update: PlayerOutlineSettings.() -> PlayerOutlineSettings) {
+        outlineManager.updateSettings(player, update)
+    }
+
+    fun getOutlineSettings(player: UUID): PlayerOutlineSettings = outlineManager.getSettings(player)
 
 //    @EventHandler
 //    fun onPlayerJoin(event: PlayerJoinEvent) {

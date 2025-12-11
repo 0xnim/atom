@@ -15,7 +15,7 @@ interface VoxelShapeProvider {
             y: Int,
             z: Int,
         ): VoxelShape {
-            return world.getBlockAt(x, y, z).nms().getShape(world.nms(), BlockPos(x,y,z))
+            return world.getBlockAt(x, y, z).nms().getShape(world.nms(), BlockPos(x,y,z)).move(x.toDouble(), y.toDouble(), z.toDouble())
         }
     }
 }

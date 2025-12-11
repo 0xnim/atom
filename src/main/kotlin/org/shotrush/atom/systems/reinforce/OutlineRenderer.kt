@@ -9,34 +9,30 @@ import org.bukkit.util.Vector
 import org.shotrush.atom.Atom
 
 interface OutlineRenderer {
-    suspend fun render(player: Player, geometry: List<OutlineGeometry>)
+    suspend fun render(player: Player, geometry: List<OutlineGeometry>, step: Double)
 }
 
 class ParticleOutlineRenderer3D(
-    private val step: Double = 0.25,
+    private val defaultStep: Double = 0.25,
 ) : OutlineRenderer {
-    override suspend fun render(player: Player, geometry: List<OutlineGeometry>) {
+    override suspend fun render(player: Player, geometry: List<OutlineGeometry>, step: Double) {
         val world = player.world
-        val cx = player.location.blockX shr 4
-        val cz = player.location.blockZ shr 4
-        withContext(Atom.instance.regionDispatcher(world, cx, cz)) {
-            for (g in geometry) {
-                val dust = org.bukkit.Particle.DustOptions(
-                    when (g) {
-                        is OutlineGeometry.Segments3D -> g.color
-                        else -> Color.WHITE
-                    },
-                    1.2f
-                )
+        for (g in geometry) {
+            val dust = org.bukkit.Particle.DustOptions(
                 when (g) {
-                    is OutlineGeometry.Segments3D -> {
-                        for ((a, b) in g.segments) {
-                            drawSegment(world, a, b, dust)
-                        }
+                    is OutlineGeometry.Segments3D -> g.color
+                    else -> Color.WHITE
+                },
+                1.2f
+            )
+            when (g) {
+                is OutlineGeometry.Segments3D -> {
+                    for ((a, b) in g.segments) {
+                        drawSegment(world, a, b, dust, if (step > 0.0) step else defaultStep)
                     }
-
-                    else -> {}
                 }
+
+                else -> {}
             }
         }
     }
@@ -46,6 +42,7 @@ class ParticleOutlineRenderer3D(
         a: Vector,
         b: Vector,
         dust: org.bukkit.Particle.DustOptions,
+        step: Double,
     ) {
         val seg = b.clone().subtract(a)
         val len = seg.length()
