@@ -1,6 +1,8 @@
 package org.shotrush.atom.listener
 
 import org.shotrush.atom.Atom
+import org.shotrush.atom.content.workstation.ballista.BallistaListener
+import org.shotrush.atom.content.workstation.ballista.BallistaProjectileListener
 import org.shotrush.atom.systems.blockbreak.BlockBreakSystem
 import org.shotrush.atom.systems.reinforce.ReinforcementSystem
 import org.shotrush.atom.systems.room.RoomSystem
@@ -16,5 +18,9 @@ object EventListeners {
         RoomSystem.register()
         ReinforcementSystem.register()
         BlockBreakSystem.register()
+
+        // Ballista
+        BallistaListener.register()
+        BallistaProjectileListener.register()
     }
 }

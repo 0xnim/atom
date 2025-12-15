@@ -1,0 +1,145 @@
+items:
+  # Ballista Block Item
+  atom:ballista:
+    material: nether_brick
+    client-bound-data:
+      lore:
+        - <!i><gray>A powerful siege weapon
+        - ""
+        - <!i><dark_gray>Right-click to mount
+        - <!i><dark_gray>Sneak to dismount
+        - <!i><dark_gray>Right-click with bolt to load
+    data:
+      item-name: <!i><yellow>Ballista
+    model:
+      type: minecraft:model
+      path: minecraft:item/crossbow
+    behavior:
+      type: block_item
+      block:
+        behaviors:
+          - type: atom:ballista
+        loot:
+          template: default:loot_table/self
+        settings:
+          template:
+            - default:sound/wood
+            - default:pickaxe_power/level_1
+          overrides:
+            hardness: 3.0
+            resistance: 4.0
+            replaceable: false
+            is-redstone-conductor: false
+            is-suffocating: false
+            map-color: 13
+        state:
+          auto-state: non_tintable_leaves
+          model:
+            path: minecraft:block/oak_log
+
+  # Ballista Turret (for rendering only)
+  atom:ballista_turret:
+    material: paper
+    data:
+      item-name: <!i><gray>Ballista Turret
+    model:
+      type: minecraft:model
+      path: minecraft:item/crossbow
+
+  # Iron Bolt
+  atom:iron_bolt:
+    material: arrow
+    client-bound-data:
+      lore:
+        - <!i><gray>Standard ballista ammunition
+        - ""
+        - <!i><dark_gray>Damage: <white>20
+    data:
+      item-name: <!i><gray>Iron Bolt
+      components:
+        max-stack-size: 64
+    model:
+      type: minecraft:model
+      path: minecraft:item/arrow
+
+  # Poison Bolt
+  atom:poison_bolt:
+    material: arrow
+    client-bound-data:
+      lore:
+        - <!i><gray>Poisoned ballista bolt
+        - ""
+        - <!i><dark_gray>Damage: <white>15
+        - <!i><dark_gray>Effect: <green>Poison II (10s)
+    data:
+      item-name: <!i><dark_green>Poison Bolt
+      components:
+        max-stack-size: 32
+    model:
+      type: minecraft:model
+      path: minecraft:item/tipped_arrow
+
+  # Explosive Bolt
+  atom:explosive_bolt:
+    material: arrow
+    client-bound-data:
+      lore:
+        - <!i><gray>Explosive ballista bolt
+        - ""
+        - <!i><dark_gray>Damage: <white>10
+        - <!i><dark_gray>Effect: <red>Small Explosion
+    data:
+      item-name: <!i><red>Explosive Bolt
+      components:
+        max-stack-size: 16
+    model:
+      type: minecraft:model
+      path: minecraft:item/spectral_arrow
+
+recipes:
+  atom:ballista:
+    type: shaped
+    pattern:
+      - "III"
+      - "SLS"
+      - "PPP"
+    ingredients:
+      I: minecraft:iron_ingot
+      S: "#minecraft:wooden_slabs"
+      L: "#minecraft:logs"
+      P: "#minecraft:planks"
+    result:
+      id: atom:ballista
+      count: 1
+
+  atom:iron_bolt:
+    type: shaped
+    pattern:
+      - "I"
+      - "S"
+      - "F"
+    ingredients:
+      I: minecraft:iron_ingot
+      S: minecraft:stick
+      F: minecraft:feather
+    result:
+      id: atom:iron_bolt
+      count: 4
+
+  atom:poison_bolt:
+    type: shapeless
+    ingredients:
+      - atom:iron_bolt
+      - minecraft:spider_eye
+    result:
+      id: atom:poison_bolt
+      count: 1
+
+  atom:explosive_bolt:
+    type: shapeless
+    ingredients:
+      - atom:iron_bolt
+      - minecraft:gunpowder
+    result:
+      id: atom:explosive_bolt
+      count: 1

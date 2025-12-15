@@ -6,6 +6,7 @@ import net.momirealms.craftengine.core.block.entity.BlockEntity
 import net.momirealms.craftengine.core.block.entity.BlockEntityType
 import net.momirealms.craftengine.core.block.entity.BlockEntityTypes
 import net.momirealms.craftengine.core.util.Key
+import org.shotrush.atom.content.workstation.ballista.BallistaBlockBehavior
 import org.shotrush.atom.content.workstation.clay_cauldron.ClayCauldronBlockBehavior
 import org.shotrush.atom.content.workstation.craftingbasket.CraftingBasketBlockBehavior
 import org.shotrush.atom.content.workstation.knapping.KnappingBlockBehavior
@@ -20,6 +21,7 @@ object Workstations {
 
     val LEATHER_BED = register("atom:leather_bed", LeatherBedBlockBehavior.Factory)
     val CLAY_CAULDRON = register("atom:clay_cauldron", ClayCauldronBlockBehavior.Factory)
+    val BALLISTA = register("atom:ballista", BallistaBlockBehavior.Factory)
 
     val CRAFTING_BASKET_KEY = Key.of("atom:crafting_basket")
     val CRAFTING_BASKET_BEHAVIOR = BlockBehaviors.register(CRAFTING_BASKET_KEY, CraftingBasketBlockBehavior.Companion.Factory)
